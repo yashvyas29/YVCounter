@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Counter',
+      title: 'YVCounter',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Counter'),
+      home: const MyHomePage(title: 'YVCounter'),
     );
   }
 }
@@ -49,29 +50,46 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final String counterKey = 'counter';
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    _loadCounter();
+  }
+
+  // Loading counter value on start
+  Future<void> _loadCounter() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _counter = (prefs.getInt(counterKey) ?? 0);
     });
   }
 
-  void _decrementCounter() {
+  // Incrementing counter after click
+  Future<void> _incrementCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _counter = (prefs.getInt(counterKey) ?? 0) + 1;
+      prefs.setInt(counterKey, _counter);
+    });
+  }
+
+  Future<void> _decrementCounter() async {
+    final prefs = await SharedPreferences.getInstance();
     if (_counter > 0) {
       setState(() {
-        _counter--;
+        _counter = (prefs.getInt(counterKey) ?? 0) - 1;
+        prefs.setInt(counterKey, _counter);
       });
     }
   }
 
-  void _resetCounter() {
+  Future<void> _resetCounter() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = 0;
+      prefs.setInt(counterKey, _counter);
     });
   }
 
@@ -107,9 +125,10 @@ class _MyHomePageState extends State<MyHomePage> {
           // center the children vertically; the main axis here is the vertical
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            const SizedBox(height: 20),
             Text(
               'Your completed malas:',
               style: Theme.of(context).textTheme.headline6,
@@ -118,17 +137,22 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline1,
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              height: MediaQuery.of(context).size.width - 40,
-              child: FloatingActionButton.extended(
-                icon: const Icon(Icons.add, size: 40),
-                label: const Text(
-                  'Add Mala',
-                  style: TextStyle(fontSize: 30),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: SizedBox.expand(
+                  // width: MediaQuery.of(context).size.width - 40,
+                  // height: MediaQuery.of(context).size.width - 40,
+                  child: FloatingActionButton.extended(
+                    icon: const Icon(Icons.add, size: 40),
+                    label: const Text(
+                      'Add Mala',
+                      style: TextStyle(fontSize: 30),
+                    ),
+                    tooltip: 'Add Mala',
+                    onPressed: _incrementCounter,
+                  ),
                 ),
-                tooltip: 'Add Mala',
-                onPressed: _incrementCounter,
               ),
             ),
           ],
@@ -141,10 +165,12 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             FloatingActionButton(
               onPressed: _decrementCounter,
+              tooltip: 'Remove Mala',
               child: const Icon(Icons.remove),
             ),
             FloatingActionButton(
               onPressed: _resetCounter,
+              tooltip: 'Reset Mala',
               child: const Icon(Icons.clear_outlined),
             ),
           ],
