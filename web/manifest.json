@@ -1,6 +1,6 @@
 {
-    "name": "yv_counter",
-    "short_name": "yv_counter",
+    "name": "YVCounter",
+    "short_name": "YVCounter",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,6 +1,6 @@
-# yv_counter
+# YVCounter
 
-A new Flutter project.
+A new Flutter project to count malas.
 
 ## Getting Started
 
