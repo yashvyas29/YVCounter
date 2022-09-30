@@ -1,8 +1,9 @@
-import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_beep/flutter_beep.dart';
+// import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -56,16 +57,16 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   final String counterKey = 'counter';
 
-  SharedPref sharedPref = SharedPref();
-  Mala mala = Mala(DateTime.now(), 0, 0);
-
   @override
   void initState() {
     super.initState();
     _loadCounter();
   }
 
-  // Loading counter value on start
+  /*
+  SharedPref sharedPref = SharedPref();
+  Mala mala = Mala(DateTime.now(), 0, 0);
+
   _loadMala() async {
     try {
       Mala mala = Mala.fromJson(await sharedPref.read(Mala.key));
@@ -93,6 +94,25 @@ class _MyHomePageState extends State<MyHomePage> {
     debugPrint(
         DateFormat.yMd().parseUTC(utcDateShortString).toLocal().toString());
   }
+  */
+
+  _playBeep([bool success = true]) {
+    if (Platform.isAndroid) {
+      FlutterBeep.beep(success);
+    } else {
+      SystemSound.play(SystemSoundType.click);
+    }
+  }
+
+  _playAlertSysSound() {
+    if (Platform.isAndroid) {
+      FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
+    } else if (Platform.isIOS) {
+      FlutterBeep.playSysSound(iOSSoundIDs.EndRecording);
+    } else {
+      SystemSound.play(SystemSoundType.alert);
+    }
+  }
 
   // Loading counter value on start
   Future<void> _loadCounter() async {
@@ -104,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Incrementing counter after click
   Future<void> _incrementCounter() async {
-    SystemSound.play(SystemSoundType.click);
+    _playBeep();
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = (prefs.getInt(counterKey) ?? 0) + 1;
@@ -113,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _decrementCounter() async {
-    SystemSound.play(SystemSoundType.click);
+    _playBeep(false);
     final prefs = await SharedPreferences.getInstance();
     if (_counter > 0) {
       setState(() {
@@ -124,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _resetCounter() async {
-    SystemSound.play(SystemSoundType.alert);
+    _playAlertSysSound();
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = 0;
@@ -220,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+/*
 class Mala {
   DateTime date;
   int count;
@@ -258,3 +279,4 @@ class SharedPref {
     prefs.remove(key);
   }
 }
+*/
