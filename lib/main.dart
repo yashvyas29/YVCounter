@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -52,10 +56,42 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   final String counterKey = 'counter';
 
+  SharedPref sharedPref = SharedPref();
+  Mala mala = Mala(DateTime.now(), 0, 0);
+
   @override
   void initState() {
     super.initState();
     _loadCounter();
+  }
+
+  // Loading counter value on start
+  _loadMala() async {
+    try {
+      Mala mala = Mala.fromJson(await sharedPref.read(Mala.key));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Loaded!"), duration: Duration(milliseconds: 500)));
+      setState(() {
+        mala = mala;
+      });
+    } catch (excepetion) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Nothing found!"),
+          duration: Duration(milliseconds: 500)));
+    }
+  }
+
+  _laoadDate() {
+    debugPrint(DateTime.now().toIso8601String());
+    final utcDate = DateTime.now().toUtc();
+    final utcDateString = utcDate.toIso8601String();
+    debugPrint(utcDateString);
+    debugPrint(DateTime.parse(utcDateString).toLocal().toString());
+    final utcDateShortString = DateFormat.yMd().format(utcDate);
+    debugPrint(utcDateShortString);
+    debugPrint(
+        DateFormat.yMd().parseUTC(utcDateShortString).toLocal().toString());
   }
 
   // Loading counter value on start
@@ -68,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Incrementing counter after click
   Future<void> _incrementCounter() async {
+    SystemSound.play(SystemSoundType.click);
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = (prefs.getInt(counterKey) ?? 0) + 1;
@@ -76,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _decrementCounter() async {
+    SystemSound.play(SystemSoundType.click);
     final prefs = await SharedPreferences.getInstance();
     if (_counter > 0) {
       setState(() {
@@ -86,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _resetCounter() async {
+    SystemSound.play(SystemSoundType.alert);
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = 0;
@@ -128,26 +167,25 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             Text(
               'Your completed malas:',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             Text(
               '$_counter',
-              style: Theme.of(context).textTheme.headline1,
+              style: Theme.of(context).textTheme.displayLarge,
             ),
             Flexible(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(30),
                 child: SizedBox.expand(
-                  // width: MediaQuery.of(context).size.width - 40,
-                  // height: MediaQuery.of(context).size.width - 40,
                   child: FloatingActionButton.extended(
-                    icon: const Icon(Icons.add, size: 40),
+                    shape: const CircleBorder(),
+                    icon: const Icon(Icons.add, size: 50),
                     label: const Text(
                       'Add Mala',
-                      style: TextStyle(fontSize: 30),
+                      style: TextStyle(fontSize: 40),
                     ),
                     tooltip: 'Add Mala',
                     onPressed: _incrementCounter,
@@ -171,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
             FloatingActionButton(
               onPressed: _resetCounter,
               tooltip: 'Reset Mala',
-              child: const Icon(Icons.clear_outlined),
+              child: const Icon(Icons.clear),
             ),
           ],
         ),
@@ -179,5 +217,44 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+class Mala {
+  DateTime date;
+  int count;
+  int japs;
+
+  static String key = "Mala";
+
+  Mala(this.date, this.count, this.japs);
+
+  Mala.fromJson(Map<String, dynamic> json)
+      : date = json['date'],
+        count = json['count'],
+        japs = json['japs'];
+
+  Map<String, dynamic> toJson() => {
+        'date': date,
+        'count': count,
+        'japs': japs,
+      };
+}
+
+class SharedPref {
+  read(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    final value = prefs.getString(key);
+    return value == null ? "" : json.decode(value);
+  }
+
+  save(String key, value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, json.encode(value));
+  }
+
+  remove(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove(key);
   }
 }
