@@ -6,7 +6,7 @@ class MalaDataTable extends StatefulWidget {
 
   final List<Mala> malas;
   @override
-  State<MalaDataTable> createState() => _MalaDataTableState(malas);
+  State<MalaDataTable> createState() => _MalaDataTableState();
 }
 
 class _RestorableDessertSelections extends RestorableProperty<Set<int>> {
@@ -51,9 +51,8 @@ class _RestorableDessertSelections extends RestorableProperty<Set<int>> {
 }
 
 class _MalaDataTableState extends State<MalaDataTable> with RestorationMixin {
-  _MalaDataTableState(this._malas);
+  _MalaDataTableState();
 
-  final List<Mala> _malas;
   final _RestorableDessertSelections _dessertSelections =
       _RestorableDessertSelections();
   final RestorableInt _rowIndex = RestorableInt(0);
@@ -75,7 +74,7 @@ class _MalaDataTableState extends State<MalaDataTable> with RestorationMixin {
     registerForRestoration(_sortAscending, 'sort_ascending');
     registerForRestoration(_sortColumnIndex, 'sort_column_index');
 
-    _dessertsDataSource ??= _DessertDataSource(context, _malas);
+    _dessertsDataSource ??= _DessertDataSource(context, widget.malas);
     switch (_sortColumnIndex.value) {
       case 0:
         _dessertsDataSource!._sort<String>((d) => d.date, _sortAscending.value);
@@ -94,7 +93,7 @@ class _MalaDataTableState extends State<MalaDataTable> with RestorationMixin {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _dessertsDataSource ??= _DessertDataSource(context, _malas);
+    _dessertsDataSource ??= _DessertDataSource(context, widget.malas);
     _dessertsDataSource!.addListener(_updateSelectedDessertRowListener);
   }
 
@@ -126,7 +125,7 @@ class _MalaDataTableState extends State<MalaDataTable> with RestorationMixin {
 
   @override
   Widget build(BuildContext context) {
-    var tableItemsCount = _malas.length;
+    var tableItemsCount = widget.malas.length;
     var defaultRowsPerPage = PaginatedDataTable.defaultRowsPerPage;
     var isRowCountLessDefaultRowsPerPage = tableItemsCount < defaultRowsPerPage;
     _rowsPerPage =
