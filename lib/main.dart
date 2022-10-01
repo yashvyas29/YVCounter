@@ -1,10 +1,12 @@
+import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
-// import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yv_counter/mala_data_table.dart';
 
 void main() {
   runApp(const MyApp());
@@ -54,47 +56,37 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final SharedPref sharedPref = SharedPref();
   int _counter = 0;
-  final String counterKey = 'counter';
+  List<Mala> _malaList = [];
+
+  static const _japs = 108;
+  static const dateFormat = 'yyyy-MM-dd';
 
   @override
   void initState() {
     super.initState();
-    _loadCounter();
+    _loadMala();
   }
-
-  /*
-  SharedPref sharedPref = SharedPref();
-  Mala mala = Mala(DateTime.now(), 0, 0);
 
   _loadMala() async {
+    final mala = Mala(DateFormat(dateFormat).format(DateTime.now()), 0, 0);
     try {
-      Mala mala = Mala.fromJson(await sharedPref.read(Mala.key));
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Loaded!"), duration: Duration(milliseconds: 500)));
+      final malaList = await sharedPref.readList(Mala.key);
+      _malaList = malaList;
+      if (malaList.last.date != DateFormat(dateFormat).format(DateTime.now())) {
+        _malaList.add(mala);
+      }
       setState(() {
-        mala = mala;
+        _counter = _malaList.last.count;
       });
     } catch (excepetion) {
+      _malaList = [mala];
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Nothing found!"),
-          duration: Duration(milliseconds: 500)));
+          duration: Duration(milliseconds: 2000)));
     }
   }
-
-  _laoadDate() {
-    debugPrint(DateTime.now().toIso8601String());
-    final utcDate = DateTime.now().toUtc();
-    final utcDateString = utcDate.toIso8601String();
-    debugPrint(utcDateString);
-    debugPrint(DateTime.parse(utcDateString).toLocal().toString());
-    final utcDateShortString = DateFormat.yMd().format(utcDate);
-    debugPrint(utcDateShortString);
-    debugPrint(
-        DateFormat.yMd().parseUTC(utcDateShortString).toLocal().toString());
-  }
-  */
 
   _playBeep([bool success = true]) {
     if (Platform.isAndroid) {
@@ -114,41 +106,36 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Loading counter value on start
-  Future<void> _loadCounter() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _counter = (prefs.getInt(counterKey) ?? 0);
-    });
-  }
-
   // Incrementing counter after click
   Future<void> _incrementCounter() async {
     _playBeep();
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _counter = (prefs.getInt(counterKey) ?? 0) + 1;
-      prefs.setInt(counterKey, _counter);
+      ++_counter;
+      _malaList.last.count = _counter;
+      _malaList.last.japs = _counter * _japs;
+      sharedPref.saveList(Mala.key, _malaList);
     });
   }
 
   Future<void> _decrementCounter() async {
     _playBeep(false);
-    final prefs = await SharedPreferences.getInstance();
     if (_counter > 0) {
       setState(() {
-        _counter = (prefs.getInt(counterKey) ?? 0) - 1;
-        prefs.setInt(counterKey, _counter);
+        --_counter;
+        _malaList.last.count = _counter;
+        _malaList.last.japs = _counter * _japs;
+        sharedPref.saveList(Mala.key, _malaList);
       });
     }
   }
 
   Future<void> _resetCounter() async {
     _playAlertSysSound();
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
       _counter = 0;
-      prefs.setInt(counterKey, _counter);
+      _malaList.last.count = _counter;
+      _malaList.last.japs = _counter;
+      sharedPref.saveList(Mala.key, _malaList);
     });
   }
 
@@ -165,6 +152,16 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            tooltip: 'Open Mala History',
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => MalaDataTable(malas: _malaList)));
+            },
+          ),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -240,11 +237,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-/*
 class Mala {
-  DateTime date;
+  String date;
   int count;
   int japs;
+  bool selected = false;
 
   static String key = "Mala";
 
@@ -274,9 +271,28 @@ class SharedPref {
     prefs.setString(key, json.encode(value));
   }
 
+  readList(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(key);
+    return list == null
+        ? []
+        : list.map((value) => Mala.fromJson(json.decode(value))).toList();
+  }
+
+  saveList(String key, List<Mala> malas) async {
+    final list = malas.map((mala) => json.encode(mala.toJson())).toList();
+    debugPrint(list.join('\n'));
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, list);
+  }
+
   remove(String key) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.remove(key);
+    await prefs.remove(key);
+  }
+
+  clear() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }
-*/
