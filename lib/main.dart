@@ -57,6 +57,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final SharedPref sharedPref = SharedPref();
+  String date = DateFormat(dateFormat).format(DateTime.now());
   int _counter = 0;
   List<Mala> _malaList = [];
 
@@ -70,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadMala() async {
-    final mala = Mala(DateFormat(dateFormat).format(DateTime.now()), 0, 0);
+    final mala = Mala(date, 0, 0);
     try {
       final malaList = await sharedPref.readList(Mala.key);
       _malaList = malaList;
@@ -107,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // Incrementing counter after click
-  Future<void> _incrementCounter() async {
+  _incrementCounter() async {
     _playBeep();
     setState(() {
       ++_counter;
@@ -117,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _decrementCounter() async {
+  _decrementCounter() async {
     _playBeep(false);
     if (_counter > 0) {
       setState(() {
@@ -129,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> _resetCounter() async {
+  _resetCounter() async {
     _playAlertSysSound();
     setState(() {
       _counter = 0;
@@ -137,6 +138,21 @@ class _MyHomePageState extends State<MyHomePage> {
       _malaList.last.japs = _counter;
       sharedPref.saveList(Mala.key, _malaList);
     });
+  }
+
+  _pickDate() async {
+    DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1992),
+        //DateTime.now() - not to allow to choose before today.
+        lastDate: DateTime(2092));
+
+    if (pickedDate != null) {
+      setState(() {
+        date = DateFormat(dateFormat).format(pickedDate);
+      });
+    }
   }
 
   @override
@@ -185,13 +201,34 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             const SizedBox(height: 30),
-            Text(
-              'Your completed malas:',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            TextButton(
+                onPressed: _pickDate,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Your completed malas on ',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const Icon(
+                      Icons.calendar_today,
+                      color: Colors.black,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      date,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
+                )),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.displayLarge,
+            ),
+            Text(
+              'Japs: ${_counter * 108}',
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             Flexible(
               child: Padding(
@@ -202,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: const Icon(Icons.add, size: 50),
                     label: const Text(
                       'Add Mala',
-                      style: TextStyle(fontSize: 40),
+                      style: TextStyle(fontSize: 35),
                     ),
                     tooltip: 'Add Mala',
                     onPressed: _incrementCounter,
