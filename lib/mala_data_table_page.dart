@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:yv_counter/main.dart';
+import 'package:yv_counter/mala.dart';
 
-class MalaDataTable extends StatefulWidget {
-  const MalaDataTable({super.key, required this.malas});
+class MalaDataTablePage extends StatefulWidget {
+  const MalaDataTablePage({super.key, required this.malas});
 
   final List<Mala> malas;
   @override
-  State<MalaDataTable> createState() => _MalaDataTableState();
+  State<MalaDataTablePage> createState() => _MalaDataTablePageState();
 }
 
 class _RestorableDessertSelections extends RestorableProperty<Set<int>> {
@@ -50,8 +50,9 @@ class _RestorableDessertSelections extends RestorableProperty<Set<int>> {
   Object toPrimitives() => _dessertSelections.toList();
 }
 
-class _MalaDataTableState extends State<MalaDataTable> with RestorationMixin {
-  _MalaDataTableState();
+class _MalaDataTablePageState extends State<MalaDataTablePage>
+    with RestorationMixin {
+  _MalaDataTablePageState();
 
   final _RestorableDessertSelections _dessertSelections =
       _RestorableDessertSelections();
@@ -61,6 +62,7 @@ class _MalaDataTableState extends State<MalaDataTable> with RestorationMixin {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   final RestorableBool _sortAscending = RestorableBool(true);
   final RestorableIntN _sortColumnIndex = RestorableIntN(null);
+  final scrollController = ScrollController();
   _DessertDataSource? _dessertsDataSource;
 
   @override
@@ -136,7 +138,9 @@ class _MalaDataTableState extends State<MalaDataTable> with RestorationMixin {
         title: const Text('Mala History'),
       ),
       body: Scrollbar(
+        controller: scrollController,
         child: ListView(
+          controller: scrollController,
           restorationId: 'data_table_list_view',
           padding: const EdgeInsets.all(16),
           children: [
