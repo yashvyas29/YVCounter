@@ -9,6 +9,7 @@ class MalaDataTablePage extends StatefulWidget {
   State<MalaDataTablePage> createState() => _MalaDataTablePageState();
 }
 
+/*
 class _RestorableDessertSelections extends RestorableProperty<Set<int>> {
   Set<int> _dessertSelections = {};
 
@@ -49,19 +50,20 @@ class _RestorableDessertSelections extends RestorableProperty<Set<int>> {
   @override
   Object toPrimitives() => _dessertSelections.toList();
 }
+*/
 
 class _MalaDataTablePageState extends State<MalaDataTablePage>
     with RestorationMixin {
   _MalaDataTablePageState();
 
-  final _RestorableDessertSelections _dessertSelections =
-      _RestorableDessertSelections();
+  // final _RestorableDessertSelections _dessertSelections =
+  //     _RestorableDessertSelections();
   final RestorableInt _rowIndex = RestorableInt(0);
   // final RestorableInt _rowsPerPage =
   //     RestorableInt(PaginatedDataTable.defaultRowsPerPage);
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
-  final RestorableBool _sortAscending = RestorableBool(true);
-  final RestorableIntN _sortColumnIndex = RestorableIntN(null);
+  final RestorableBool _sortAscending = RestorableBool(false);
+  final RestorableIntN _sortColumnIndex = RestorableIntN(0);
   final scrollController = ScrollController();
   _DessertDataSource? _dessertsDataSource;
 
@@ -70,7 +72,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_dessertSelections, 'selected_row_indices');
+    // registerForRestoration(_dessertSelections, 'selected_row_indices');
     registerForRestoration(_rowIndex, 'current_row_index');
     // registerForRestoration(_rowsPerPage, 'rows_per_page');
     registerForRestoration(_sortAscending, 'sort_ascending');
@@ -88,20 +90,20 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
         _dessertsDataSource!._sort<num>((d) => d.japs, _sortAscending.value);
         break;
     }
-    _dessertsDataSource!.updateSelectedDesserts(_dessertSelections);
-    _dessertsDataSource!.addListener(_updateSelectedDessertRowListener);
+    // _dessertsDataSource!.updateSelectedDesserts(_dessertSelections);
+    // _dessertsDataSource!.addListener(_updateSelectedDessertRowListener);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _dessertsDataSource ??= _DessertDataSource(context, widget.malas);
-    _dessertsDataSource!.addListener(_updateSelectedDessertRowListener);
+    // _dessertsDataSource!.addListener(_updateSelectedDessertRowListener);
   }
 
-  void _updateSelectedDessertRowListener() {
-    _dessertSelections.setDessertSelections(_dessertsDataSource!._desserts);
-  }
+  // void _updateSelectedDessertRowListener() {
+  //   _dessertSelections.setDessertSelections(_dessertsDataSource!._desserts);
+  // }
 
   void _sort<T>(
     Comparable<T> Function(Mala d) getField,
@@ -120,7 +122,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     // _rowsPerPage.dispose();
     _sortColumnIndex.dispose();
     _sortAscending.dispose();
-    _dessertsDataSource!.removeListener(_updateSelectedDessertRowListener);
+    // _dessertsDataSource!.removeListener(_updateSelectedDessertRowListener);
     _dessertsDataSource!.dispose();
     super.dispose();
   }
@@ -162,7 +164,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
               },
               sortColumnIndex: _sortColumnIndex.value,
               sortAscending: _sortAscending.value,
-              onSelectAll: _dessertsDataSource!._selectAll,
+              // onSelectAll: _dessertsDataSource!._selectAll,
               showCheckboxColumn: false,
               showFirstLastButtons: !isRowCountLessDefaultRowsPerPage,
               columns: [
@@ -210,8 +212,9 @@ class _DessertDataSource extends DataTableSource {
     notifyListeners();
   }
 
-  int _selectedCount = 0;
+  final int _selectedCount = 0;
 
+  /*
   void updateSelectedDesserts(_RestorableDessertSelections selectedRows) {
     _selectedCount = 0;
     for (var i = 0; i < _desserts.length; i += 1) {
@@ -225,6 +228,7 @@ class _DessertDataSource extends DataTableSource {
     }
     notifyListeners();
   }
+  */
 
   @override
   DataRow? getRow(int index) {
@@ -233,6 +237,7 @@ class _DessertDataSource extends DataTableSource {
     final dessert = _desserts[index];
     return DataRow.byIndex(
       index: index,
+      /*
       selected: dessert.selected,
       onSelectChanged: (value) {
         if (dessert.selected != value) {
@@ -242,6 +247,7 @@ class _DessertDataSource extends DataTableSource {
           notifyListeners();
         }
       },
+      */
       cells: [
         DataCell(Text(dessert.date)),
         DataCell(Text('${dessert.count}')),
@@ -259,11 +265,11 @@ class _DessertDataSource extends DataTableSource {
   @override
   int get selectedRowCount => _selectedCount;
 
-  void _selectAll(bool? checked) {
-    for (final dessert in _desserts) {
-      dessert.selected = checked ?? false;
-    }
-    _selectedCount = checked! ? _desserts.length : 0;
-    notifyListeners();
-  }
+  // void _selectAll(bool? checked) {
+  //   for (final dessert in _desserts) {
+  //     dessert.selected = checked ?? false;
+  //   }
+  //   _selectedCount = checked! ? _desserts.length : 0;
+  //   notifyListeners();
+  // }
 }

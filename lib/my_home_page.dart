@@ -72,8 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void _playAlertSysSound() {
     if (Platform.isAndroid) {
       FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
-    } else if (Platform.isIOS) {
-      FlutterBeep.playSysSound(iOSSoundIDs.EndRecording);
     } else {
       SystemSound.play(SystemSoundType.alert);
     }
@@ -81,7 +79,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Incrementing counter after click
   Future<void> _incrementCounter() async {
-    _playBeep();
     if (_mala.japs == 0) {
       _malaList.add(_mala);
     }
@@ -92,6 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
           : _mala.count = _mala.japs ~/ _japsPerMala;
     });
     sharedPref.saveList(Mala.key, _malaList);
+    if (!_selections.first && _mala.japs % _japsPerMala == 0) {
+      _playAlertSysSound();
+    } else {
+      _playBeep();
+    }
   }
 
   Future<void> _decrementCounter() async {
@@ -154,9 +156,6 @@ class _MyHomePageState extends State<MyHomePage> {
     if (currentMalaJaps > 0) {
       return "${_mala.japs - currentMalaJaps} + $currentMalaJaps";
     } else {
-      if (!_selections.first) {
-        _playAlertSysSound();
-      }
       return "${_mala.japs}";
     }
   }
@@ -180,7 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.menu),
             onPressed: () async {
               final malas = await sharedPref.readList(Mala.key);
-              malas.sort();
               if (!mounted) return;
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => MalaDataTablePage(malas: malas)));

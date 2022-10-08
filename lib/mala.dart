@@ -20,5 +20,5 @@ class Mala implements Comparable<Mala> {
       };
 
   @override
-  int compareTo(Mala other) => date.compareTo(other.date);
+  int compareTo(Mala other) => other.date.compareTo(date);
 }
