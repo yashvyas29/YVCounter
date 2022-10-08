@@ -56,10 +56,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final SharedPref sharedPref = SharedPref();
-  String date = DateFormat(dateFormat).format(DateTime.now());
-  int _counter = 0;
+  late Mala _mala;
   List<Mala> _malaList = [];
+
+  final SharedPref sharedPref = SharedPref();
+  final String today = DateFormat(dateFormat).format(DateTime.now());
+  final List<bool> _selections = [true, false];
 
   static const _japs = 108;
   static const dateFormat = 'yyyy-MM-dd';
@@ -67,29 +69,27 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _mala = Mala(today, 0, 0);
     _loadMala();
   }
 
-  _loadMala() async {
-    final mala = Mala(date, 0, 0);
+  Future<void> _loadMala() async {
     try {
       final malaList = await sharedPref.readList(Mala.key);
       _malaList = malaList;
-      if (malaList.last.date != DateFormat(dateFormat).format(DateTime.now())) {
-        _malaList.add(mala);
-      }
+      final todayMala =
+          malaList.where((mala) => mala.date == today).toList().first;
       setState(() {
-        _counter = _malaList.last.count;
+        _mala = todayMala;
       });
     } catch (excepetion) {
-      _malaList = [mala];
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Nothing found!"),
           duration: Duration(milliseconds: 2000)));
     }
   }
 
-  _playBeep([bool success = true]) {
+  void _playBeep([bool success = true]) {
     if (Platform.isAndroid) {
       FlutterBeep.beep(success);
     } else {
@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  _playAlertSysSound() {
+  void _playAlertSysSound() {
     if (Platform.isAndroid) {
       FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
     } else if (Platform.isIOS) {
@@ -108,39 +108,54 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // Incrementing counter after click
-  _incrementCounter() async {
+  Future<void> _incrementCounter() async {
     _playBeep();
+    if (_mala.japs == 0) {
+      _malaList.add(_mala);
+    }
     setState(() {
-      ++_counter;
-      _malaList.last.count = _counter;
-      _malaList.last.japs = _counter * _japs;
-      sharedPref.saveList(Mala.key, _malaList);
+      _selections.first ? _mala.count += 1 : _mala.japs += 1;
+      _selections.first
+          ? _mala.japs = _mala.count * _japs
+          : _mala.count = _mala.japs ~/ _japs;
     });
+    sharedPref.saveList(Mala.key, _malaList);
   }
 
-  _decrementCounter() async {
-    _playBeep(false);
-    if (_counter > 0) {
+  Future<void> _decrementCounter() async {
+    if (_mala.japs > 0) {
+      _playBeep(false);
+    }
+    if (_selections.first && _mala.count > 0) {
       setState(() {
-        --_counter;
-        _malaList.last.count = _counter;
-        _malaList.last.japs = _counter * _japs;
-        sharedPref.saveList(Mala.key, _malaList);
+        _mala.count -= 1;
+        _mala.japs = _mala.count * _japs;
       });
+    } else if (!_selections.first && _mala.japs > 0) {
+      setState(() {
+        _mala.count = _mala.japs ~/ _japs;
+        _mala.japs -= 1;
+      });
+    }
+    if (_mala.japs == 0) {
+      _malaList.remove(_mala);
+    }
+    sharedPref.saveList(Mala.key, _malaList);
+  }
+
+  Future<void> _resetCounter() async {
+    if (_mala.japs > 0) {
+      _playAlertSysSound();
+      setState(() {
+        _mala.count = 0;
+        _mala.japs = 0;
+      });
+      _malaList.remove(_mala);
+      sharedPref.saveList(Mala.key, _malaList);
     }
   }
 
-  _resetCounter() async {
-    _playAlertSysSound();
-    setState(() {
-      _counter = 0;
-      _malaList.last.count = _counter;
-      _malaList.last.japs = _counter;
-      sharedPref.saveList(Mala.key, _malaList);
-    });
-  }
-
-  _pickDate() async {
+  Future<void> _pickDate() async {
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -150,7 +165,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (pickedDate != null) {
       setState(() {
-        date = DateFormat(dateFormat).format(pickedDate);
+        final date = DateFormat(dateFormat).format(pickedDate);
+        try {
+          _mala = _malaList.where((mala) => mala.date == date).toList().first;
+        } catch (excepetion) {
+          _mala = Mala(date, 0, 0);
+        }
       });
     }
   }
@@ -172,9 +192,11 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             tooltip: 'Open Mala History',
             icon: const Icon(Icons.menu),
-            onPressed: () {
+            onPressed: () async {
+              final malas = await sharedPref.readList(Mala.key);
+              if (!mounted) return;
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => MalaDataTable(malas: _malaList)));
+                  builder: (context) => MalaDataTable(malas: malas)));
             },
           ),
         ],
@@ -197,52 +219,85 @@ class _MyHomePageState extends State<MyHomePage> {
           // center the children vertically; the main axis here is the vertical
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             const SizedBox(height: 30),
-            TextButton(
-                onPressed: _pickDate,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Your completed malas on ',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const Icon(
-                      Icons.calendar_today,
-                      color: Colors.black,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      date,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ],
-                )),
             Text(
-              '$_counter',
+              'Your completed ${_selections.first ? 'malas' : 'japs'} on',
+              style: Theme.of(context).textTheme.headlineSmall,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            TextButton.icon(
+              icon: const Icon(
+                Icons.calendar_today,
+                color: Colors.black,
+                size: 18,
+              ),
+              label: Text(
+                _mala.date,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              onPressed: _pickDate,
+            ),
+            Text(
+              '${_selections.first ? _mala.count : _mala.japs}',
               style: Theme.of(context).textTheme.displayLarge,
             ),
             Text(
-              'Japs: ${_counter * 108}',
+              '${!_selections.first ? 'Malas' : 'Japs'}: ${!_selections.first ? _mala.count : _mala.japs}',
               style: Theme.of(context).textTheme.titleSmall,
             ),
+            const SizedBox(height: 20),
+            ToggleButtons(
+              onPressed: (int index) {
+                setState(() {
+                  // The button that is tapped is set to true, and the others to false.
+                  for (int i = 0; i < _selections.length; i++) {
+                    _selections[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.red[700],
+              selectedColor: Colors.white,
+              fillColor: Colors.red[200],
+              color: Colors.red[400],
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 80.0,
+              ),
+              isSelected: _selections,
+              children: const [
+                Text('Mala'),
+                Text('Jap'),
+              ],
+            ),
             Flexible(
-              child: Padding(
-                padding: const EdgeInsets.all(30),
-                child: SizedBox.expand(
-                  child: FloatingActionButton.extended(
-                    shape: const CircleBorder(),
-                    icon: const Icon(Icons.add, size: 50),
-                    label: const Text(
-                      'Add Mala',
-                      style: TextStyle(fontSize: 35),
-                    ),
-                    tooltip: 'Add Mala',
+              child: SizedBox.expand(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 50),
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    label: const Text('Add', style: TextStyle(fontSize: 20)),
                     onPressed: _incrementCounter,
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(const CircleBorder()),
+                      padding:
+                          MaterialStateProperty.all(const EdgeInsets.all(20)),
+                      backgroundColor: MaterialStateProperty.all(
+                          Colors.blue), // <-- Button color
+                      overlayColor:
+                          MaterialStateProperty.resolveWith<Color?>((states) {
+                        if (states.contains(MaterialState.pressed)) {
+                          return Colors.red; // <-- Splash color
+                        } else {
+                          return null;
+                        }
+                      }),
+                    ),
                   ),
                 ),
               ),
@@ -256,11 +311,13 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             FloatingActionButton(
+              heroTag: 1,
               onPressed: _decrementCounter,
               tooltip: 'Remove Mala',
               child: const Icon(Icons.remove),
             ),
             FloatingActionButton(
+              heroTag: 2,
               onPressed: _resetCounter,
               tooltip: 'Reset Mala',
               child: const Icon(Icons.clear),
@@ -308,7 +365,7 @@ class SharedPref {
     prefs.setString(key, json.encode(value));
   }
 
-  readList(String key) async {
+  Future<List<Mala>> readList(String key) async {
     final prefs = await SharedPreferences.getInstance();
     final list = prefs.getStringList(key);
     return list == null
