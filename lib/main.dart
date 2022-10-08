@@ -194,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.menu),
             onPressed: () async {
               final malas = await sharedPref.readList(Mala.key);
+              malas.sort();
               if (!mounted) return;
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => MalaDataTable(malas: malas)));
@@ -331,7 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class Mala {
+class Mala implements Comparable<Mala> {
   String date;
   int count;
   int japs;
@@ -351,6 +352,9 @@ class Mala {
         'count': count,
         'japs': japs,
       };
+
+  @override
+  int compareTo(Mala other) => date.compareTo(other.date);
 }
 
 class SharedPref {
