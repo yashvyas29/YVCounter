@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/mala.dart';
 
 part 'mala_data_table_page_state.dart';
@@ -9,6 +13,75 @@ class MalaDataTablePage extends StatefulWidget {
   final List<Mala> malas;
   @override
   State<MalaDataTablePage> createState() => _MalaDataTablePageState();
+
+  Future<void> _createExcel() async {
+    var excel = Excel.createExcel();
+    Sheet sheetObject = excel['Mala History'];
+
+    CellStyle cellStyle = CellStyle(
+        backgroundColorHex: "#1AFF1A",
+        fontFamily: getFontFamily(FontFamily.Calibri));
+
+    cellStyle.underline = Underline.Single; // or Underline.Double
+
+    var cell1 = sheetObject.cell(CellIndex.indexByString("A1"));
+    cell1.value = 'Date'; // dynamic values support provided;
+    cell1.cellStyle = cellStyle;
+
+    var cell2 = sheetObject.cell(CellIndex.indexByString("B1"));
+    cell2.value = 'Malas'; // dynamic values support provided;
+    cell2.cellStyle = cellStyle;
+
+    var cell3 = sheetObject.cell(CellIndex.indexByString("C1"));
+    cell3.value = 'Japs'; // dynamic values support provided;
+    cell3.cellStyle = cellStyle;
+
+    /// Inserting and removing column and rows
+
+    // insert column at index = 8
+    // sheetObject.insertColumn(8);
+
+    // remove column at index = 18
+    // sheetObject.removeColumn(18);
+
+    // insert row at index = 82
+    malas.asMap().forEach((index, mala) {
+      sheetObject
+          .insertRowIterables([mala.date, mala.count, mala.japs], index + 1);
+    });
+
+    // remove row at index = 80
+    // sheetObject.removeRow(80);
+
+    final defaultSheet = excel.getDefaultSheet();
+    if (defaultSheet != null) {
+      /// deleting the sheet
+      excel.delete(defaultSheet);
+    }
+
+    // Save the Changes in file
+    Directory directory;
+    if (Platform.isAndroid) {
+      final directories =
+          await getExternalStorageDirectories(type: StorageDirectory.downloads);
+      directory =
+          directories?.first ?? await getApplicationDocumentsDirectory();
+    } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+      directory = await getDownloadsDirectory() ??
+          await getApplicationDocumentsDirectory();
+    } else {
+      directory = await getApplicationDocumentsDirectory();
+    }
+    String outputFile = "${directory.path}/malas.xlsx";
+    debugPrint(outputFile);
+    // File(outputFile).writeAsBytes(excel.encode());
+    List<int>? fileBytes = excel.save();
+    if (fileBytes != null) {
+      File(outputFile)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(fileBytes);
+    }
+  }
 }
 
 /*

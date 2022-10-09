@@ -86,6 +86,11 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mala History'),
+        actions: [
+          IconButton(
+              onPressed: widget._createExcel,
+              icon: const Icon(Icons.file_download_outlined)),
+        ],
       ),
       body: Scrollbar(
         controller: scrollController,
