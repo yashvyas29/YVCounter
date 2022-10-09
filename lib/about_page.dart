@@ -12,7 +12,7 @@ class AboutPage extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              '\n@Yash Vyas\n',
+              '\n©Yash Vyas\n',
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
