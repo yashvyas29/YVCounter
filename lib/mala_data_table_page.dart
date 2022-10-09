@@ -14,7 +14,7 @@ class MalaDataTablePage extends StatefulWidget {
   @override
   State<MalaDataTablePage> createState() => _MalaDataTablePageState();
 
-  Future<void> _createExcel() async {
+  Future<void> _createExcel(VoidCallback onSuccess) async {
     var excel = Excel.createExcel();
     Sheet sheetObject = excel['Mala History'];
 
@@ -80,6 +80,7 @@ class MalaDataTablePage extends StatefulWidget {
       File(outputFile)
         ..createSync(recursive: true)
         ..writeAsBytesSync(fileBytes);
+      onSuccess.call();
     }
   }
 }
