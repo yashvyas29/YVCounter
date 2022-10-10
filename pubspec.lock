@@ -67,10 +67,12 @@ packages:
   excel:
     dependency: "direct main"
     description:
-      name: excel
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0-null-safety-3"
+      path: "."
+      ref: null-safety
+      resolved-ref: eb091ba91963773741b7f0f8a3378269300a8ed2
+      url: "https://github.com/justkawal/excel"
+    source: git
+    version: "2.0.0-null-safety-4"
   fake_async:
     dependency: transitive
     description:
@@ -164,7 +166,7 @@ packages:
     source: hosted
     version: "1.8.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       url: "https://pub.dartlang.org"
@@ -419,7 +421,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.4.1"
+    version: "6.1.0"
 sdks:
   dart: ">=2.18.2 <3.0.0"
   flutter: ">=3.0.0"

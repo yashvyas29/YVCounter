@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
@@ -62,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _playBeep([bool success = true]) {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       FlutterBeep.beep(success);
     } else {
       SystemSound.play(SystemSoundType.click);
@@ -70,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _playAlertSysSound() {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
     } else {
       SystemSound.play(SystemSoundType.alert);

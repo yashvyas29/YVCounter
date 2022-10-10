@@ -101,48 +101,53 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
           restorationId: 'data_table_list_view',
           padding: const EdgeInsets.all(16),
           children: [
-            PaginatedDataTable(
-              header: const Text('Japs Mala'),
-              rowsPerPage: _rowsPerPage,
-              onRowsPerPageChanged: isRowCountLessDefaultRowsPerPage
-                  ? null
-                  : (value) {
+            tableItemsCount == 0
+                ? const Text(
+                    'No malas or japs completed yet.',
+                    textAlign: TextAlign.center,
+                  )
+                : PaginatedDataTable(
+                    header: const Text('Japs Mala'),
+                    rowsPerPage: _rowsPerPage,
+                    onRowsPerPageChanged: isRowCountLessDefaultRowsPerPage
+                        ? null
+                        : (value) {
+                            setState(() {
+                              _rowsPerPage = value!;
+                            });
+                          },
+                    initialFirstRowIndex: _rowIndex.value,
+                    onPageChanged: (rowIndex) {
                       setState(() {
-                        _rowsPerPage = value!;
+                        _rowIndex.value = rowIndex;
                       });
                     },
-              initialFirstRowIndex: _rowIndex.value,
-              onPageChanged: (rowIndex) {
-                setState(() {
-                  _rowIndex.value = rowIndex;
-                });
-              },
-              sortColumnIndex: _sortColumnIndex.value,
-              sortAscending: _sortAscending.value,
-              // onSelectAll: _dessertsDataSource!._selectAll,
-              showCheckboxColumn: false,
-              showFirstLastButtons: !isRowCountLessDefaultRowsPerPage,
-              columns: [
-                DataColumn(
-                  label: const Text('Date'),
-                  onSort: (columnIndex, ascending) =>
-                      _sort<String>((d) => d.date, columnIndex, ascending),
-                ),
-                DataColumn(
-                  label: const Text('Malas'),
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.count, columnIndex, ascending),
-                ),
-                DataColumn(
-                  label: const Text('Japs'),
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort<num>((d) => d.japs, columnIndex, ascending),
-                ),
-              ],
-              source: _dessertsDataSource!,
-            ),
+                    sortColumnIndex: _sortColumnIndex.value,
+                    sortAscending: _sortAscending.value,
+                    // onSelectAll: _dessertsDataSource!._selectAll,
+                    showCheckboxColumn: false,
+                    showFirstLastButtons: !isRowCountLessDefaultRowsPerPage,
+                    columns: [
+                      DataColumn(
+                        label: const Text('Date'),
+                        onSort: (columnIndex, ascending) => _sort<String>(
+                            (d) => d.date, columnIndex, ascending),
+                      ),
+                      DataColumn(
+                        label: const Text('Malas'),
+                        numeric: true,
+                        onSort: (columnIndex, ascending) =>
+                            _sort<num>((d) => d.count, columnIndex, ascending),
+                      ),
+                      DataColumn(
+                        label: const Text('Japs'),
+                        numeric: true,
+                        onSort: (columnIndex, ascending) =>
+                            _sort<num>((d) => d.japs, columnIndex, ascending),
+                      ),
+                    ],
+                    source: _dessertsDataSource!,
+                  ),
           ],
         ),
       ),

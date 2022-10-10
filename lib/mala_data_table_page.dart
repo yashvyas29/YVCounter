@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:excel/excel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:yv_counter/mala.dart';
+import 'package:path/path.dart' as p;
 
 part 'mala_data_table_page_state.dart';
 
@@ -62,32 +64,37 @@ class MalaDataTablePage extends StatefulWidget {
 
     // Save the Changes in file
     Directory directory;
-    if (Platform.isAndroid) {
-      const storagePermission = Permission.storage;
-      final isPermissionGranted = await storagePermission.isGranted;
-      if (!isPermissionGranted) {
-        storagePermission.request();
-      }
-      final downloadDirectory = Directory('/storage/emulated/0/Download');
-      final downloadDirectoryExists = await downloadDirectory.exists();
-      directory = downloadDirectoryExists
-          ? downloadDirectory
-          : await getApplicationDocumentsDirectory();
-    } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-      directory = await getDownloadsDirectory() ??
-          await getApplicationDocumentsDirectory();
-    } else {
-      directory = await getApplicationDocumentsDirectory();
-    }
-    String outputFile = "${directory.path}/malas.xlsx";
-    debugPrint(outputFile);
-    // File(outputFile).writeAsBytes(excel.encode());
-    List<int>? fileBytes = excel.save();
-    if (fileBytes != null) {
-      File(outputFile)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(fileBytes);
+    if (kIsWeb) {
+      excel.save(fileName: 'malas.xlsx');
       onSuccess.call();
+    } else {
+      if (Platform.isAndroid) {
+        const storagePermission = Permission.storage;
+        final isPermissionGranted = await storagePermission.isGranted;
+        if (!isPermissionGranted) {
+          storagePermission.request();
+        }
+        final downloadDirectory = Directory('/storage/emulated/0/Download');
+        final downloadDirectoryExists = await downloadDirectory.exists();
+        directory = downloadDirectoryExists
+            ? downloadDirectory
+            : await getApplicationDocumentsDirectory();
+      } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+        directory = await getDownloadsDirectory() ??
+            await getApplicationDocumentsDirectory();
+      } else {
+        directory = await getApplicationDocumentsDirectory();
+      }
+      String outputFile = p.join(directory.path, 'malas.xlsx');
+      debugPrint(outputFile);
+      // File(outputFile).writeAsBytes(excel.encode());
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null) {
+        File(outputFile)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(fileBytes);
+        onSuccess.call();
+      }
     }
   }
 }
