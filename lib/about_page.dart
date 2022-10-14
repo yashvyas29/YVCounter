@@ -17,7 +17,7 @@ class AboutPage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const Text(
-              'YVCounter app is created while learning flutter to solve a common scenario to count malas or japas which is done by hindu religion pepole during meditation.\n\nIn Hinduism the japa mala is used to direct and count the recitation of mantras during meditation. It usually consists of 108 beads strung in a circle to represent the cyclic nature of life.',
+              'YVCounter app is created for solving a common scenario of counting malas or japs which is done by hindu religion pepole during meditation.\n\nIn Hinduism the jap mala is used to direct and count the recitation of mantras during meditation. It usually consists of 108 beads strung in a circle to represent the cyclic nature of life.',
               style: TextStyle(fontSize: 20),
               textAlign: TextAlign.justify,
             ),

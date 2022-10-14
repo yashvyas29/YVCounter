@@ -78,10 +78,9 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
   @override
   Widget build(BuildContext context) {
     var tableItemsCount = widget.malas.length;
-    var defaultRowsPerPage = PaginatedDataTable.defaultRowsPerPage;
-    var isRowCountLessDefaultRowsPerPage = tableItemsCount < defaultRowsPerPage;
+    var isRowCountLessDefaultRowsPerPage = tableItemsCount < _rowsPerPage;
     _rowsPerPage =
-        isRowCountLessDefaultRowsPerPage ? tableItemsCount : defaultRowsPerPage;
+        isRowCountLessDefaultRowsPerPage ? tableItemsCount : _rowsPerPage;
 
     return Scaffold(
       appBar: AppBar(
