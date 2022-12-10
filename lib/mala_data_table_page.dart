@@ -90,7 +90,8 @@ class MalaDataTablePage extends StatefulWidget {
       // File(outputFile).writeAsBytes(excel.encode());
       List<int>? fileBytes = excel.save();
       if (fileBytes != null) {
-        File(outputFile)
+        final file = File(outputFile);
+        file
           ..createSync(recursive: true)
           ..writeAsBytesSync(fileBytes);
         onSuccess.call();

@@ -1,11 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/about_page.dart';
+import 'package:yv_counter/google_drive.dart';
 import 'package:yv_counter/mala.dart';
 import 'package:yv_counter/mala_data_table_page.dart';
 import 'package:yv_counter/shared_pref.dart';
@@ -50,15 +52,12 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final malaList = await sharedPref.readList(Mala.key);
       _malaList = malaList;
-      final todayMala =
-          malaList.where((mala) => mala.date == today).toList().first;
+      final todayMala = malaList.firstWhere((mala) => mala.date == today);
       setState(() {
         _mala = todayMala;
       });
-    } catch (excepetion) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Nothing found!"),
-          duration: Duration(milliseconds: 2000)));
+    } catch (error) {
+      showSnackBar("Nothing found! $error");
     }
   }
 
@@ -130,6 +129,40 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> _restoreBackup() async {
+    debugPrint("_restoreBackup");
+    final malas = await GoogleDrive().downloadGoogleDriveFile();
+    debugPrint("_restoreBackup malas: $malas");
+    if (malas != null && malas.isNotEmpty) {
+      _malaList = malas;
+      try {
+        final mala = malas.firstWhere((mala) => mala.date == today);
+        setState(() {
+          _mala = mala;
+        });
+      } catch (error) {
+        showSnackBar("No mala available for today in backup. $error");
+      }
+    } else {
+      showSnackBar("No backup available.");
+    }
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(message), duration: const Duration(milliseconds: 2000)));
+  }
+
+  Future<void> _saveBackup() async {
+    final malasJson = json.encode(_malaList);
+    debugPrint(malasJson);
+    final tempDir = await getTemporaryDirectory();
+    final file = File("${tempDir.path}/malas");
+    await file.writeAsString(malasJson);
+    await GoogleDrive().uploadFileToGoogleDrive(file);
+    file.delete();
+  }
+
   Future<void> _pickDate() async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -144,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         final date = DateFormat(dateFormat).format(pickedDate);
         try {
-          _mala = _malaList.where((mala) => mala.date == date).toList().first;
+          _mala = _malaList.firstWhere((mala) => mala.date == date);
         } catch (excepetion) {
           _mala = Mala(date, 0, 0);
         }
@@ -191,6 +224,61 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const AboutPage()));
+            },
+          ),
+          PopupMenuButton<Menu>(
+            tooltip: "Google Drive",
+            onSelected: (menu) {
+              switch (menu) {
+                case Menu.signIn:
+                  GoogleDrive().signIn();
+                  break;
+                case Menu.backup:
+                  _saveBackup();
+                  break;
+                case Menu.restore:
+                  _restoreBackup();
+                  break;
+                case Menu.delete:
+                  GoogleDrive().deleteAppDataFolderFiles();
+                  break;
+                case Menu.signOut:
+                  GoogleDrive().signOut();
+              }
+            },
+            itemBuilder: (context) {
+              return const [
+                PopupMenuItem(
+                  value: Menu.signIn,
+                  child: Text(
+                    'Sign In to Google Drive',
+                  ),
+                ),
+                PopupMenuItem(
+                  value: Menu.backup,
+                  child: Text(
+                    'Backup to Google Drive',
+                  ),
+                ),
+                PopupMenuItem(
+                  value: Menu.restore,
+                  child: Text(
+                    'Restore from Google Drive',
+                  ),
+                ),
+                PopupMenuItem(
+                  value: Menu.delete,
+                  child: Text(
+                    'Delete Backup from Google Drive',
+                  ),
+                ),
+                PopupMenuItem(
+                  value: Menu.signOut,
+                  child: Text(
+                    'Sign Out from Google Drive',
+                  ),
+                ),
+              ];
             },
           ),
         ],
@@ -314,7 +402,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Icon(Icons.remove),
             ),
             FloatingActionButton(
-              heroTag: 2,
+              heroTag: 4,
               onPressed: _resetCounter,
               tooltip: 'Reset Mala or Jap',
               child: const Icon(Icons.clear),
@@ -327,3 +415,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+// This is the type used by the popup menu below.
+enum Menu { signIn, backup, restore, delete, signOut }

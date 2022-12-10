@@ -89,12 +89,12 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "yv_counter" "\0"
+            VALUE "CompanyName", "com.yash" "\0"
+            VALUE "FileDescription", "YVCounter" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "yv_counter" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "yv_counter.exe" "\0"
+            VALUE "InternalName", "YVCounter" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022 com.yash.YVCounter All rights reserved." "\0"
+            VALUE "OriginalFilename", "YVCounter.exe" "\0"
             VALUE "ProductName", "YVCounter" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

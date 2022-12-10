@@ -1,4 +1,4 @@
-package com.example.yv_counter
+package com.yash.YVCounter
 
 import io.flutter.embedding.android.FlutterActivity
 
