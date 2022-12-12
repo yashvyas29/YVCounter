@@ -29,14 +29,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadMala() async {
     try {
-      final malaList = await _sharedPref.readList(Mala.key);
-      _malaList = malaList;
-      final todayMala = malaList.firstWhere((mala) => mala.date == _today);
+      _malaList = await _sharedPref.readList(Mala.key);
+      final todayMala = _malaList.firstWhere((mala) => mala.date == _today);
       setState(() {
         _mala = todayMala;
       });
     } catch (error) {
-      _showSnackBar("Nothing found! $error");
+      _showSnackBar("Nothing found!");
     }
   }
 
@@ -124,11 +123,78 @@ class _MyHomePageState extends State<MyHomePage> {
             _mala = mala;
           });
         } catch (error) {
-          _showSnackBar("No mala available for today in backup. $error");
+          _showSnackBar("No mala available for today in backup.");
         }
       } else {
         _showSnackBar("No backup available.");
       }
+    }
+  }
+
+  Future<void> _restoreExcelBackup() async {
+    debugPrint("_restoreExcelBackup");
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+    );
+    final file = result?.files.single;
+    if (file != null) {
+      debugPrint(file.name);
+      final filePath = file.path;
+      debugPrint(filePath);
+      if (filePath != null) {
+        final file = File(filePath);
+        final fileBytes = await file.readAsBytes();
+        final excel = Excel.decodeBytes(fileBytes);
+        for (var table in excel.tables.keys) {
+          debugPrint(table); //sheet Name
+          final sheet = excel.tables[table];
+          if (sheet != null) {
+            debugPrint(sheet.maxCols.toString());
+            debugPrint(sheet.maxRows.toString());
+            final List<Mala> malas = [];
+            sheet.rows.asMap().forEach((rowIndex, rowValue) {
+              if (rowIndex > 0) {
+                late String date;
+                late int malasCount;
+                late int japs;
+                rowValue.asMap().forEach((columnIndex, columnData) {
+                  if (columnData != null) {
+                    final columnValue = columnData.value;
+                    switch (columnIndex) {
+                      case 0:
+                        date = columnValue;
+                        break;
+                      case 1:
+                        malasCount = columnValue;
+                        break;
+                      case 2:
+                        japs = columnValue;
+                    }
+                  }
+                });
+                malas.add(Mala(date, malasCount, japs));
+              }
+            });
+            _malaList.removeWhere((mala) => malas.contains(mala));
+            malas.addAll(_malaList);
+            try {
+              final mala = malas.firstWhere((mala) => mala.date == _today);
+              setState(() {
+                _mala = mala;
+              });
+            } catch (error) {
+              _showSnackBar("No mala available for today in backup.");
+            }
+            _malaList = malas;
+            _sharedPref.saveList(Mala.key, malas);
+          }
+        }
+      } else {
+        _showSnackBar("Invalid file.");
+      }
+    } else {
+      _showSnackBar("Restore cancelled.");
     }
   }
 
@@ -256,6 +322,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   await _restoreBackup();
                   _hideProgressIndicator();
                   break;
+                case Menu.restoreExcel:
+                  _showProgressIndicator("Restoring from Excel");
+                  await _restoreExcelBackup();
+                  _hideProgressIndicator();
+                  break;
                 case Menu.delete:
                   _showProgressIndicator("Deleting Backup");
                   await _googleDrive.deleteAppDataFolderFiles();
@@ -283,15 +354,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   */
                 const PopupMenuItem(
-                  value: Menu.backup,
+                  value: Menu.restoreExcel,
                   child: Text(
-                    'Backup to Google Drive',
+                    'Restore from Excel',
                   ),
                 ),
                 const PopupMenuItem(
                   value: Menu.restore,
                   child: Text(
                     'Restore from Google Drive',
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: Menu.backup,
+                  child: Text(
+                    'Backup to Google Drive',
                   ),
                 ),
                 const PopupMenuItem(

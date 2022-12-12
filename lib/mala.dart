@@ -21,4 +21,10 @@ class Mala implements Comparable<Mala> {
 
   @override
   int compareTo(Mala other) => other.date.compareTo(date);
+
+  @override
+  bool operator ==(Object other) => other is Mala && other.date == date;
+
+  @override
+  int get hashCode => date.hashCode;
 }
