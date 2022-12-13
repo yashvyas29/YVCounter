@@ -17,6 +17,10 @@ class MalaDataTablePage extends StatefulWidget {
   @override
   State<MalaDataTablePage> createState() => _MalaDataTablePageState();
 
+  int _getTotalMalas() {
+    return malas.fold(0, (sum, mala) => sum + mala.count);
+  }
+
   Future<void> _createExcel(VoidCallback onSuccess) async {
     var excel = Excel.createExcel();
     Sheet sheetObject = excel['Mala History'];

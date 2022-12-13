@@ -33,6 +33,74 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+
+  void _playBeep([bool success = true]) {
+    if (!kIsWeb && Platform.isAndroid) {
+      FlutterBeep.beep(success);
+    } else {
+      SystemSound.play(SystemSoundType.click);
+    }
+  }
+
+  void _playAlertSysSound() {
+    if (!kIsWeb && Platform.isAndroid) {
+      FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
+    } else {
+      SystemSound.play(SystemSoundType.alert);
+    }
+  }
+
+  Future<List<Mala>> _getMalasFromExcel() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+    );
+    final file = result?.files.single;
+    if (file != null) {
+      debugPrint(file.name);
+      final filePath = file.path;
+      debugPrint(filePath);
+      if (filePath != null) {
+        final file = File(filePath);
+        final fileBytes = await file.readAsBytes();
+        final excel = Excel.decodeBytes(fileBytes);
+        for (var table in excel.tables.keys) {
+          debugPrint(table); //sheet Name
+          final sheet = excel.tables[table];
+          if (sheet != null) {
+            debugPrint(sheet.maxCols.toString());
+            debugPrint(sheet.maxRows.toString());
+            final List<Mala> malas = [];
+            sheet.rows.asMap().forEach((rowIndex, rowValue) {
+              if (rowIndex > 0) {
+                late String date;
+                late int malasCount;
+                late int japs;
+                rowValue.asMap().forEach((columnIndex, columnData) {
+                  if (columnData != null) {
+                    final columnValue = columnData.value;
+                    switch (columnIndex) {
+                      case 0:
+                        date = columnValue;
+                        break;
+                      case 1:
+                        malasCount = columnValue;
+                        break;
+                      case 2:
+                        japs = columnValue;
+                    }
+                  }
+                });
+                malas.add(Mala(date, malasCount, japs));
+              }
+            });
+            return malas;
+          }
+        }
+      }
+    }
+    return [];
+  }
 }
 
 // This is the type used by the popup menu below.

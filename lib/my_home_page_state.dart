@@ -10,7 +10,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final String _today = DateFormat(dateFormat).format(DateTime.now());
   final List<bool> _selections = [true, false];
 
-  static const _japsPerMala = 108;
   static const dateFormat = 'yyyy-MM-dd';
 
   @override
@@ -39,22 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _playBeep([bool success = true]) {
-    if (!kIsWeb && Platform.isAndroid) {
-      FlutterBeep.beep(success);
-    } else {
-      SystemSound.play(SystemSoundType.click);
-    }
-  }
-
-  void _playAlertSysSound() {
-    if (!kIsWeb && Platform.isAndroid) {
-      FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
-    } else {
-      SystemSound.play(SystemSoundType.alert);
-    }
-  }
-
   // Incrementing counter after click
   Future<void> _incrementCounter() async {
     if (_mala.japs == 0) {
@@ -63,29 +46,29 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selections.first ? _mala.count += 1 : _mala.japs += 1;
       _selections.first
-          ? _mala.japs = _mala.count * _japsPerMala
-          : _mala.count = _mala.japs ~/ _japsPerMala;
+          ? _mala.japs = _mala.count * Mala.japsPerMala
+          : _mala.count = _mala.japs ~/ Mala.japsPerMala;
     });
     _sharedPref.saveList(Mala.key, _malaList);
-    if (!_selections.first && _mala.japs % _japsPerMala == 0) {
-      _playAlertSysSound();
+    if (!_selections.first && _mala.japs % Mala.japsPerMala == 0) {
+      widget._playAlertSysSound();
     } else {
-      _playBeep();
+      widget._playBeep();
     }
   }
 
   Future<void> _decrementCounter() async {
     if (_mala.japs > 0) {
-      _playBeep(false);
+      widget._playBeep(false);
     }
     if (_selections.first && _mala.count > 0) {
       setState(() {
         _mala.count -= 1;
-        _mala.japs = _mala.count * _japsPerMala;
+        _mala.japs = _mala.count * Mala.japsPerMala;
       });
     } else if (!_selections.first && _mala.japs > 0) {
       setState(() {
-        _mala.count = _mala.japs ~/ _japsPerMala;
+        _mala.count = _mala.japs ~/ Mala.japsPerMala;
         _mala.japs -= 1;
       });
     }
@@ -97,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _resetCounter() async {
     if (_mala.japs > 0) {
-      _playAlertSysSound();
+      widget._playAlertSysSound();
       setState(() {
         _mala.count = 0;
         _mala.japs = 0;
@@ -133,68 +116,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _restoreExcelBackup() async {
     debugPrint("_restoreExcelBackup");
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['xlsx'],
-    );
-    final file = result?.files.single;
-    if (file != null) {
-      debugPrint(file.name);
-      final filePath = file.path;
-      debugPrint(filePath);
-      if (filePath != null) {
-        final file = File(filePath);
-        final fileBytes = await file.readAsBytes();
-        final excel = Excel.decodeBytes(fileBytes);
-        for (var table in excel.tables.keys) {
-          debugPrint(table); //sheet Name
-          final sheet = excel.tables[table];
-          if (sheet != null) {
-            debugPrint(sheet.maxCols.toString());
-            debugPrint(sheet.maxRows.toString());
-            final List<Mala> malas = [];
-            sheet.rows.asMap().forEach((rowIndex, rowValue) {
-              if (rowIndex > 0) {
-                late String date;
-                late int malasCount;
-                late int japs;
-                rowValue.asMap().forEach((columnIndex, columnData) {
-                  if (columnData != null) {
-                    final columnValue = columnData.value;
-                    switch (columnIndex) {
-                      case 0:
-                        date = columnValue;
-                        break;
-                      case 1:
-                        malasCount = columnValue;
-                        break;
-                      case 2:
-                        japs = columnValue;
-                    }
-                  }
-                });
-                malas.add(Mala(date, malasCount, japs));
-              }
-            });
-            _malaList.removeWhere((mala) => malas.contains(mala));
-            malas.addAll(_malaList);
-            try {
-              final mala = malas.firstWhere((mala) => mala.date == _today);
-              setState(() {
-                _mala = mala;
-              });
-            } catch (error) {
-              _showSnackBar("No mala available for today in backup.");
-            }
-            _malaList = malas;
-            _sharedPref.saveList(Mala.key, malas);
-          }
-        }
-      } else {
-        _showSnackBar("Invalid file.");
-      }
+    final malas = await widget._getMalasFromExcel();
+    if (malas.isEmpty) {
+      _showSnackBar("No malas loaded from backup.");
     } else {
-      _showSnackBar("Restore cancelled.");
+      _malaList.removeWhere((mala) => malas.contains(mala));
+      malas.addAll(_malaList);
+      _malaList = malas;
+      _sharedPref.saveList(Mala.key, malas);
+      try {
+        final mala = malas.firstWhere((mala) => mala.date == _today);
+        setState(() {
+          _mala = mala;
+        });
+      } catch (error) {
+        _showSnackBar("No mala available for today in backup.");
+      }
     }
   }
 
@@ -265,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String getJapsPerMala() {
-    final currentMalaJaps = _mala.japs % _japsPerMala;
+    final currentMalaJaps = _mala.japs % Mala.japsPerMala;
     if (currentMalaJaps > 0) {
       return "${_mala.japs - currentMalaJaps} + $currentMalaJaps";
     } else {

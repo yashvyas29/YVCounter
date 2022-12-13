@@ -7,9 +7,9 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
   // final _RestorableDessertSelections _dessertSelections =
   //     _RestorableDessertSelections();
   final RestorableInt _rowIndex = RestorableInt(0);
-  // final RestorableInt _rowsPerPage =
-  //     RestorableInt(PaginatedDataTable.defaultRowsPerPage);
-  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
+  final RestorableInt _rowsPerPage =
+      RestorableInt(PaginatedDataTable.defaultRowsPerPage);
+  // int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   final RestorableBool _sortAscending = RestorableBool(false);
   final RestorableIntN _sortColumnIndex = RestorableIntN(0);
   final scrollController = ScrollController();
@@ -22,7 +22,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
     // registerForRestoration(_dessertSelections, 'selected_row_indices');
     registerForRestoration(_rowIndex, 'current_row_index');
-    // registerForRestoration(_rowsPerPage, 'rows_per_page');
+    registerForRestoration(_rowsPerPage, 'rows_per_page');
     registerForRestoration(_sortAscending, 'sort_ascending');
     registerForRestoration(_sortColumnIndex, 'sort_column_index');
 
@@ -67,7 +67,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
 
   @override
   void dispose() {
-    // _rowsPerPage.dispose();
+    _rowsPerPage.dispose();
     _sortColumnIndex.dispose();
     _sortAscending.dispose();
     // _dessertsDataSource!.removeListener(_updateSelectedDessertRowListener);
@@ -77,20 +77,23 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
 
   @override
   Widget build(BuildContext context) {
-    var tableItemsCount = widget.malas.length;
-    var isRowCountLessDefaultRowsPerPage = tableItemsCount < _rowsPerPage;
-    _rowsPerPage =
-        isRowCountLessDefaultRowsPerPage ? tableItemsCount : _rowsPerPage;
+    final tableItemsCount = widget.malas.length;
+    final totalMalas = widget._getTotalMalas();
+    final totalJaps = totalMalas * Mala.japsPerMala;
+    var isRowCountLessDefaultRowsPerPage = tableItemsCount < _rowsPerPage.value;
+    final rowsPerPage =
+        isRowCountLessDefaultRowsPerPage ? tableItemsCount : _rowsPerPage.value;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mala History'),
         actions: [
-          IconButton(
-              onPressed: () async => await widget._createExcel(() {
-                    _showExcelSavedDialog(context);
-                  }),
-              icon: const Icon(Icons.file_download_outlined)),
+          if (tableItemsCount > 0)
+            IconButton(
+                onPressed: () async => await widget._createExcel(() {
+                      _showExcelSavedDialog(context);
+                    }),
+                icon: const Icon(Icons.file_download_outlined)),
         ],
       ),
       body: Scrollbar(
@@ -106,15 +109,21 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                     textAlign: TextAlign.center,
                   )
                 : PaginatedDataTable(
-                    header: const Text('Japs Mala'),
-                    rowsPerPage: _rowsPerPage,
-                    onRowsPerPageChanged: isRowCountLessDefaultRowsPerPage
-                        ? null
-                        : (value) {
-                            setState(() {
-                              _rowsPerPage = value!;
-                            });
-                          },
+                    header:
+                        Text('Total -> Malas: $totalMalas, Japs: $totalJaps'),
+                    availableRowsPerPage: [
+                      rowsPerPage,
+                      rowsPerPage * 2,
+                      rowsPerPage * 3,
+                      rowsPerPage * 4,
+                      rowsPerPage * 5,
+                    ],
+                    rowsPerPage: rowsPerPage,
+                    onRowsPerPageChanged: (value) {
+                      setState(() {
+                        _rowsPerPage.value = value!;
+                      });
+                    },
                     initialFirstRowIndex: _rowIndex.value,
                     onPageChanged: (rowIndex) {
                       setState(() {

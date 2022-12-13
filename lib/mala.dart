@@ -4,7 +4,8 @@ class Mala implements Comparable<Mala> {
   int japs;
   bool selected = false;
 
-  static String key = "Mala";
+  static const String key = "Mala";
+  static const japsPerMala = 108;
 
   Mala(this.date, this.count, this.japs);
 
