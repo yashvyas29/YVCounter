@@ -235,6 +235,14 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
+            tooltip: 'Open My Family Tree',
+            icon: const Icon(Icons.grass_sharp),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const FamilyTreePage()));
+            },
+          ),
+          IconButton(
             tooltip: 'Open About',
             icon: const Icon(Icons.info_outline),
             onPressed: () {
@@ -329,115 +337,134 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const SizedBox(height: 20),
-            if (_user?.name != null)
-              Text(
-                'Welcome ${_user?.name}',
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.center,
-              ),
-            const SizedBox(height: 10),
-            Text(
-              'Your completed ${_selections.first ? 'malas' : 'japs'} on',
-              style: Theme.of(context).textTheme.headlineSmall,
-              // maxLines: 3,
-              // overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-            TextButton.icon(
-              icon: const Icon(
-                Icons.calendar_today,
-                color: Colors.black,
-                size: 18,
-              ),
-              label: Text(
-                _mala.date,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              onPressed: _pickDate,
-            ),
-            Text(
-              '${_selections.first ? _mala.count : getJapsPerMala()}',
-              style: _selections.first
-                  ? Theme.of(context).textTheme.displayLarge
-                  : Theme.of(context).textTheme.displayMedium,
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              '${!_selections.first ? 'Malas' : 'Japs'}: ${!_selections.first ? _mala.count : _mala.japs}',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 20),
-            ToggleButtons(
-              onPressed: (int index) {
-                setState(() {
-                  // The button that is tapped is set to true, and the others to false.
-                  for (int i = 0; i < _selections.length; i++) {
-                    _selections[i] = i == index;
-                  }
-                });
-              },
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              selectedBorderColor: Colors.red[700],
-              selectedColor: Colors.white,
-              fillColor: Colors.red[200],
-              color: Colors.red[400],
-              constraints: const BoxConstraints(
-                minHeight: 40.0,
-                minWidth: 80.0,
-              ),
-              isSelected: _selections,
-              children: const [
-                Text('Mala'),
-                Text('Jap'),
-              ],
-            ),
-            Flexible(
-              child: SizedBox.expand(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 50),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.add, color: Colors.white),
-                    label: const Text('Add', style: TextStyle(fontSize: 20)),
-                    onPressed: _incrementCounter,
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all(const CircleBorder()),
-                      padding:
-                          MaterialStateProperty.all(const EdgeInsets.all(20)),
-                      backgroundColor: MaterialStateProperty.all(
-                          Colors.blue), // <-- Button color
-                      overlayColor:
-                          MaterialStateProperty.resolveWith<Color?>((states) {
-                        if (states.contains(MaterialState.pressed)) {
-                          return Colors.red; // <-- Splash color
-                        } else {
-                          return null;
-                        }
-                      }),
-                    ),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    // Column is also a layout widget. It takes a list of children and
+                    // arranges them vertically. By default, it sizes itself to fit its
+                    // children horizontally, and tries to be as tall as its parent.
+                    //
+                    // Invoke "debug painting" (press "p" in the console, choose the
+                    // "Toggle Debug Paint" action from the Flutter Inspector in Android
+                    // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+                    // to see the wireframe for each widget.
+                    //
+                    // Column has various properties to control how it sizes itself and
+                    // how it positions its children. Here we use mainAxisAlignment to
+                    // center the children vertically; the main axis here is the vertical
+                    // axis because Columns are vertical (the cross axis would be
+                    // horizontal).
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      const SizedBox(height: 20),
+                      if (_user?.name != null)
+                        Text(
+                          'Welcome ${_user?.name}',
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Your completed ${_selections.first ? 'malas' : 'japs'} on',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                        // maxLines: 3,
+                        // overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(
+                          Icons.calendar_today,
+                          color: Colors.black,
+                          size: 18,
+                        ),
+                        label: Text(
+                          _mala.date,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        onPressed: _pickDate,
+                      ),
+                      Text(
+                        '${_selections.first ? _mala.count : getJapsPerMala()}',
+                        style: _selections.first
+                            ? Theme.of(context).textTheme.displayLarge
+                            : Theme.of(context).textTheme.displayMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        '${!_selections.first ? 'Malas' : 'Japs'}: ${!_selections.first ? _mala.count : _mala.japs}',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 20),
+                      ToggleButtons(
+                        onPressed: (int index) {
+                          setState(() {
+                            // The button that is tapped is set to true, and the others to false.
+                            for (int i = 0; i < _selections.length; i++) {
+                              _selections[i] = i == index;
+                            }
+                          });
+                        },
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                        selectedBorderColor: Colors.red[700],
+                        selectedColor: Colors.white,
+                        fillColor: Colors.red[200],
+                        color: Colors.red[400],
+                        constraints: const BoxConstraints(
+                          minHeight: 40.0,
+                          minWidth: 80.0,
+                        ),
+                        isSelected: _selections,
+                        children: const [
+                          Text('Mala'),
+                          Text('Jap'),
+                        ],
+                      ),
+                      Flexible(
+                        child: SizedBox.expand(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 50),
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.add, color: Colors.white),
+                              label: const Text('Add',
+                                  style: TextStyle(fontSize: 20)),
+                              onPressed: _incrementCounter,
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    const CircleBorder()),
+                                padding: MaterialStateProperty.all(
+                                    const EdgeInsets.all(20)),
+                                backgroundColor: MaterialStateProperty.all(
+                                    Colors.blue), // <-- Button color
+                                overlayColor:
+                                    MaterialStateProperty.resolveWith<Color?>(
+                                        (states) {
+                                  if (states.contains(MaterialState.pressed)) {
+                                    return Colors.red; // <-- Splash color
+                                  } else {
+                                    return null;
+                                  }
+                                }),
+                                minimumSize: MaterialStateProperty.all(
+                                    const Size(150, 150)),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
       floatingActionButton: Padding(
