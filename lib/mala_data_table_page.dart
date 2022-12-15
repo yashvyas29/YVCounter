@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:yv_counter/mala.dart';
+import 'package:yv_counter/data_model/mala.dart';
 import 'package:path/path.dart' as p;
 
 part 'mala_data_table_page_state.dart';

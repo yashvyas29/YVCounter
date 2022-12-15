@@ -239,7 +239,9 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.grass_sharp),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const FamilyTreePage()));
+                  builder: (context) => const FamilyTreePage(
+                        title: "Vanshavali",
+                      )));
             },
           ),
           IconButton(

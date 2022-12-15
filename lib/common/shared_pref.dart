@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:yv_counter/mala.dart';
+import 'package:yv_counter/data_model/mala.dart';
 
 class SharedPref {
   read(String key) async {

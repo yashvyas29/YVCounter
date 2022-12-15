@@ -5,7 +5,7 @@ import 'package:file/memory.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
-import 'package:yv_counter/user.dart';
+import 'package:yv_counter/data_model/user.dart';
 
 class GoogleDrive {
   static const _scopes = [ga.DriveApi.driveAppdataScope];

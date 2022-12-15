@@ -1,12 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:graphview/GraphView.dart';
 
 class FamilyTreePage extends StatefulWidget {
-  const FamilyTreePage({super.key});
+  const FamilyTreePage({super.key, required this.title});
 
   @override
   State<FamilyTreePage> createState() => _FamilyTreePageState();
 
+  final String title;
+
+  /*
   static const json = {
     'nodes': [
       {'id': 1, 'label': 'Heera Lal Ji Vyas'},
@@ -255,41 +261,68 @@ class FamilyTreePage extends StatefulWidget {
       // {'from': 19, 'to': 31},
     ]
   };
+  */
+
+  Future readJson() async {
+    final content = await rootBundle.loadString('lib/family_tree/family.json');
+    // debugPrint(content);
+    return jsonDecode(content);
+  }
 }
 
 class _FamilyTreePageState extends State<FamilyTreePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Vanshavli')),
-        body: Column(
-          children: [
-            Expanded(
-              child: InteractiveViewer(
-                  constrained: false,
-                  boundaryMargin: const EdgeInsets.all(100),
-                  minScale: 0.01,
-                  maxScale: 5.6,
-                  child: GraphView(
-                    graph: graph,
-                    algorithm: BuchheimWalkerAlgorithm(
-                        builder, TreeEdgeRenderer(builder)),
-                    paint: Paint()
-                      ..color = Colors.green
-                      ..strokeWidth = 1
-                      ..style = PaintingStyle.stroke,
-                    builder: (Node node) {
-                      // I can decide what widget should be shown here based on the id
-                      var a = node.key!.value as int?;
-                      var nodes = FamilyTreePage.json['nodes']!;
-                      var nodeValue =
-                          nodes.firstWhere((element) => element['id'] == a);
-                      return rectangleWidget(nodeValue['label'] as String?);
-                    },
-                  )),
-            ),
-          ],
-        ));
+      appBar: AppBar(title: Text(widget.title)),
+      body: FutureBuilder(
+        future: widget.readJson(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                  backgroundColor: Colors.red,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)),
+            );
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            final edges = snapshot.data["edges"];
+            updateNode(edges);
+            return Column(
+              children: [
+                Expanded(
+                  child: InteractiveViewer(
+                      constrained: false,
+                      boundaryMargin: const EdgeInsets.all(100),
+                      minScale: 0.01,
+                      maxScale: 5.6,
+                      child: GraphView(
+                        graph: graph,
+                        algorithm: BuchheimWalkerAlgorithm(
+                            builder, TreeEdgeRenderer(builder)),
+                        paint: Paint()
+                          ..color = Colors.green
+                          ..strokeWidth = 1
+                          ..style = PaintingStyle.stroke,
+                        builder: (Node node) {
+                          // I can decide what widget should be shown here based on the id
+                          final a = node.key!.value as int?;
+                          final nodes = snapshot.data['nodes'];
+                          debugPrint(nodes.toString());
+                          final nodeValue =
+                              nodes.firstWhere((element) => element['id'] == a);
+                          return rectangleWidget(nodeValue['label'] as String?);
+                        },
+                      )),
+                ),
+              ],
+            );
+          }
+          return const Center(
+            child: Text("Something went wrong, please try again later."),
+          );
+        },
+      ),
+    );
   }
 
   Widget rectangleWidget(String? a) {
@@ -315,17 +348,20 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   @override
   void initState() {
     super.initState();
-    var edges = FamilyTreePage.json['edges']!;
-    for (var element in edges) {
-      var fromNodeId = element['from'];
-      var toNodeId = element['to'];
-      graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
-    }
-
     builder
       ..siblingSeparation = (10)
       ..levelSeparation = (15)
       ..subtreeSeparation = (15)
       ..orientation = (BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM);
+  }
+
+  void updateNode(List edges) {
+    debugPrint("updateNode");
+    for (var element in edges) {
+      debugPrint(element.toString());
+      var fromNodeId = element['from'];
+      var toNodeId = element['to'];
+      graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
+    }
   }
 }

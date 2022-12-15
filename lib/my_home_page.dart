@@ -9,12 +9,12 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/about_page.dart';
-import 'package:yv_counter/family_tree_page.dart';
-import 'package:yv_counter/google_drive.dart';
-import 'package:yv_counter/mala.dart';
+import 'package:yv_counter/family_tree/family_tree_page.dart';
+import 'package:yv_counter/common/google_drive.dart';
+import 'package:yv_counter/data_model/mala.dart';
 import 'package:yv_counter/mala_data_table_page.dart';
-import 'package:yv_counter/shared_pref.dart';
-import 'package:yv_counter/user.dart';
+import 'package:yv_counter/common/shared_pref.dart';
+import 'package:yv_counter/data_model/user.dart';
 
 part 'my_home_page_state.dart';
 
