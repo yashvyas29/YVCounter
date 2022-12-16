@@ -10,7 +10,7 @@
         },
         {
             "id": 3,
-            "label": "Kishore Ji\nVadam Bai"
+            "label": "Kishor Ji\nVadam Bai"
         },
         {
             "id": 4,
@@ -318,43 +318,43 @@
         },
         {
             "id": 80,
-            "label": "Boy"
+            "label": "Savay Lal Ji\nBasanti Bai"
         },
         {
             "id": 81,
-            "label": "Kunj Bihari Ji"
+            "label": "Kunj Bihari Ji\nGirja Devi"
         },
         {
             "id": 82,
-            "label": "Avadh Bihari Ji"
+            "label": "Avadh Bihari Ji\nPushpa Devi"
         },
         {
             "id": 83,
-            "label": "Dev Datt Ji"
+            "label": "Dev Datt Ji\nPushpa Devi"
         },
         {
             "id": 84,
-            "label": "Aniruddh Ji"
+            "label": "Aniruddh Ji\nFulmala Devi"
         },
         {
             "id": 85,
-            "label": "Rajendra Ji"
+            "label": "Rajendra Ji\nShashikala Devi"
         },
         {
             "id": 86,
-            "label": "Ashwin Ji"
+            "label": "Ashwin Ji\nSharda Devi"
         },
         {
             "id": 87,
-            "label": "Pavan Ji"
+            "label": "Pavan Ji\nSaroj Devi"
         },
         {
             "id": 88,
-            "label": "Dhananjay Ji"
+            "label": "Dhananjay Ji\nTarulata (Antim) Devi"
         },
         {
             "id": 89,
-            "label": "Pradhyumn Ji"
+            "label": "Pradhyumn Ji\nPremlata Devi"
         },
         {
             "id": 90,
@@ -370,19 +370,147 @@
         },
         {
             "id": 93,
-            "label": "Boy"
+            "label": "Himanshu"
         },
         {
             "id": 94,
-            "label": "Girl"
+            "label": "Shivali"
         },
         {
             "id": 95,
-            "label": "Boy"
+            "label": "Ritik"
         },
         {
             "id": 96,
+            "label": "Vanshika"
+        },
+        {
+            "id": 97,
+            "label": "Anshu"
+        },
+        {
+            "id": 98,
             "label": "Boy"
+        },
+        {
+            "id": 99,
+            "label": "Girl"
+        },
+        {
+            "id": 100,
+            "label": "Krishntanay"
+        },
+        {
+            "id": 101,
+            "label": "Dimple"
+        },
+        {
+            "id": 102,
+            "label": "Kishan Lal Ji"
+        },
+        {
+            "id": 103,
+            "label": "Ganpat Ji\nWife\nGanga Bai"
+        },
+        {
+            "id": 104,
+            "label": "Vranda Devi"
+        },
+        {
+            "id": 105,
+            "label": "Lalita Devi"
+        },
+        {
+            "id": 106,
+            "label": "Bhavar Ji"
+        },
+        {
+            "id": 107,
+            "label": "Parshottam Ji"
+        },
+        {
+            "id": 108,
+            "label": "Raghunath Ji"
+        },
+        {
+            "id": 109,
+            "label": "Girja Devi"
+        },
+        {
+            "id": 110,
+            "label": "Manohar Lal Ji"
+        },
+        {
+            "id": 111,
+            "label": "Santosh Lal (Vedraj) Ji"
+        },
+        {
+            "id": 112,
+            "label": "Harnarayan Ji"
+        },
+        {
+            "id": 113,
+            "label": "Yashoda Devi"
+        },
+        {
+            "id": 114,
+            "label": "Babru Ji"
+        },
+        {
+            "id": 115,
+            "label": "Chandr Shekhar Ji"
+        },
+        {
+            "id": 116,
+            "label": "Prem Shankar (Tintu) Ji"
+        },
+        {
+            "id": 117,
+            "label": "Damyanti Devi"
+        },
+        {
+            "id": 118,
+            "label": "Brahmdatt Ji"
+        },
+        {
+            "id": 119,
+            "label": "Nirmala Devi"
+        },
+        {
+            "id": 120,
+            "label": "Harjivan Ji"
+        },
+        {
+            "id": 121,
+            "label": "Shanti Lal Ji"
+        },
+        {
+            "id": 122,
+            "label": "Kanak Ji"
+        },
+        {
+            "id": 123,
+            "label": "Sury Prakash Ji"
+        },
+        {
+            "id": 124,
+            "label": "Shyam Ji"
+        },
+        {
+            "id": 125,
+            "label": "Lal Bahadur Ji"
+        },
+        {
+            "id": 126,
+            "label": "Shakuntala Devi"
+        },
+        {
+            "id": 127,
+            "label": "Kailash Ji"
+        },
+        {
+            "id": 128,
+            "label": "Girl"
         }
     ],
     "edges": [
@@ -396,7 +524,15 @@
         },
         {
             "from": 3,
+            "to": 102
+        },
+        {
+            "from": 3,
             "to": 4
+        },
+        {
+            "from": 3,
+            "to": 103
         },
         {
             "from": 4,
@@ -751,20 +887,136 @@
             "to": 92
         },
         {
-            "from": 86,
+            "from": 85,
             "to": 93
         },
         {
-            "from": 87,
+            "from": 86,
             "to": 94
         },
         {
-            "from": 88,
+            "from": 86,
             "to": 95
         },
         {
-            "from": 89,
+            "from": 87,
             "to": 96
+        },
+        {
+            "from": 87,
+            "to": 97
+        },
+        {
+            "from": 88,
+            "to": 98
+        },
+        {
+            "from": 88,
+            "to": 99
+        },
+        {
+            "from": 89,
+            "to": 100
+        },
+        {
+            "from": 89,
+            "to": 101
+        },
+        {
+            "from": 102,
+            "to": 105
+        },
+        {
+            "from": 103,
+            "to": 106
+        },
+        {
+            "from": 103,
+            "to": 107
+        },
+        {
+            "from": 103,
+            "to": 108
+        },
+        {
+            "from": 103,
+            "to": 109
+        },
+        {
+            "from": 103,
+            "to": 110
+        },
+        {
+            "from": 103,
+            "to": 111
+        },
+        {
+            "from": 106,
+            "to": 112
+        },
+        {
+            "from": 106,
+            "to": 113
+        },
+        {
+            "from": 107,
+            "to": 114
+        },
+        {
+            "from": 108,
+            "to": 115
+        },
+        {
+            "from": 108,
+            "to": 116
+        },
+        {
+            "from": 110,
+            "to": 117
+        },
+        {
+            "from": 110,
+            "to": 118
+        },
+        {
+            "from": 110,
+            "to": 119
+        },
+        {
+            "from": 111,
+            "to": 120
+        },
+        {
+            "from": 111,
+            "to": 121
+        },
+        {
+            "from": 111,
+            "to": 122
+        },
+        {
+            "from": 111,
+            "to": 123
+        },
+        {
+            "from": 115,
+            "to": 124
+        },
+        {
+            "from": 115,
+            "to": 125
+        },
+        {
+            "from": 115,
+            "to": 126
+        },
+        {
+            "from": 115,
+            "to": 127
+        },
+        {
+            "from": 115,
+            "to": 128
         }
     ]
 }

@@ -27,15 +27,20 @@ Future<File> writeJson(String text) async {
   return file.writeAsString(text);
 }
 
+Future<File> writeJsonData(Map<String, dynamic> map) async {
+  final file = await localFile();
+  return file.writeAsString(jsonEncode(map));
+}
+
 Future<Map<String, dynamic>> readJson() async {
-  debugPrint("readJson2");
+  debugPrint("readJson");
   try {
     final file = await localFile();
     // Delete the file
     // file.deleteSync();
     // Read the file
     final content = await file.readAsString();
-    debugPrint(content);
+    // debugPrint(content);
     return jsonDecode(content);
   } catch (e) {
     debugPrint(e.toString());

@@ -1,0 +1,190 @@
+{
+    "nodes": [
+        {
+            "id": 8,
+            "label": "Moti Lal Ji Dharmawat"
+        },
+        {
+            "id": 9,
+            "label": "Shankar Lal Ji"
+        },
+        {
+            "id": 10,
+            "label": "Jagannath Ji\nHeera Bai"
+        },
+        {
+            "id": 21,
+            "label": "Sajjan Devi\nGirja Lal Ji Vyas"
+        },
+        {
+            "id": 11,
+            "label": "Bhanwar Lal Ji\nDurga Devi"
+        },
+        {
+            "id": 22,
+            "label": "Sundar Lal Ji\nAmba Devi"
+        },
+        {
+            "id": 19,
+            "label": "Pushpa Devi\nBheru Lal Ji Choubisa"
+        },
+        {
+            "id": 20,
+            "label": "Heera Lal Ji\nRukman Devi"
+        },
+        {
+            "id": 13,
+            "label": "Mithhu Lal Ji\nNirmala Devi"
+        },
+        {
+            "id": 14,
+            "label": "Deepika Devi\nVinod Ji Choubisa"
+        },
+        {
+            "id": 15,
+            "label": "Pooja\nYash Vyas"
+        },
+        {
+            "id": 16,
+            "label": "Ayush"
+        },
+        {
+            "id": 17,
+            "label": "Abhishek"
+        },
+        {
+            "id": 18,
+            "label": "Parth"
+        },
+        {
+            "id": 23,
+            "label": "Chandra Prakash Ji\nBhagvati Devi"
+        },
+        {
+            "id": 24,
+            "label": "Deepak Ji\nDurga Devi"
+        },
+        {
+            "id": 25,
+            "label": "Elakshi"
+        },
+        {
+            "id": 26,
+            "label": "Prayag"
+        },
+        {
+            "id": 27,
+            "label": "Rajshree"
+        },
+        {
+            "id": 28,
+            "label": "Vaideh"
+        },
+        {
+            "id": 29,
+            "label": "Devkanya Devi\nRadheshyam Ji Choubisa"
+        },
+        {
+            "id": 30,
+            "label": "Lokesh Ji\nDeepmala Devi"
+        },
+        {
+            "id": 31,
+            "label": "Bhagvati Devi\nMahesh Ji Choubisa"
+        }
+    ],
+    "edges": [
+        {
+            "from": 8,
+            "to": 9
+        },
+        {
+            "from": 9,
+            "to": 10
+        },
+        {
+            "from": 10,
+            "to": 21
+        },
+        {
+            "from": 10,
+            "to": 11
+        },
+        {
+            "from": 10,
+            "to": 22
+        },
+        {
+            "from": 11,
+            "to": 19
+        },
+        {
+            "from": 11,
+            "to": 20
+        },
+        {
+            "from": 11,
+            "to": 13
+        },
+        {
+            "from": 13,
+            "to": 14
+        },
+        {
+            "from": 13,
+            "to": 15
+        },
+        {
+            "from": 13,
+            "to": 16
+        },
+        {
+            "from": 13,
+            "to": 17
+        },
+        {
+            "from": 15,
+            "to": 12
+        },
+        {
+            "from": 14,
+            "to": 18
+        },
+        {
+            "from": 20,
+            "to": 23
+        },
+        {
+            "from": 20,
+            "to": 24
+        },
+        {
+            "from": 23,
+            "to": 25
+        },
+        {
+            "from": 23,
+            "to": 26
+        },
+        {
+            "from": 24,
+            "to": 27
+        },
+        {
+            "from": 24,
+            "to": 28
+        },
+        {
+            "from": 19,
+            "to": 29
+        },
+        {
+            "from": 19,
+            "to": 30
+        },
+        {
+            "from": 19,
+            "to": 31
+        }
+    ]
+}
