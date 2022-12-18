@@ -91,7 +91,8 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
           if (tableItemsCount > 0)
             IconButton(
                 onPressed: () async => await widget._createExcel(() {
-                      _showExcelSavedDialog(context);
+                      showAlertDialog(
+                          context, 'Excel file saved successfully.');
                     }),
                 icon: const Icon(Icons.file_download_outlined)),
         ],
@@ -159,33 +160,6 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
           ],
         ),
       ),
-    );
-  }
-
-  Future<void> _showExcelSavedDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alert'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text('Excel file saved successfully.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }

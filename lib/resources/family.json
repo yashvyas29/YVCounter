@@ -2,7 +2,7 @@
     "nodes": [
         {
             "id": 1,
-            "label": "Heera Lal Ji Vyas"
+            "label": "Heera Lal Ji"
         },
         {
             "id": 2,
@@ -54,7 +54,7 @@
         },
         {
             "id": 14,
-            "label": "Chaitanya Prakash Ji\nShakuntala Devi"
+            "label": "Chaitanya Prakash Ji\nShakuntala Devi Kadvawat"
         },
         {
             "id": 15,
@@ -282,7 +282,7 @@
         },
         {
             "id": 71,
-            "label": "Girl2"
+            "label": "Girl"
         },
         {
             "id": 72,
@@ -418,7 +418,7 @@
         },
         {
             "id": 105,
-            "label": "Lalita Devi"
+            "label": "Basanti Devi"
         },
         {
             "id": 106,
@@ -511,9 +511,25 @@
         {
             "id": 128,
             "label": "Girl"
+        },
+        {
+            "id": 129,
+            "label": "Devki Nandan Ji Vyas"
+        },
+        {
+            "id": 130,
+            "label": "Lalita Devi"
+        },
+        {
+            "id": 131,
+            "label": "Kishan Lal Ji"
         }
     ],
     "edges": [
+        {
+            "from": 129,
+            "to": 1
+        },
         {
             "from": 1,
             "to": 2
@@ -533,6 +549,14 @@
         {
             "from": 3,
             "to": 103
+        },
+        {
+            "from": 4,
+            "to": 130
+        },
+        {
+            "from": 4,
+            "to": 131
         },
         {
             "from": 4,
@@ -921,6 +945,10 @@
         {
             "from": 89,
             "to": 101
+        },
+        {
+            "from": 102,
+            "to": 104
         },
         {
             "from": 102,

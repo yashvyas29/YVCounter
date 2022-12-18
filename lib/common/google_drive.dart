@@ -110,21 +110,25 @@ class GoogleDrive {
         }
         debugPrint("App data deleted successfully.");
       } else {
-        debugPrint("App data not available.");
+        const error = "App data not available.";
+        Future.error(error);
       }
     } else {
-      debugPrint("User not logged in.");
+      const error = "User not logged in.";
+      Future.error(error);
     }
   }
 
   Future<void> uploadFileToGoogleDrive(File file) async {
     final driveApi = await _getDriveApi();
     if (driveApi == null) {
-      debugPrint("Sign-in upload client Error");
+      const error = "Sign In Error";
+      debugPrint(error);
+      return Future.error(error);
     } else {
       ga.File fileToUpload = ga.File();
       final fileId = await _getFileId(driveApi);
-      if (fileId != null) {
+      try {
         debugPrint("Update file");
         final uploadedFile = await driveApi.files.update(
           fileToUpload,
@@ -132,7 +136,7 @@ class GoogleDrive {
           uploadMedia: ga.Media(file.openRead(), file.lengthSync()),
         );
         _printFileMetaData(uploadedFile);
-      } else {
+      } catch (error) {
         fileToUpload.parents = [_appDataFolderId];
         fileToUpload.name = _fileName;
         debugPrint("Create file");
@@ -143,13 +147,15 @@ class GoogleDrive {
     }
   }
 
-  Future<File?> downloadGoogleDriveFile() async {
+  Future<File> downloadGoogleDriveFile() async {
     var driveApi = await _getDriveApi();
     if (driveApi == null) {
-      debugPrint("Sign-in download first Error");
+      const error = "Sign In Error";
+      debugPrint(error);
+      return Future.error(error);
     } else {
       final fileId = await _getFileId(driveApi);
-      if (fileId != null) {
+      try {
         ga.Media file = await driveApi.files.get(fileId,
             downloadOptions: ga.DownloadOptions.fullMedia) as ga.Media;
         List<int> dataStore = [];
@@ -166,9 +172,10 @@ class GoogleDrive {
           completer.completeError(error);
         });
         return completer.future;
+      } catch (error) {
+        return Future.error(error);
       }
     }
-    return null;
   }
 
   Future<String?> _getFolderIdIfExists(
@@ -185,23 +192,24 @@ class GoogleDrive {
     }
   }
 
-  Future<String?> _getFileId(ga.DriveApi driveApi) async {
+  Future<String> _getFileId(ga.DriveApi driveApi) async {
     try {
       final found = await driveApi.files.list(
         q: "'$_appDataFolderId' in parents and name = '$_fileName'",
         spaces: _appDataFolderId,
         $fields: "files(id)",
       );
-      final files = found.files;
-      if (files == null || files.isEmpty) {
-        debugPrint("File not found.");
-        return null;
+      final fileId = found.files?.first.id;
+      if (fileId == null || fileId.isEmpty) {
+        const error = "File not found";
+        debugPrint(error);
+        return Future.error(error);
       } else {
-        return files.first.id;
+        return fileId;
       }
-    } catch (e) {
-      debugPrint("_getFileId error: $e.toString()");
-      return null;
+    } catch (error) {
+      debugPrint("_getFileId error: $error.toString()");
+      return Future.error(error);
     }
   }
 

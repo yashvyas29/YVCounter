@@ -2,7 +2,6 @@ class Mala implements Comparable<Mala> {
   String date;
   int count;
   int japs;
-  bool selected = false;
 
   static const String key = "Mala";
   static const japsPerMala = 108;

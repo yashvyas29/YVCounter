@@ -1,11 +1,11 @@
 class User implements Comparable<User> {
-  String? name;
-  String email;
-  String id;
+  final String? name;
+  final String email;
+  final String id;
 
   static String key = "User";
 
-  User(this.name, this.email, this.id);
+  const User(this.name, this.email, this.id);
 
   User.fromJson(Map<String, dynamic> json)
       : name = json['name'],

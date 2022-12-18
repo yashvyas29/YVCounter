@@ -9,26 +9,18 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/about_page.dart';
-import 'package:yv_counter/family_tree/family_tree_page.dart';
+import 'package:yv_counter/family_tree_page.dart';
 import 'package:yv_counter/common/google_drive.dart';
 import 'package:yv_counter/data_model/mala.dart';
 import 'package:yv_counter/mala_data_table_page.dart';
 import 'package:yv_counter/common/shared_pref.dart';
 import 'package:yv_counter/data_model/user.dart';
+import 'package:yv_counter/common/snackbar_dialog.dart';
 
 part 'my_home_page_state.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -105,4 +97,4 @@ class MyHomePage extends StatefulWidget {
 }
 
 // This is the type used by the popup menu below.
-enum Menu { signIn, backup, restore, restoreExcel, delete, signOut }
+enum Menu { backup, restore, restoreExcel, delete, signOut }

@@ -34,7 +34,8 @@ class _MyHomePageState extends State<MyHomePage> {
         _mala = todayMala;
       });
     } catch (error) {
-      _showSnackBar("Nothing found!");
+      debugPrint(error.toString());
+      showSnackBar(context, "Nothing found!");
     }
   }
 
@@ -93,90 +94,61 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _restoreBackup() async {
     debugPrint("_restoreBackup");
     final file = await _googleDrive.downloadGoogleDriveFile();
-    if (file != null) {
+    try {
       final malasString = await file.readAsString();
+      if (!mounted) return;
       final malasJson = json.decode(malasString) as List;
       final malas = malasJson.map((value) => Mala.fromJson(value)).toList();
       if (malas.isNotEmpty) {
         _malaList = malas;
         _sharedPref.saveList(Mala.key, malas);
-        try {
-          final mala = malas.firstWhere((mala) => mala.date == _today);
-          setState(() {
-            _mala = mala;
-          });
-        } catch (error) {
-          _showSnackBar("No mala available for today in backup.");
-        }
+        final mala = malas.firstWhere((mala) => mala.date == _today);
+        setState(() {
+          _mala = mala;
+        });
+        showAlertDialog(context, "Restore successful.");
       } else {
-        _showSnackBar("No backup available.");
+        showSnackBar(context, "No backup available.");
       }
+    } catch (error) {
+      if (!mounted) return;
+      showSnackBar(context, error.toString());
     }
   }
 
   Future<void> _restoreExcelBackup() async {
     debugPrint("_restoreExcelBackup");
     final malas = await widget._getMalasFromExcel();
+    if (!mounted) return;
     if (malas.isEmpty) {
-      _showSnackBar("No malas loaded from backup.");
+      showSnackBar(context, "No malas loaded from backup.");
     } else {
       _malaList.removeWhere((mala) => malas.contains(mala));
       malas.addAll(_malaList);
       _malaList = malas;
       _sharedPref.saveList(Mala.key, malas);
-      try {
-        final mala = malas.firstWhere((mala) => mala.date == _today);
-        setState(() {
-          _mala = mala;
-        });
-      } catch (error) {
-        _showSnackBar("No mala available for today in backup.");
-      }
+      final mala = malas.firstWhere((mala) => mala.date == _today);
+      setState(() {
+        _mala = mala;
+      });
+      await showAlertDialog(context, "Restore successful.");
     }
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(message), duration: const Duration(milliseconds: 2000)));
-  }
-
-  void _showProgressIndicator(String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                Text(message),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _hideProgressIndicator() {
-    Navigator.pop(context);
-  }
-
   Future<void> _saveBackup() async {
-    final malasJson = json.encode(_malaList);
-    debugPrint(malasJson);
-    final tempDir = await getTemporaryDirectory();
-    final file = File("${tempDir.path}/malas");
-    await file.writeAsString(malasJson);
-    await _googleDrive.uploadFileToGoogleDrive(file);
-    file.delete();
+    try {
+      final malasJson = json.encode(_malaList);
+      debugPrint(malasJson);
+      final tempDir = await getTemporaryDirectory();
+      final file = File("${tempDir.path}/malas");
+      await file.writeAsString(malasJson);
+      await _googleDrive.uploadFileToGoogleDrive(file);
+      file.delete();
+      if (!mounted) return;
+      await showAlertDialog(context, "Backup done successfully.");
+    } catch (error) {
+      showSnackBar(context, error.toString());
+    }
   }
 
   Future<void> _pickDate() async {
@@ -212,16 +184,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
         actions: [
           IconButton(
@@ -256,50 +220,42 @@ class _MyHomePageState extends State<MyHomePage> {
             tooltip: "Google Drive",
             onSelected: (menu) async {
               switch (menu) {
-                case Menu.signIn:
-                  await _googleDrive.signIn();
-                  break;
                 case Menu.backup:
-                  _showProgressIndicator("Backup in Progress");
+                  showProgressIndicator(context, "Backup in Progress");
                   await _saveBackup();
-                  _hideProgressIndicator();
                   break;
                 case Menu.restore:
-                  _showProgressIndicator("Restoring from Backup");
+                  showProgressIndicator(context, "Restoring from Backup");
                   await _restoreBackup();
-                  _hideProgressIndicator();
                   break;
                 case Menu.restoreExcel:
-                  _showProgressIndicator("Restoring from Excel");
+                  showProgressIndicator(context, "Restoring from Excel");
                   await _restoreExcelBackup();
-                  _hideProgressIndicator();
                   break;
                 case Menu.delete:
-                  _showProgressIndicator("Deleting Backup");
-                  await _googleDrive.deleteAppDataFolderFiles();
-                  _hideProgressIndicator();
+                  showProgressIndicator(context, "Deleting Backup");
+                  try {
+                    await _googleDrive.deleteAppDataFolderFiles();
+                    if (!mounted) return;
+                    await showAlertDialog(context,
+                        "App data deleted successfully from Google Drive.");
+                  } catch (error) {
+                    showSnackBar(context, error.toString());
+                  }
                   break;
                 case Menu.signOut:
-                  _showProgressIndicator("Signing Out");
+                  showProgressIndicator(context, "Signing Out");
                   await _googleDrive.signOut();
-                  _hideProgressIndicator();
               }
               final user = await _googleDrive.getUser();
               setState(() {
                 _user = user;
               });
+              if (!mounted) return;
+              hideProgressIndicator(context);
             },
             itemBuilder: (context) {
               return [
-                /*
-                if (_user == null)
-                  const PopupMenuItem(
-                    value: Menu.signIn,
-                    child: Text(
-                      'Sign In to Google Drive',
-                    ),
-                  ),
-                  */
                 const PopupMenuItem(
                   value: Menu.restoreExcel,
                   child: Text(
@@ -348,20 +304,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 child: IntrinsicHeight(
                   child: Column(
-                    // Column is also a layout widget. It takes a list of children and
-                    // arranges them vertically. By default, it sizes itself to fit its
-                    // children horizontally, and tries to be as tall as its parent.
-                    //
-                    // Invoke "debug painting" (press "p" in the console, choose the
-                    // "Toggle Debug Paint" action from the Flutter Inspector in Android
-                    // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-                    // to see the wireframe for each widget.
-                    //
-                    // Column has various properties to control how it sizes itself and
-                    // how it positions its children. Here we use mainAxisAlignment to
-                    // center the children vertically; the main axis here is the vertical
-                    // axis because Columns are vertical (the cross axis would be
-                    // horizontal).
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
