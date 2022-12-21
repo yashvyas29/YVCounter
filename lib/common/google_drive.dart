@@ -11,7 +11,9 @@ class GoogleDrive {
   static const _scopes = [ga.DriveApi.driveAppdataScope];
   static const _folderMimeType = "application/vnd.google-apps.folder";
   static const _appDataFolderId = "appDataFolder";
-  static const _fileName = "malas";
+  static const malasFileName = "malas";
+  static const familyFileName = "family";
+  static String fileName = malasFileName;
 
   final _googleSignIn = GoogleSignIn.standard(scopes: _scopes);
 
@@ -138,7 +140,7 @@ class GoogleDrive {
         _printFileMetaData(uploadedFile);
       } catch (error) {
         fileToUpload.parents = [_appDataFolderId];
-        fileToUpload.name = _fileName;
+        fileToUpload.name = fileName;
         debugPrint("Create file");
         final uploadedFile = await driveApi.files.create(fileToUpload,
             uploadMedia: ga.Media(file.openRead(), file.lengthSync()));
@@ -164,7 +166,7 @@ class GoogleDrive {
           dataStore.insertAll(dataStore.length, data);
         }, onDone: () async {
           debugPrint("File downloaded.");
-          final file = MemoryFileSystem().file(_fileName);
+          final file = MemoryFileSystem().file(fileName);
           await file.writeAsBytes(dataStore);
           completer.complete(file);
         }, onError: (error) {
@@ -195,7 +197,7 @@ class GoogleDrive {
   Future<String> _getFileId(ga.DriveApi driveApi) async {
     try {
       final found = await driveApi.files.list(
-        q: "'$_appDataFolderId' in parents and name = '$_fileName'",
+        q: "'$_appDataFolderId' in parents and name = '$fileName'",
         spaces: _appDataFolderId,
         $fields: "files(id)",
       );

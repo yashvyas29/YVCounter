@@ -46,7 +46,19 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         actions: [
           IconButton(
               onPressed: () {
-                debugPrint("Reset pressed.");
+                debugPrint("Reset to family pressed.");
+                JsonFileHandler.fileName = JsonFileHandler.familyFileName;
+                widget._jsonFileHandler.deleteLocalFile();
+                graph = Graph()..isTree = true;
+                setState(() {
+                  _data.clear();
+                });
+              },
+              icon: const Icon(Icons.sync)),
+          IconButton(
+              onPressed: () {
+                debugPrint("Reset to family1 pressed.");
+                JsonFileHandler.fileName = JsonFileHandler.family1FileName;
                 widget._jsonFileHandler.deleteLocalFile();
                 graph = Graph()..isTree = true;
                 setState(() {
@@ -62,11 +74,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
   Widget rectangleWidget(Node node) {
     // debugPrint("rectangleWidget: ${node.toString()}");
-    final id = node.key!.value;
     final nodes = _data[nodesKey];
-    // debugPrint(nodes.toString());
+    final id = node.key!.value;
     final nodeIndex = nodes.indexWhere((node) => node['id'] == id);
+    // debugPrint("id: $id, nodeIndex: $nodeIndex");
     final nodeValue = nodes[nodeIndex];
+    // debugPrint(nodeValue.toString());
     final value = nodeValue['label'].toString();
     final readOnly = nodeValue['readOnly'] ?? true;
     InputDecoration inputDecoration = InputDecoration(
@@ -288,11 +301,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     debugPrint("updateNode");
     debugPrint(edges.length.toString());
     // debugPrint(edges.toString());
-    if (edges.length < 100 &&
-        _transformationController.value != Matrix4.identity()) {
+    if (edges.length > 80) {
+      if (_transformationController.value == Matrix4.identity()) {
+        setupTransformationController();
+      }
+    } else {
       _transformationController.value = Matrix4.identity();
-    } else if (_transformationController.value == Matrix4.identity()) {
-      setupTransformationController();
     }
     if (edges.isEmpty) {
       final nodes = _data[nodesKey];

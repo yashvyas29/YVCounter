@@ -93,8 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _restoreBackup() async {
     debugPrint("_restoreBackup");
-    final file = await _googleDrive.downloadGoogleDriveFile();
     try {
+      GoogleDrive.fileName = GoogleDrive.malasFileName;
+      final file = await _googleDrive.downloadGoogleDriveFile();
       final malasString = await file.readAsString();
       if (!mounted) return;
       final malasJson = json.decode(malasString) as List;
@@ -108,8 +109,11 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         showAlertDialog(context, "Restore successful.");
       } else {
-        showSnackBar(context, "No backup available.");
+        showSnackBar(context, "Malas backup not available.");
       }
+      GoogleDrive.fileName = GoogleDrive.familyFileName;
+      final familyFile = await _googleDrive.downloadGoogleDriveFile();
+      const JsonFileHandler().writeJson(await familyFile.readAsString());
     } catch (error) {
       if (!mounted) return;
       showSnackBar(context, error.toString());
@@ -140,10 +144,14 @@ class _MyHomePageState extends State<MyHomePage> {
       final malasJson = json.encode(_malaList);
       debugPrint(malasJson);
       final tempDir = await getTemporaryDirectory();
-      final file = File("${tempDir.path}/malas");
+      GoogleDrive.fileName = GoogleDrive.malasFileName;
+      final file = File("${tempDir.path}/${GoogleDrive.fileName}");
       await file.writeAsString(malasJson);
       await _googleDrive.uploadFileToGoogleDrive(file);
       file.delete();
+      GoogleDrive.fileName = GoogleDrive.familyFileName;
+      final familyFile = await const JsonFileHandler().localFile();
+      await _googleDrive.uploadFileToGoogleDrive(familyFile);
       if (!mounted) return;
       await showAlertDialog(context, "Backup done successfully.");
     } catch (error) {

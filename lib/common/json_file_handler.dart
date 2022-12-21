@@ -8,6 +8,9 @@ import 'package:yv_counter/data_model/my_node.dart';
 
 class JsonFileHandler {
   const JsonFileHandler();
+  static const familyFileName = "family.json";
+  static const family1FileName = "family1.json";
+  static String fileName = familyFileName;
 
   String listMyNodeJSON(List<MyNode> lst) {
     Map<String, String> mapMyNodeJSON = {};
@@ -24,7 +27,7 @@ class JsonFileHandler {
 
   Future<File> localFile() async {
     final path = await localPath();
-    return File('$path/family_tree.json');
+    return File('$path/$familyFileName');
   }
 
   Future<File> writeJson(String text) async {
@@ -53,7 +56,7 @@ class JsonFileHandler {
   }
 
   Future<String> readJsonFromBundle() async {
-    const filePath = 'lib/resources/family.json';
+    String filePath = 'lib/resources/$fileName';
     return rootBundle.loadString(filePath);
   }
 
