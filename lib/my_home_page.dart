@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:intl/intl.dart';
+import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/about_page.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
@@ -14,7 +15,7 @@ import 'package:yv_counter/family_tree_page.dart';
 import 'package:yv_counter/common/google_drive.dart';
 import 'package:yv_counter/data_model/mala.dart';
 import 'package:yv_counter/mala_data_table_page.dart';
-import 'package:yv_counter/common/shared_pref.dart';
+// import 'package:yv_counter/common/shared_pref.dart';
 import 'package:yv_counter/data_model/user.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 
@@ -94,6 +95,30 @@ class MyHomePage extends StatefulWidget {
       }
     }
     return [];
+  }
+
+  Future<Isar> openIsarMala() async {
+    final isar = Isar.getInstance();
+    if (isar == null) {
+      return await Isar.open([MalaSchema]);
+    } else {
+      return isar;
+    }
+  }
+
+  Future<List<Mala>> _getMalas() async {
+    final isar = await openIsarMala();
+    return await isar.malas.where().findAll();
+  }
+
+  Future<void> _saveMalas(List<Mala> malas) async {
+    final isar = await openIsarMala();
+    isar.writeTxn(() async => await isar.malas.putAllByDate(malas));
+  }
+
+  Future<void> deleteMalaByDate(String date) async {
+    final isar = await openIsarMala();
+    isar.writeTxn(() async => await isar.malas.deleteByDate(date));
   }
 }
 
