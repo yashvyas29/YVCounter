@@ -1,4 +1,4 @@
-part of 'mala_data_table_page.dart';
+part of '../mala_japs/mala_data_table_page.dart';
 
 class _MalaDataTablePageState extends State<MalaDataTablePage>
     with RestorationMixin {

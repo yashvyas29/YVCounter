@@ -99,7 +99,6 @@ Mala _malaDeserialize(
     reader.readLong(offsets[0]),
     reader.readLong(offsets[3]),
   );
-  object.id = id;
   return object;
 }
 
@@ -131,9 +130,7 @@ List<IsarLinkBase<dynamic>> _malaGetLinks(Mala object) {
   return [];
 }
 
-void _malaAttach(IsarCollection<dynamic> col, Id id, Mala object) {
-  object.id = id;
-}
+void _malaAttach(IsarCollection<dynamic> col, Id id, Mala object) {}
 
 extension MalaByIndex on IsarCollection<Mala> {
   Future<Mala?> getByDate(String date) {

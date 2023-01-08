@@ -1,4 +1,4 @@
-part of 'my_home_page.dart';
+part of '../mala_japs/mala_jap_counter_page.dart';
 
 class _MyHomePageState extends State<MyHomePage> {
   late Mala _mala;
@@ -6,7 +6,7 @@ class _MyHomePageState extends State<MyHomePage> {
   User? _user;
 
   final GoogleDrive _googleDrive = GoogleDrive();
-  // final SharedPref _sharedPref = SharedPref();
+  final SharedPref _sharedPref = SharedPref();
   final String _today = DateFormat(dateFormat).format(DateTime.now());
   final List<bool> _selections = [true, false];
 
@@ -24,12 +24,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     _mala = Mala(_today, 0, 0);
     _loadMala();
+    // FamilyHandler().loadFamily();
   }
 
   Future<void> _loadMala() async {
     try {
-      _malaList = await widget._getMalas();
-      // _malaList = await _sharedPref.readList(Mala.key);
+      // _malaList = await widget._getMalas();
+      _malaList = await _sharedPref.readList(Mala.key);
       final todayMala = _malaList.firstWhere((mala) => mala.date == _today);
       setState(() {
         _mala = todayMala;
@@ -51,8 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ? _mala.japs = _mala.count * Mala.japsPerMala
           : _mala.count = _mala.japs ~/ Mala.japsPerMala;
     });
-    // _sharedPref.saveList(Mala.key, _malaList);
-    widget._saveMalas(_malaList);
+    _sharedPref.saveList(Mala.key, _malaList);
+    // widget._saveMalas(_malaList);
     if (!_selections.first && _mala.japs % Mala.japsPerMala == 0) {
       widget._playAlertSysSound();
     } else {
@@ -78,8 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_mala.japs == 0) {
       _malaList.remove(_mala);
     }
-    // _sharedPref.saveList(Mala.key, _malaList);
-    widget._saveMalas(_malaList);
+    _sharedPref.saveList(Mala.key, _malaList);
+    // widget._saveMalas(_malaList);
   }
 
   Future<void> _resetCounter() async {
@@ -90,8 +91,8 @@ class _MyHomePageState extends State<MyHomePage> {
         _mala.japs = 0;
       });
       _malaList.remove(_mala);
-      // _sharedPref.saveList(Mala.key, _malaList);
-      widget.deleteMalaByDate(_mala.date);
+      _sharedPref.saveList(Mala.key, _malaList);
+      // widget.deleteMalaByDate(_mala.date);
     }
   }
 
@@ -106,8 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
       final malas = malasJson.map((value) => Mala.fromJson(value)).toList();
       if (malas.isNotEmpty) {
         _malaList = malas;
-        // _sharedPref.saveList(Mala.key, malas);
-        widget._saveMalas(_malaList);
+        _sharedPref.saveList(Mala.key, malas);
+        // widget._saveMalas(_malaList);
         final mala = malas.firstWhere((mala) => mala.date == _today);
         setState(() {
           _mala = mala;
@@ -135,8 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _malaList.removeWhere((mala) => malas.contains(mala));
       malas.addAll(_malaList);
       _malaList = malas;
-      // _sharedPref.saveList(Mala.key, malas);
-      widget._saveMalas(_malaList);
+      _sharedPref.saveList(Mala.key, malas);
+      // widget._saveMalas(_malaList);
       final mala = malas.firstWhere((mala) => mala.date == _today);
       setState(() {
         _mala = mala;
@@ -206,8 +207,8 @@ class _MyHomePageState extends State<MyHomePage> {
             tooltip: 'Open Mala History',
             icon: const Icon(Icons.menu),
             onPressed: () async {
-              // final malas = await _sharedPref.readList(Mala.key);
-              final malas = await widget._getMalas();
+              final malas = await _sharedPref.readList(Mala.key);
+              // final malas = await widget._getMalas();
               if (!mounted) return;
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => MalaDataTablePage(malas: malas)));
@@ -217,10 +218,11 @@ class _MyHomePageState extends State<MyHomePage> {
             tooltip: 'Open My Family Tree',
             icon: const Icon(Icons.grass_sharp),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const FamilyTreePage(
-                        title: "Vanshavali",
-                      )));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const FamilyListPage(),
+                ),
+              );
             },
           ),
           IconButton(

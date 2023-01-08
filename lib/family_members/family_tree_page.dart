@@ -16,8 +16,27 @@ class FamilyTreePage extends StatefulWidget {
   final String title;
   final _jsonFileHandler = const JsonFileHandler();
 
-  Future readJsonData() async {
+  Future<Map<String, dynamic>> readJsonData() async {
     debugPrint("readJsonData");
+    if (title == 'Vyas Family') {
+      JsonFileHandler.fileName = JsonFileHandler.familyFileName;
+      final content = await _jsonFileHandler.readJsonFromBundle();
+      return jsonDecode(content);
+    } else if (title == 'Dharmawat Family') {
+      JsonFileHandler.fileName = JsonFileHandler.family1FileName;
+      final content = await _jsonFileHandler.readJsonFromBundle();
+      return jsonDecode(content);
+    } else if (title == 'Kadvawat Family') {
+      JsonFileHandler.fileName = JsonFileHandler.family2FileName;
+      final content = await _jsonFileHandler.readJsonFromBundle();
+      return jsonDecode(content);
+    } else {
+      JsonFileHandler.fileName =
+          title.trim().toLowerCase().replaceAll(RegExp(' '), '_');
+      debugPrint(JsonFileHandler.fileName);
+      return await _jsonFileHandler.readJson();
+    }
+    /*
     final map = await _jsonFileHandler.readJson();
     if (map.isEmpty) {
       final content = await _jsonFileHandler.readJsonFromBundle();
@@ -26,6 +45,7 @@ class FamilyTreePage extends StatefulWidget {
     } else {
       return map;
     }
+    */
   }
 }
 
@@ -47,25 +67,13 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           IconButton(
               onPressed: () {
                 debugPrint("Reset to family pressed.");
-                JsonFileHandler.fileName = JsonFileHandler.familyFileName;
                 widget._jsonFileHandler.deleteLocalFile();
                 graph = Graph()..isTree = true;
                 setState(() {
                   _data.clear();
                 });
               },
-              icon: const Icon(Icons.sync)),
-          IconButton(
-              onPressed: () {
-                debugPrint("Reset to family1 pressed.");
-                JsonFileHandler.fileName = JsonFileHandler.family1FileName;
-                widget._jsonFileHandler.deleteLocalFile();
-                graph = Graph()..isTree = true;
-                setState(() {
-                  _data.clear();
-                });
-              },
-              icon: const Icon(Icons.restore))
+              icon: const Icon(Icons.restore)),
         ],
       ),
       body: _futureBuilder(),

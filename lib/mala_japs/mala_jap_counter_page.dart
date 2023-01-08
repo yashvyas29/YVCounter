@@ -7,19 +7,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:intl/intl.dart';
-import 'package:isar/isar.dart';
+// import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/about_page.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
-import 'package:yv_counter/family_tree_page.dart';
+import 'package:yv_counter/family_members/family_list_page.dart';
 import 'package:yv_counter/common/google_drive.dart';
 import 'package:yv_counter/data_model/mala.dart';
-import 'package:yv_counter/mala_data_table_page.dart';
-// import 'package:yv_counter/common/shared_pref.dart';
+import 'package:yv_counter/mala_japs/mala_data_table_page.dart';
+import 'package:yv_counter/common/shared_pref.dart';
 import 'package:yv_counter/data_model/user.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 
-part 'my_home_page_state.dart';
+// import '../common/family_handler.dart';
+
+part '../mala_japs/mala_jap_counter_page_state.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -97,13 +99,9 @@ class MyHomePage extends StatefulWidget {
     return [];
   }
 
+  /*
   Future<Isar> openIsarMala() async {
-    final isar = Isar.getInstance();
-    if (isar == null) {
-      return await Isar.open([MalaSchema]);
-    } else {
-      return isar;
-    }
+    return Isar.getInstance() ?? await Future.error("No db open.");
   }
 
   Future<List<Mala>> _getMalas() async {
@@ -120,6 +118,7 @@ class MyHomePage extends StatefulWidget {
     final isar = await openIsarMala();
     isar.writeTxn(() async => await isar.malas.deleteByDate(date));
   }
+  */
 }
 
 // This is the type used by the popup menu below.

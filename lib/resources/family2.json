@@ -1,0 +1,146 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "label": "Ganpat Ji Kadvawat\nSohan Bai"
+        },
+        {
+            "id": 2,
+            "label": "Shobha Lal Ji\nParvati Devi"
+        },
+        {
+            "id": 3,
+            "label": "Banshi Lal Ji\nWife"
+        },
+        {
+            "id": 4,
+            "label": "Fulmala Devi\nAniruddh Ji Vyas"
+        },
+        {
+            "id": 5,
+            "label": "Shakuntala Devi\nChaitanya Prakash Ji Vyas"
+        },
+        {
+            "id": 6,
+            "label": "Uma Devi\nKaushal Ji Vyas"
+        },
+        {
+            "id": 7,
+            "label": "Atal Ji\nSavita Devi Vyas"
+        },
+        {
+            "id": 8,
+            "label": "Ruchika \n Sanjay Ji Joshi"
+        },
+        {
+            "id": 9,
+            "label": "Omendra"
+        },
+        {
+            "id": 10,
+            "label": "Apeksha Devi\nBhupendr Ji Joshi"
+        },
+        {
+            "id": 11,
+            "label": "Yash\nPooja"
+        },
+        {
+            "id": 12,
+            "label": "Harshit\nWife"
+        },
+        {
+            "id": 13,
+            "label": "Neeraj"
+        },
+        {
+            "id": 14,
+            "label": "Gandhar"
+        },
+        {
+            "id": 15,
+            "label": "Akshar"
+        },
+        {
+            "id": 16,
+            "label": "Hemlata Devi\nHusband"
+        },
+        {
+            "id": 17,
+            "label": "Yashwant Ji\nWife"
+        },
+        {
+            "id": 18,
+            "label": "Bharti Devi\nManoj Ji Vyas"
+        }
+    ],
+    "edges": [
+        {
+            "from": 1,
+            "to": 2
+        },
+        {
+            "from": 1,
+            "to": 3
+        },
+        {
+            "from": 2,
+            "to": 4
+        },
+        {
+            "from": 2,
+            "to": 5
+        },
+        {
+            "from": 2,
+            "to": 6
+        },
+        {
+            "from": 2,
+            "to": 7
+        },
+        {
+            "from": 4,
+            "to": 8
+        },
+        {
+            "from": 4,
+            "to": 9
+        },
+        {
+            "from": 5,
+            "to": 10
+        },
+        {
+            "from": 5,
+            "to": 11
+        },
+        {
+            "from": 6,
+            "to": 12
+        },
+        {
+            "from": 6,
+            "to": 13
+        },
+        {
+            "from": 7,
+            "to": 14
+        },
+        {
+            "from": 7,
+            "to": 15
+        },
+        {
+            "from": 3,
+            "to": 16
+        },
+        {
+            "from": 3,
+            "to": 17
+        },
+        {
+            "from": 3,
+            "to": 18
+        }
+    ]
+}

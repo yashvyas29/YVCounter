@@ -9,7 +9,7 @@ import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/data_model/mala.dart';
 import 'package:path/path.dart' as p;
 
-part 'mala_data_table_page_state.dart';
+part '../mala_japs/mala_data_table_page_state.dart';
 
 class MalaDataTablePage extends StatefulWidget {
   const MalaDataTablePage({super.key, required this.malas});

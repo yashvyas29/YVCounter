@@ -4,21 +4,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:yv_counter/data_model/my_node.dart';
 
 class JsonFileHandler {
   const JsonFileHandler();
   static const familyFileName = "family.json";
   static const family1FileName = "family1.json";
+  static const family2FileName = "family2.json";
   static String fileName = familyFileName;
-
-  String listMyNodeJSON(List<MyNode> lst) {
-    Map<String, String> mapMyNodeJSON = {};
-    for (int i = 0; i < lst.length; i++) {
-      mapMyNodeJSON[lst[i].id.toString()] = lst[i].label;
-    }
-    return jsonEncode(mapMyNodeJSON);
-  }
 
   Future<String> localPath() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -27,7 +19,7 @@ class JsonFileHandler {
 
   Future<File> localFile() async {
     final path = await localPath();
-    return File('$path/$familyFileName');
+    return File('$path/$fileName');
   }
 
   Future<File> writeJson(String text) async {
@@ -51,7 +43,7 @@ class JsonFileHandler {
     } catch (e) {
       debugPrint(e.toString());
       // If encountering an error, return empty string
-      return {};
+      return {'nodes': [], 'edges': []};
     }
   }
 

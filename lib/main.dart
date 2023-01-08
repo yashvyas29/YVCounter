@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:yv_counter/my_home_page.dart';
+/*
+import 'package:isar/isar.dart';
+import 'package:yv_counter/data_model/family_member_relation.dart';
+import 'package:yv_counter/data_model/mala.dart';
+*/
+import 'package:yv_counter/mala_japs/mala_jap_counter_page.dart';
 
-void main() {
+Future<void> main() async {
+  /*
+  await Isar.open([MalaSchema, FamilySchema, MemberSchema, RelationSchema],
+      inspector: true);
+      */
   runApp(const MyApp());
 }
 

@@ -3,10 +3,10 @@ part 'mala.g.dart';
 
 @collection
 class Mala implements Comparable<Mala> {
-  Id id = Isar.autoIncrement;
+  final Id id = Isar.autoIncrement;
   // Id get isarId => fastHash(date);
   @Index(unique: true, replace: true, caseSensitive: false)
-  String date;
+  final String date;
   int count;
   int japs;
 
