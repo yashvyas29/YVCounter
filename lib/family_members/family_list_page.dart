@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
+import '../common/json_file_handler.dart';
+import '../common/snackbar_dialog.dart';
 import 'family_tree_page.dart';
 
 class FamilyListPage extends StatefulWidget {
-  const FamilyListPage({super.key});
+  const FamilyListPage({super.key, required this.title});
+
+  final String title;
+  final _jsonFileHandler = const JsonFileHandler();
 
   @override
   State<StatefulWidget> createState() => _FamilyListPageState();
@@ -15,11 +20,16 @@ class FamilyListPage extends StatefulWidget {
   ];
 
   final newFamilyName = "New Family";
+
+  String getFamilyFileName(String name) {
+    return _jsonFileHandler.getFamilyFileName(name);
+  }
 }
 
 class _FamilyListPageState extends State<FamilyListPage> {
   final List<bool> _readOnlyList = [];
   final List<String> _families = [];
+  final List<TextEditingController> _controllers = [];
   String _message = '';
 
   void _setReadOnlyList() {
@@ -37,6 +47,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
             ? _readOnlyList.add(false)
             : _readOnlyList.add(true);
         _families.add(name);
+        _controllers.add(TextEditingController(text: name));
         // _message = "Family Created!";
       });
     } else {
@@ -47,17 +58,32 @@ class _FamilyListPageState extends State<FamilyListPage> {
     await _resetMessage();
   }
 
-  Future<void> _updateFamily(String oldName, String newName, int index) async {
-    if (newName.isEmpty) {
-      await DBProvider.db.deleteTable(oldName);
+  Future<void> _deleteFamily(String name, int index) async {
+    showDeleteConfirmationDialog(context, 'Are you sure you want to delete ?',
+        () async {
+      await DBProvider.db.deleteTable(name);
+      await widget._jsonFileHandler
+          .deleteLocalFile(widget.getFamilyFileName(name));
       setState(() {
         _families.removeAt(index);
+        _readOnlyList.removeAt(index);
+        _controllers.removeAt(index);
+        Navigator.pop(context);
         _message = "Family Deleted!";
       });
+      await _resetMessage();
+    });
+  }
+
+  Future<void> _updateFamily(String oldName, String newName, int index) async {
+    if (newName.isEmpty) {
+      _deleteFamily(oldName, index);
     } else {
       var isExist = await DBProvider.db.checkIfTableExists(newName);
       if (!isExist) {
         await DBProvider.db.renameTable(oldName, newName.trim());
+        widget._jsonFileHandler.renameFile(widget.getFamilyFileName(oldName),
+            widget.getFamilyFileName(newName));
         setState(() {
           _families[index] = newName;
           _message = "Family Updated!";
@@ -93,9 +119,9 @@ class _FamilyListPageState extends State<FamilyListPage> {
         setState(() {
           _families.addAll(families.map((e) => e['name'].toString()));
           _setReadOnlyList();
+          _controllers.addAll(
+              _families.map((family) => TextEditingController(text: family)));
         });
-        debugPrint(_families.toString());
-        debugPrint(_readOnlyList.toString());
       }
     });
   }
@@ -104,7 +130,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Family List'),
+        title: Text(widget.title),
         actions: [
           IconButton(
               onPressed: () async {
@@ -130,32 +156,45 @@ class _FamilyListPageState extends State<FamilyListPage> {
                             : const OutlineInputBorder(),
                         hintText: "Enter Family Name",
                       );
-                      final TextEditingController textController =
-                          TextEditingController();
-                      textController.text = title;
                       return ListTile(
                         title: TextField(
                           keyboardType: TextInputType.multiline,
                           maxLines: null,
-                          controller: textController,
+                          controller: _controllers[index],
                           decoration: inputDecoration,
                           readOnly: readOnly,
                           enabled: !readOnly,
+                          autofocus: !readOnly,
                         ),
+                        tileColor: Colors.white,
+                        focusColor: Colors.white,
                         trailing: readOnly
-                            ? IconButton(
-                                onPressed: () {
-                                  debugPrint("Edit for $title pressed.");
-                                  setState(() {
-                                    _setReadOnlyList();
-                                    _readOnlyList[index] = false;
-                                  });
-                                },
-                                icon: const Icon(Icons.edit))
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                      onPressed: () async {
+                                        debugPrint(
+                                            "Delete for $title pressed.");
+                                        await _deleteFamily(title, index);
+                                      },
+                                      icon: const Icon(Icons.delete)),
+                                  IconButton(
+                                      onPressed: () async {
+                                        debugPrint("Edit for $title pressed.");
+                                        _setReadOnlyList();
+                                        setState(() {
+                                          _readOnlyList[index] = false;
+                                        });
+                                      },
+                                      icon: const Icon(Icons.edit))
+                                ],
+                              )
                             : IconButton(
                                 onPressed: () async {
                                   debugPrint("Done for $title pressed.");
-                                  final newTitle = textController.text.trim();
+                                  final newTitle =
+                                      _controllers[index].text.trim();
                                   if (newTitle == widget.newFamilyName) {
                                     setState(() {
                                       _message = "Rename to your family name!";
@@ -189,5 +228,13 @@ class _FamilyListPageState extends State<FamilyListPage> {
               ],
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
   }
 }

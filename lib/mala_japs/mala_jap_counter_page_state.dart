@@ -117,9 +117,11 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         showSnackBar(context, "Malas backup not available.");
       }
-      GoogleDrive.fileName = GoogleDrive.familyFileName;
+      const fileName = 'vyas_family';
+      GoogleDrive.fileName = fileName;
       final familyFile = await _googleDrive.downloadGoogleDriveFile();
-      const JsonFileHandler().writeJson(await familyFile.readAsString());
+      const JsonFileHandler()
+          .writeJson(fileName, await familyFile.readAsString());
     } catch (error) {
       if (!mounted) return;
       showSnackBar(context, error.toString());
@@ -156,9 +158,12 @@ class _MyHomePageState extends State<MyHomePage> {
       await file.writeAsString(malasJson);
       await _googleDrive.uploadFileToGoogleDrive(file);
       file.delete();
-      GoogleDrive.fileName = GoogleDrive.familyFileName;
-      final familyFile = await const JsonFileHandler().localFile();
-      await _googleDrive.uploadFileToGoogleDrive(familyFile);
+      final files = await const JsonFileHandler().files();
+      for (var filePath in files) {
+        GoogleDrive.fileName = p.basename(filePath);
+        final file = File(filePath);
+        await _googleDrive.uploadFileToGoogleDrive(file);
+      }
       if (!mounted) return;
       await showAlertDialog(context, "Backup done successfully.");
     } catch (error) {
@@ -220,7 +225,9 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const FamilyListPage(),
+                  builder: (context) => const FamilyListPage(
+                    title: 'Famaily List',
+                  ),
                 ),
               );
             },

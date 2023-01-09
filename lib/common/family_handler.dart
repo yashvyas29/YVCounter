@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
@@ -23,9 +21,8 @@ class FamilyHandler {
     */
 
     if (await isar.familys.count() == 0) {
-      JsonFileHandler.fileName = JsonFileHandler.familyFileName;
-      final familyString = await jsonFileHendler.readJsonFromBundle();
-      final familyJson = jsonDecode(familyString);
+      final familyJson =
+          await jsonFileHendler.readJsonFromBundle('vyas_family');
       final family = Family('Vyas Family', id: 1);
 
       final List nodes = familyJson['nodes'];

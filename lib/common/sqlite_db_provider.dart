@@ -5,11 +5,16 @@ class DBProvider {
   DBProvider._();
 
   static final DBProvider db = DBProvider._();
+  static const dbName = 'family.db';
   static Database? _database;
+
+  Future<String> getDatabasePath() async {
+    return join(await getDatabasesPath(), dbName);
+  }
 
   Future<Database> get database async {
     _database ??= await openDatabase(
-      join(await getDatabasesPath(), 'family.db'),
+      await getDatabasePath(),
       version: 1,
     );
     return _database!;
@@ -24,45 +29,36 @@ class DBProvider {
     
     ''');
 
-    if (res.length == 1) {
-      return true;
-    } else {
-      return false;
-    }
+    return res.isNotEmpty;
   }
 
-  Future<bool> checkIfNameExists(String table, String name) async {
+  Future<bool> checkIfValueExists(
+      String tableName, String columnName, String columnValue) async {
     final db = await database;
 
     var res = await db.rawQuery('''
     
-    SELECT * FROM $table WHERE name ='$name';
+    SELECT * FROM '$tableName' WHERE '$columnName' ='$columnValue';
     
     ''');
 
-    if (res.length == 1) {
-      return true;
-    } else {
-      return false;
-    }
+    return res.isNotEmpty;
   }
 
   Future<void> createNewTable(String familyName) async {
     final db = await database;
 
-    String name = familyName;
-
     db
       ..execute('''
-   CREATE TABLE IF NOT EXISTS '$name' (
+   CREATE TABLE IF NOT EXISTS '$familyName' (
    id INTEGER PRIMARY KEY AUTOINCREMENT,
    name TEXT,
    c INTEGER);
     ''')
       ..rawInsert('''
-     REPLACE INTO '$name' (id, name, c)
+     REPLACE INTO '$familyName' (id, name, c)
       VALUES (?, ?, ?);
-     ''', [1, name, null]);
+     ''', [1, familyName, null]);
   }
 
   Future<List<Map>> getFamilies() async {
@@ -73,10 +69,10 @@ class DBProvider {
     return res;
   }
 
-  Future<List<Map>> cleanTable(String column) async {
+  Future<List<Map>> cleanTable(String table) async {
     final db = await database;
     var res = await db.rawQuery('''
-    delete from $column;
+    delete from $table;
     ''');
     return res;
   }

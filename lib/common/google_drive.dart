@@ -12,7 +12,6 @@ class GoogleDrive {
   static const _folderMimeType = "application/vnd.google-apps.folder";
   static const _appDataFolderId = "appDataFolder";
   static const malasFileName = "malas";
-  static const familyFileName = "family";
   static String fileName = malasFileName;
 
   final _googleSignIn = GoogleSignIn.standard(scopes: _scopes);

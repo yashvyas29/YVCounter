@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -16,36 +15,24 @@ class FamilyTreePage extends StatefulWidget {
   final String title;
   final _jsonFileHandler = const JsonFileHandler();
 
+  static const edgesKey = 'edges';
+
+  String getFileName() {
+    return _jsonFileHandler.getFamilyFileName(title);
+  }
+
   Future<Map<String, dynamic>> readJsonData() async {
-    debugPrint("readJsonData");
-    if (title == 'Vyas Family') {
-      JsonFileHandler.fileName = JsonFileHandler.familyFileName;
-      final content = await _jsonFileHandler.readJsonFromBundle();
-      return jsonDecode(content);
-    } else if (title == 'Dharmawat Family') {
-      JsonFileHandler.fileName = JsonFileHandler.family1FileName;
-      final content = await _jsonFileHandler.readJsonFromBundle();
-      return jsonDecode(content);
-    } else if (title == 'Kadvawat Family') {
-      JsonFileHandler.fileName = JsonFileHandler.family2FileName;
-      final content = await _jsonFileHandler.readJsonFromBundle();
-      return jsonDecode(content);
+    final fileName = getFileName();
+    final data = await _jsonFileHandler.readJson(fileName);
+    if (data[edgesKey].isEmpty) {
+      return await _jsonFileHandler.readJsonFromBundle(fileName);
     } else {
-      JsonFileHandler.fileName =
-          title.trim().toLowerCase().replaceAll(RegExp(' '), '_');
-      debugPrint(JsonFileHandler.fileName);
-      return await _jsonFileHandler.readJson();
+      return data;
     }
-    /*
-    final map = await _jsonFileHandler.readJson();
-    if (map.isEmpty) {
-      final content = await _jsonFileHandler.readJsonFromBundle();
-      // debugPrint(content);
-      return jsonDecode(content);
-    } else {
-      return map;
-    }
-    */
+  }
+
+  Future<void> writeJsonData(Map<String, dynamic> map) async {
+    await _jsonFileHandler.writeJsonData(getFileName(), map);
   }
 }
 
@@ -67,7 +54,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           IconButton(
               onPressed: () {
                 debugPrint("Reset to family pressed.");
-                widget._jsonFileHandler.deleteLocalFile();
+                widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
                 graph = Graph()..isTree = true;
                 setState(() {
                   _data.clear();
@@ -133,7 +120,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       Navigator.pop(context);
                       // debugPrint(graph.nodes.toString());
                       // debugPrint(graph.edges.toString());
-                      widget._jsonFileHandler.writeJsonData(_data);
+                      widget.writeJsonData(_data);
                       // debugPrint(_data.toString());
                     });
                   },
@@ -146,7 +133,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           nodeValue['readOnly'] = false;
                           // _data[nodesKey][nodeIndex] = nodeValue;
                         });
-                        widget._jsonFileHandler.writeJsonData(_data);
+                        widget.writeJsonData(_data);
                       },
                       icon: const Icon(Icons.edit))
                   : IconButton(
@@ -157,7 +144,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           nodeValue['readOnly'] = true;
                           // _data[nodesKey][nodeIndex] = nodeValue;
                         });
-                        widget._jsonFileHandler.writeJsonData(_data);
+                        widget.writeJsonData(_data);
                       },
                       icon: const Icon(Icons.done_outline)),
               IconButton(
@@ -181,7 +168,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       // debugPrint(edgeValue.toString());
                       _data[edgesKey].add(edgeValue);
                     });
-                    widget._jsonFileHandler.writeJsonData(_data);
+                    widget.writeJsonData(_data);
                   },
                   icon: const Icon(Icons.add_circle)),
             ],
