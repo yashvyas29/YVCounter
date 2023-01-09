@@ -32,6 +32,24 @@ class _FamilyListPageState extends State<FamilyListPage> {
   final List<TextEditingController> _controllers = [];
   String _message = '';
 
+  Future<List<String>> _getFamilies() async {
+    final families = await DBProvider.db.getFamilies();
+    debugPrint(families.toString());
+    if (families.isEmpty) {
+      for (final family in widget.families) {
+        await _addFamily(family);
+      }
+    } else {
+      setState(() {
+        _families.addAll(families.map((e) => e['name'].toString()));
+        _setReadOnlyList();
+        _controllers.addAll(
+            _families.map((family) => TextEditingController(text: family)));
+      });
+    }
+    return _families;
+  }
+
   void _setReadOnlyList() {
     _readOnlyList.clear();
     _readOnlyList.addAll(_families
@@ -109,21 +127,6 @@ class _FamilyListPageState extends State<FamilyListPage> {
   @override
   void initState() {
     super.initState();
-    DBProvider.db.getFamilies().then((families) async {
-      debugPrint(families.toString());
-      if (families.isEmpty) {
-        for (var family in widget.families) {
-          await _addFamily(family);
-        }
-      } else {
-        setState(() {
-          _families.addAll(families.map((e) => e['name'].toString()));
-          _setReadOnlyList();
-          _controllers.addAll(
-              _families.map((family) => TextEditingController(text: family)));
-        });
-      }
-    });
   }
 
   @override
@@ -140,100 +143,129 @@ class _FamilyListPageState extends State<FamilyListPage> {
               icon: const Icon(Icons.add_circle)),
         ],
       ),
-      body: _families.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _families.length,
-                    itemBuilder: (context, index) {
-                      final title = _families[index];
-                      final readOnly = _readOnlyList[index];
-                      InputDecoration inputDecoration = InputDecoration(
-                        border: readOnly
-                            ? InputBorder.none
-                            : const OutlineInputBorder(),
-                        hintText: "Enter Family Name",
-                      );
-                      return ListTile(
-                        title: TextField(
-                          keyboardType: TextInputType.multiline,
-                          maxLines: null,
-                          controller: _controllers[index],
-                          decoration: inputDecoration,
-                          readOnly: readOnly,
-                          enabled: !readOnly,
-                          autofocus: !readOnly,
-                        ),
-                        tileColor: Colors.white,
-                        focusColor: Colors.white,
-                        trailing: readOnly
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                      onPressed: () async {
-                                        debugPrint(
-                                            "Delete for $title pressed.");
-                                        await _deleteFamily(title, index);
-                                      },
-                                      icon: const Icon(Icons.delete)),
-                                  IconButton(
-                                      onPressed: () async {
-                                        debugPrint("Edit for $title pressed.");
-                                        _setReadOnlyList();
-                                        setState(() {
-                                          _readOnlyList[index] = false;
-                                        });
-                                      },
-                                      icon: const Icon(Icons.edit))
-                                ],
-                              )
-                            : IconButton(
-                                onPressed: () async {
-                                  debugPrint("Done for $title pressed.");
-                                  final newTitle =
-                                      _controllers[index].text.trim();
-                                  if (newTitle == widget.newFamilyName) {
-                                    setState(() {
-                                      _message = "Rename to your family name!";
-                                    });
-                                    _resetMessage();
-                                  } else {
-                                    await _updateFamily(title, newTitle, index);
-                                    setState(() {
-                                      _setReadOnlyList();
-                                    });
-                                  }
-                                },
-                                icon: const Icon(Icons.done_outline)),
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => FamilyTreePage(
-                                    title: title,
-                                  )));
+      body: _futureBuilder(),
+    );
+  }
+
+  Widget _futureBuilder() {
+    return _families.isEmpty
+        ? FutureBuilder(
+            future: _getFamilies(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.red,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                );
+              } else if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  return _familyList();
+                } else {
+                  return const Center(
+                    child: Text("No families available."),
+                  );
+                }
+              } else {
+                return const Center(
+                  child: Text("Something went wrong, please try again later."),
+                );
+              }
+            },
+          )
+        : _familyList();
+  }
+
+  Widget _familyList() {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: _families.length,
+            itemBuilder: (context, index) {
+              final title = _families[index];
+              final readOnly = _readOnlyList[index];
+              InputDecoration inputDecoration = InputDecoration(
+                border:
+                    readOnly ? InputBorder.none : const OutlineInputBorder(),
+                hintText: "Enter Family Name",
+              );
+              return ListTile(
+                title: TextField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  controller: _controllers[index],
+                  decoration: inputDecoration,
+                  readOnly: readOnly,
+                  enabled: !readOnly,
+                  autofocus: !readOnly,
+                ),
+                tileColor: Colors.white,
+                focusColor: Colors.white,
+                trailing: readOnly
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                              onPressed: () async {
+                                debugPrint("Delete for $title pressed.");
+                                await _deleteFamily(title, index);
+                              },
+                              icon: const Icon(Icons.delete)),
+                          IconButton(
+                              onPressed: () async {
+                                debugPrint("Edit for $title pressed.");
+                                _setReadOnlyList();
+                                setState(() {
+                                  _readOnlyList[index] = false;
+                                });
+                              },
+                              icon: const Icon(Icons.edit))
+                        ],
+                      )
+                    : IconButton(
+                        onPressed: () async {
+                          debugPrint("Done for $title pressed.");
+                          final newTitle = _controllers[index].text.trim();
+                          if (newTitle == widget.newFamilyName) {
+                            setState(() {
+                              _message = "Rename to your family name!";
+                            });
+                            _resetMessage();
+                          } else {
+                            await _updateFamily(title, newTitle, index);
+                            setState(() {
+                              _setReadOnlyList();
+                            });
+                          }
                         },
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(_message.isEmpty ? 0 : 20),
-                  child: Text(
-                    _message,
-                    style: TextStyle(fontSize: _message.isEmpty ? 0 : 20),
-                  ),
-                ),
-              ],
-            ),
+                        icon: const Icon(Icons.done_outline)),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => FamilyTreePage(
+                            title: title,
+                          )));
+                },
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(_message.isEmpty ? 0 : 20),
+          child: Text(
+            _message,
+            style: TextStyle(fontSize: _message.isEmpty ? 0 : 20),
+          ),
+        ),
+      ],
     );
   }
 
   @override
   void dispose() {
     super.dispose();
-    for (var controller in _controllers) {
+    for (final controller in _controllers) {
       controller.dispose();
     }
   }

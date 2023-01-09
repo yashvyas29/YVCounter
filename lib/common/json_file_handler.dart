@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class JsonFileHandler {
@@ -10,18 +11,19 @@ class JsonFileHandler {
 
   Future<String> localPath() async {
     final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
+    final jsonsDir = await Directory(join(directory.path, 'jsons')).create();
+    return jsonsDir.path;
   }
 
   Future<File> localFile(String fileName) async {
     final path = await localPath();
-    return File('$path/$fileName.json');
+    return File(join(path, '$fileName.json'));
   }
 
   Future<List<String>> files() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final list = directory.listSync(recursive: true);
-    for (var file in list) {
+    final directory = Directory(await localPath());
+    final list = directory.listSync();
+    for (final file in list) {
       debugPrint(file.path);
       // await file.delete();
     }

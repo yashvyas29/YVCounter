@@ -113,18 +113,34 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _mala = mala;
         });
-        showAlertDialog(context, "Restore successful.");
       } else {
         showSnackBar(context, "Malas backup not available.");
       }
-      const fileName = 'vyas_family';
-      GoogleDrive.fileName = fileName;
-      final familyFile = await _googleDrive.downloadGoogleDriveFile();
-      const JsonFileHandler()
-          .writeJson(fileName, await familyFile.readAsString());
+      debugPrint('Malas restored successfully.');
+      final files = await _googleDrive.downloadAppDataFolderFiles();
+      const jsonFileHandler = JsonFileHandler();
+      for (final file in files) {
+        String path = '';
+        final fileExtension = p.extension(file.path);
+        if (fileExtension == '.json') {
+          path =
+              p.join(await jsonFileHandler.localPath(), p.basename(file.path));
+        } else if (fileExtension == '.db') {
+          path = await DBProvider.db.getDatabasePath();
+        }
+        if (path.isNotEmpty) {
+          final newFile = File(path);
+          await newFile.writeAsBytes(await file.readAsBytes());
+        }
+      }
+      debugPrint('Family jsons and db restored successfully.');
+      if (!mounted) return;
+      await showAlertDialog(context, "Google Drive restore successful.");
     } catch (error) {
+      debugPrint(error.toString());
       if (!mounted) return;
       showSnackBar(context, error.toString());
+      return Future.error(error);
     }
   }
 
@@ -144,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _mala = mala;
       });
-      await showAlertDialog(context, "Restore successful.");
+      await showAlertDialog(context, "Excel restore successful.");
     }
   }
 
@@ -158,12 +174,21 @@ class _MyHomePageState extends State<MyHomePage> {
       await file.writeAsString(malasJson);
       await _googleDrive.uploadFileToGoogleDrive(file);
       file.delete();
+      debugPrint('Malas file uploaded successfully.');
       final files = await const JsonFileHandler().files();
-      for (var filePath in files) {
-        GoogleDrive.fileName = p.basename(filePath);
+      for (final filePath in files) {
+        debugPrint('File to upload with path: $filePath');
         final file = File(filePath);
+        GoogleDrive.fileName = p.basename(filePath);
         await _googleDrive.uploadFileToGoogleDrive(file);
       }
+      debugPrint('Family json files uploaded successfully.');
+      final dbFilePath = await DBProvider.db.getDatabasePath();
+      debugPrint('File to upload with path: $dbFilePath');
+      final dbFile = File(dbFilePath);
+      GoogleDrive.fileName = p.basename(dbFilePath);
+      await _googleDrive.uploadFileToGoogleDrive(dbFile);
+      debugPrint('Database file uploaded successfully.');
       if (!mounted) return;
       await showAlertDialog(context, "Backup done successfully.");
     } catch (error) {

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -9,7 +10,9 @@ class DBProvider {
   static Database? _database;
 
   Future<String> getDatabasePath() async {
-    return join(await getDatabasesPath(), dbName);
+    final path = await getDatabasesPath();
+    debugPrint(path);
+    return join(path, dbName);
   }
 
   Future<Database> get database async {

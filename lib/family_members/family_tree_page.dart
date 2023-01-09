@@ -189,6 +189,9 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           .forEach((nodeElement) => _removeNodeFromData(nodeElement));
     }
     graph.removeNode(node);
+    if (graph.edges.length < 50) {
+      _transformationController.value = Matrix4.identity();
+    }
   }
 
   Graph graph = Graph()..isTree = true;
@@ -203,6 +206,8 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       ..levelSeparation = (15)
       ..subtreeSeparation = (15);
     // ..orientation = (BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM);
+
+    _transformationController.value = Matrix4.identity();
   }
 
   void setupTransformationController() {
@@ -215,10 +220,10 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         Platform.isWindows ||
         Platform.isFuchsia) {
       xTranslate = 4900.0;
-      yTranslate = 900.0;
+      yTranslate = 1050.0;
     } else {
       xTranslate = 5380.0;
-      yTranslate = 1050.0;
+      yTranslate = 1100.0;
     }
     debugPrint("x: $xTranslate, y: $yTranslate");
     /*
@@ -296,12 +301,9 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     debugPrint("updateNode");
     debugPrint(edges.length.toString());
     // debugPrint(edges.toString());
-    if (edges.length > 80) {
-      if (_transformationController.value == Matrix4.identity()) {
-        setupTransformationController();
-      }
-    } else {
-      _transformationController.value = Matrix4.identity();
+    if (edges.length > 80 &&
+        _transformationController.value == Matrix4.identity()) {
+      setupTransformationController();
     }
     if (edges.isEmpty) {
       final nodes = _data[nodesKey];
@@ -338,7 +340,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       );
       graph.addEdge(fromNode, toNode);
     } else {
-      for (var element in edges) {
+      for (final element in edges) {
         var fromNodeId = element['from'];
         var toNodeId = element['to'];
         graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
