@@ -99,10 +99,42 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _restoreBackup() async {
     debugPrint("_restoreBackup");
     try {
-      GoogleDrive.fileName = GoogleDrive.malasFileName;
-      final file = await _googleDrive.downloadGoogleDriveFile();
-      final malasString = await file.readAsString();
+      final files = await _googleDrive.downloadAppDataFolderFiles();
+      const jsonFileHandler = JsonFileHandler();
+      for (final file in files) {
+        String path = '';
+        final fileExtension = p.extension(file.path);
+        final fileName = p.basename(file.path);
+        debugPrint('Restoring $fileName.');
+        if (fileName == GoogleDrive.malasFileName) {
+          _restoreMalasBackup(file);
+        } else if (fileExtension == '.json') {
+          path = p.join(
+            await jsonFileHandler.localPath(),
+            fileName,
+          );
+        } else if (fileExtension == '.db') {
+          path = await DBProvider.db.getDatabasePath();
+        }
+        if (path.isNotEmpty) {
+          final newFile = File(path);
+          await newFile.writeAsBytes(await file.readAsBytes());
+        }
+        await file.delete();
+      }
       if (!mounted) return;
+      await showAlertDialog(context, "Google Drive restore successful.");
+    } catch (error) {
+      debugPrint(error.toString());
+      if (!mounted) return;
+      showSnackBar(context, "Google Drive backup not available.");
+    }
+  }
+
+  Future<void> _restoreMalasBackup(File file) async {
+    try {
+      debugPrint('_restoreMalasBackup');
+      final malasString = await file.readAsString();
       final malasJson = json.decode(malasString) as List;
       final malas = malasJson.map((value) => Mala.fromJson(value)).toList();
       if (malas.isNotEmpty) {
@@ -114,33 +146,14 @@ class _MyHomePageState extends State<MyHomePage> {
           _mala = mala;
         });
       } else {
+        if (!mounted) return;
         showSnackBar(context, "Malas backup not available.");
       }
       debugPrint('Malas restored successfully.');
-      final files = await _googleDrive.downloadAppDataFolderFiles();
-      const jsonFileHandler = JsonFileHandler();
-      for (final file in files) {
-        String path = '';
-        final fileExtension = p.extension(file.path);
-        if (fileExtension == '.json') {
-          path =
-              p.join(await jsonFileHandler.localPath(), p.basename(file.path));
-        } else if (fileExtension == '.db') {
-          path = await DBProvider.db.getDatabasePath();
-        }
-        if (path.isNotEmpty) {
-          final newFile = File(path);
-          await newFile.writeAsBytes(await file.readAsBytes());
-        }
-      }
-      debugPrint('Family jsons and db restored successfully.');
-      if (!mounted) return;
-      await showAlertDialog(context, "Google Drive restore successful.");
     } catch (error) {
       debugPrint(error.toString());
       if (!mounted) return;
-      showSnackBar(context, error.toString());
-      return Future.error(error);
+      showSnackBar(context, "Malas backup not available.");
     }
   }
 

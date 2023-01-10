@@ -95,10 +95,10 @@ class GoogleDrive {
       final List<File> downloadedFiles = [];
       if (files != null && files.isNotEmpty) {
         for (final file in files) {
-          _printFileMetaData(file);
+          // _printFileMetaData(file);
           final fileId = file.id;
           final fileName = file.name;
-          if (fileId != null && fileName != null && fileName != malasFileName) {
+          if (fileId != null && fileName != null) {
             final downloadedFile =
                 await _downloadFileFromGoogleDrive(fileId, fileName, driveApi);
             downloadedFiles.add(downloadedFile);
@@ -149,21 +149,23 @@ class GoogleDrive {
       try {
         final fileId = await _getFileId(driveApi);
         debugPrint("Update file");
-        final uploadedFile = await driveApi.files.update(
+        // final uploadedFile =
+        await driveApi.files.update(
           fileToUpload,
           fileId,
           uploadMedia: ga.Media(file.openRead(), file.lengthSync()),
         );
-        _printFileMetaData(uploadedFile);
+        // _printFileMetaData(uploadedFile);
       } catch (error) {
         debugPrint(error.toString());
         fileToUpload.parents = [_appDataFolderId];
         fileToUpload.name = fileName;
         debugPrint("Create file");
         try {
-          final uploadedFile = await driveApi.files.create(fileToUpload,
+          // final uploadedFile =
+          await driveApi.files.create(fileToUpload,
               uploadMedia: ga.Media(file.openRead(), file.lengthSync()));
-          _printFileMetaData(uploadedFile);
+          // _printFileMetaData(uploadedFile);
         } catch (error) {
           debugPrint(error.toString());
           return Future.error(error);
@@ -194,7 +196,7 @@ class GoogleDrive {
       file.stream.listen((data) {
         dataStore.insertAll(dataStore.length, data);
       }, onDone: () async {
-        debugPrint("File downloaded.");
+        debugPrint("$fileName downloaded.");
         final file = MemoryFileSystem().file(fileName);
         await file.writeAsBytes(dataStore);
         completer.complete(file);
@@ -250,9 +252,11 @@ class GoogleDrive {
     debugPrint("accessToken: ${auth.accessToken}");
   }
 
+  /*
   void _printFileMetaData(ga.File file) {
     debugPrint(file.id);
     debugPrint(file.name);
     debugPrint(file.mimeType);
   }
+  */
 }
