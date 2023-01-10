@@ -93,6 +93,8 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                 onPressed: () async => await widget._createExcel(() {
                       showAlertDialog(
                           context, 'Excel file saved successfully.');
+                    }, () {
+                      showSnackBar(context, 'Can not save excel file.');
                     }),
                 icon: const Icon(Icons.file_download_outlined)),
         ],

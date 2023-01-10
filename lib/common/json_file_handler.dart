@@ -48,8 +48,8 @@ class JsonFileHandler {
       final content = await file.readAsString();
       // debugPrint(content);
       return jsonDecode(content);
-    } catch (e) {
-      debugPrint(e.toString());
+    } catch (error) {
+      debugPrint(error.toString());
       return {'nodes': [], 'edges': []};
     }
   }
@@ -57,12 +57,22 @@ class JsonFileHandler {
   Future<Map<String, dynamic>> readJsonFromBundle(String fileName) async {
     debugPrint("readJsonFromBundle");
     try {
-      String filePath = 'lib/resources/$fileName.json';
-      final content = await rootBundle.loadString(filePath);
+      final content = await readJsonStringFromBundle(fileName);
       return await jsonDecode(content);
-    } catch (e) {
-      debugPrint(e.toString());
+    } catch (error) {
+      debugPrint(error.toString());
       return {'nodes': [], 'edges': []};
+    }
+  }
+
+  Future<String> readJsonStringFromBundle(String fileName) async {
+    debugPrint("readJsonStringFromBundle");
+    try {
+      String filePath = 'lib/resources/$fileName.json';
+      return await rootBundle.loadString(filePath);
+    } catch (error) {
+      debugPrint(error.toString());
+      return Future.error(error);
     }
   }
 

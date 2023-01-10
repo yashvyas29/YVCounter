@@ -22,7 +22,8 @@ class MalaDataTablePage extends StatefulWidget {
     return malas.fold(0, (sum, mala) => sum + mala.count);
   }
 
-  Future<void> _createExcel(VoidCallback onSuccess) async {
+  Future<void> _createExcel(
+      VoidCallback onSuccess, VoidCallback onFailure) async {
     var excel = Excel.createExcel();
     Sheet sheetObject = excel['Mala History'];
 
@@ -44,22 +45,10 @@ class MalaDataTablePage extends StatefulWidget {
     cell3.value = 'Japs'; // dynamic values support provided;
     cell3.cellStyle = cellStyle;
 
-    /// Inserting and removing column and rows
-
-    // insert column at index = 8
-    // sheetObject.insertColumn(8);
-
-    // remove column at index = 18
-    // sheetObject.removeColumn(18);
-
-    // insert row at index = 82
     malas.asMap().forEach((index, mala) {
       sheetObject
           .insertRowIterables([mala.date, mala.count, mala.japs], index + 1);
     });
-
-    // remove row at index = 80
-    // sheetObject.removeRow(80);
 
     final defaultSheet = excel.getDefaultSheet();
     if (defaultSheet != null) {
@@ -92,7 +81,14 @@ class MalaDataTablePage extends StatefulWidget {
       }
       String outputFile = p.join(directory.path, 'malas.xlsx');
       debugPrint(outputFile);
-      // File(outputFile).writeAsBytes(excel.encode());
+      List<int>? fileBytes = excel.encode();
+      if (fileBytes != null) {
+        File(outputFile).writeAsBytes(fileBytes);
+        onSuccess.call();
+      } else {
+        onFailure.call();
+      }
+      /*
       List<int>? fileBytes = excel.save();
       if (fileBytes != null) {
         final file = File(outputFile);
@@ -100,7 +96,10 @@ class MalaDataTablePage extends StatefulWidget {
           ..createSync(recursive: true)
           ..writeAsBytesSync(fileBytes);
         onSuccess.call();
+      } else {
+        // showSnackBar(context, "");
       }
+      */
     }
   }
 }
