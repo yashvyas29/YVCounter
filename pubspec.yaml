@@ -32,11 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.0.15
-  intl: ^0.17.0
-  flutter_beep:
-    git:
-      url: https://github.com/trietho/flutter_beep
-      ref: master
+  intl: ^0.18.0
   excel: ^2.0.1
   path_provider: ^2.0.11
   path: ^1.8.2
@@ -50,6 +46,15 @@ dependencies:
   file: ^6.1.4
   file_picker: ^5.2.4
   graphview: ^1.1.1
+
+  flutter_beep:
+    git:
+      url: https://github.com/trietho/flutter_beep
+      ref: master
+  flutter_file_dialog:
+    git:
+      url: https://github.com/kineapps/flutter_file_dialog
+      ref: master
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

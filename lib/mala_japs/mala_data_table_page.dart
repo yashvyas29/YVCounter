@@ -1,13 +1,8 @@
-import 'dart:io';
-
-import 'package:excel/excel.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/data_model/mala.dart';
-import 'package:path/path.dart' as p;
+
+import 'mala_jap_excel_file_handler.dart';
 
 part '../mala_japs/mala_data_table_page_state.dart';
 
@@ -15,90 +10,12 @@ class MalaDataTablePage extends StatefulWidget {
   const MalaDataTablePage({super.key, required this.malas});
 
   final List<Mala> malas;
+
   @override
   State<MalaDataTablePage> createState() => _MalaDataTablePageState();
 
   int _getTotalMalas() {
     return malas.fold(0, (sum, mala) => sum + mala.count);
-  }
-
-  Future<void> _createExcel(
-      VoidCallback onSuccess, VoidCallback onFailure) async {
-    var excel = Excel.createExcel();
-    Sheet sheetObject = excel['Mala History'];
-
-    CellStyle cellStyle = CellStyle(
-        backgroundColorHex: "#1AFF1A",
-        fontFamily: getFontFamily(FontFamily.Calibri));
-
-    cellStyle.underline = Underline.Single; // or Underline.Double
-
-    var cell1 = sheetObject.cell(CellIndex.indexByString("A1"));
-    cell1.value = 'Date'; // dynamic values support provided;
-    cell1.cellStyle = cellStyle;
-
-    var cell2 = sheetObject.cell(CellIndex.indexByString("B1"));
-    cell2.value = 'Malas'; // dynamic values support provided;
-    cell2.cellStyle = cellStyle;
-
-    var cell3 = sheetObject.cell(CellIndex.indexByString("C1"));
-    cell3.value = 'Japs'; // dynamic values support provided;
-    cell3.cellStyle = cellStyle;
-
-    malas.asMap().forEach((index, mala) {
-      sheetObject
-          .insertRowIterables([mala.date, mala.count, mala.japs], index + 1);
-    });
-
-    final defaultSheet = excel.getDefaultSheet();
-    if (defaultSheet != null) {
-      /// deleting the sheet
-      excel.delete(defaultSheet);
-    }
-
-    // Save the Changes in file
-    Directory directory;
-    if (kIsWeb) {
-      excel.save(fileName: 'malas.xlsx');
-      onSuccess.call();
-    } else {
-      if (Platform.isAndroid) {
-        const storagePermission = Permission.storage;
-        final isPermissionGranted = await storagePermission.isGranted;
-        if (!isPermissionGranted) {
-          storagePermission.request();
-        }
-        final downloadDirectory = Directory('/storage/emulated/0/Download');
-        final downloadDirectoryExists = await downloadDirectory.exists();
-        directory = downloadDirectoryExists
-            ? downloadDirectory
-            : await getApplicationDocumentsDirectory();
-      } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-        directory = await getDownloadsDirectory() ??
-            await getApplicationDocumentsDirectory();
-      } else {
-        directory = await getApplicationDocumentsDirectory();
-      }
-      String outputFile = p.join(directory.path, 'malas.xlsx');
-      debugPrint(outputFile);
-      // List<int>? fileBytes = excel.encode();
-      List<int>? fileBytes = excel.save();
-      if (fileBytes != null && fileBytes.isNotEmpty) {
-        final file = File(outputFile);
-        try {
-          if (!await file.exists()) {
-            await file.create(recursive: true);
-          }
-          await file.writeAsBytes(fileBytes);
-          onSuccess.call();
-        } catch (error) {
-          debugPrint(error.toString());
-          onFailure.call();
-        }
-      } else {
-        onFailure.call();
-      }
-    }
   }
 }
 

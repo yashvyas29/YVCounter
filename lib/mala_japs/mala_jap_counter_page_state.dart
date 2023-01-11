@@ -240,6 +240,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _handleExcelBackupSuccess() {
+    showAlertDialog(context, 'Excel backup done successfully.');
+  }
+
+  void _handleExcelBackupFailure(String error) {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,6 +296,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   showProgressIndicator(context, "Restoring from Backup");
                   await _restoreBackup();
                   break;
+                case Menu.backupExcel:
+                  final fileHandler = MalaJapExcelFileHandler(_malaList);
+                  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+                    await fileHandler.createAndSaveExcelOnMobile(
+                        _handleExcelBackupSuccess, _handleExcelBackupFailure);
+                  } else {
+                    await fileHandler.saveExcel(
+                        _handleExcelBackupSuccess, _handleExcelBackupFailure);
+                  }
+                  break;
                 case Menu.restoreExcel:
                   showProgressIndicator(context, "Restoring from Excel");
                   await _restoreExcelBackup();
@@ -319,21 +335,27 @@ class _MyHomePageState extends State<MyHomePage> {
             itemBuilder: (context) {
               return [
                 const PopupMenuItem(
-                  value: Menu.restoreExcel,
+                  value: Menu.backupExcel,
                   child: Text(
-                    'Restore from Excel',
+                    'Backup Malas to Excel',
                   ),
                 ),
                 const PopupMenuItem(
-                  value: Menu.restore,
+                  value: Menu.restoreExcel,
                   child: Text(
-                    'Restore from Google Drive',
+                    'Restore Malas from Excel',
                   ),
                 ),
                 const PopupMenuItem(
                   value: Menu.backup,
                   child: Text(
                     'Backup to Google Drive',
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: Menu.restore,
+                  child: Text(
+                    'Restore from Google Drive',
                   ),
                 ),
                 const PopupMenuItem(

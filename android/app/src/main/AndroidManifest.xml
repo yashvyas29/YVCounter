@@ -3,9 +3,8 @@
     <!-- Permissions options for the `storage` group -->
     <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <!-- <application
-          android:requestLegacyExternalStorage="true" -->
     <application
+        android:requestLegacyExternalStorage="true"
         android:label="YVCounter"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

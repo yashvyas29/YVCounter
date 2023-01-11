@@ -14,6 +14,13 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
   final RestorableIntN _sortColumnIndex = RestorableIntN(0);
   final scrollController = ScrollController();
   _DessertDataSource? _dessertsDataSource;
+  late MalaJapExcelFileHandler fileHandler;
+
+  @override
+  initState() {
+    super.initState();
+    fileHandler = MalaJapExcelFileHandler(widget.malas);
+  }
 
   @override
   String get restorationId => 'data_table_demo';
@@ -75,6 +82,14 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     super.dispose();
   }
 
+  void _handleSaveExcelSuccess() {
+    showAlertDialog(context, 'Excel file saved successfully.');
+  }
+
+  void _handleSaveExcelFailure(String error) {
+    showSnackBar(context, 'Can not save excel file.\n$error');
+  }
+
   @override
   Widget build(BuildContext context) {
     final tableItemsCount = widget.malas.length;
@@ -90,13 +105,9 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
         actions: [
           if (tableItemsCount > 0)
             IconButton(
-                onPressed: () async => await widget._createExcel(() {
-                      showAlertDialog(
-                          context, 'Excel file saved successfully.');
-                    }, () {
-                      showSnackBar(context, 'Can not save excel file.');
-                    }),
-                icon: const Icon(Icons.file_download_outlined)),
+                onPressed: () async => await fileHandler.saveExcel(
+                    _handleSaveExcelSuccess, _handleSaveExcelFailure),
+                icon: const Icon(Icons.file_download)),
         ],
       ),
       body: Scrollbar(
