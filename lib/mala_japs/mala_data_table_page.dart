@@ -81,25 +81,23 @@ class MalaDataTablePage extends StatefulWidget {
       }
       String outputFile = p.join(directory.path, 'malas.xlsx');
       debugPrint(outputFile);
-      List<int>? fileBytes = excel.encode();
-      if (fileBytes != null) {
-        File(outputFile).writeAsBytes(fileBytes);
-        onSuccess.call();
+      // List<int>? fileBytes = excel.encode();
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null && fileBytes.isNotEmpty) {
+        final file = File(outputFile);
+        try {
+          if (!await file.exists()) {
+            await file.create(recursive: true);
+          }
+          await file.writeAsBytes(fileBytes);
+          onSuccess.call();
+        } catch (error) {
+          debugPrint(error.toString());
+          onFailure.call();
+        }
       } else {
         onFailure.call();
       }
-      /*
-      List<int>? fileBytes = excel.save();
-      if (fileBytes != null) {
-        final file = File(outputFile);
-        file
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(fileBytes);
-        onSuccess.call();
-      } else {
-        // showSnackBar(context, "");
-      }
-      */
     }
   }
 }

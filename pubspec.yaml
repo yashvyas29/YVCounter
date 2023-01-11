@@ -37,10 +37,7 @@ dependencies:
     git:
       url: https://github.com/trietho/flutter_beep
       ref: master
-  excel:
-    git:
-      url: https://github.com/justkawal/excel
-      ref: null-safety
+  excel: ^2.0.1
   path_provider: ^2.0.11
   path: ^1.8.2
   permission_handler: ^10.2.0
@@ -58,9 +55,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
   
-  isar: ^3.0.5
-  isar_flutter_libs: ^3.0.5
-  drift: ^2.3.0
+  # isar: ^3.0.5
+  # isar_flutter_libs: ^3.0.5
+  # drift: ^2.3.0
   sqflite: ^2.2.2
 
 dev_dependencies:

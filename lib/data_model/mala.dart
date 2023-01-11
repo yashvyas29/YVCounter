@@ -1,11 +1,11 @@
-import 'package:isar/isar.dart';
-part 'mala.g.dart';
+// import 'package:isar/isar.dart';
+// part 'mala.g.dart';
 
-@collection
+// @collection
 class Mala implements Comparable<Mala> {
-  final Id id = Isar.autoIncrement;
+  // final Id id = Isar.autoIncrement;
   // Id get isarId => fastHash(date);
-  @Index(unique: true, replace: true, caseSensitive: false)
+  // @Index(unique: true, replace: true, caseSensitive: false)
   final String date;
   int count;
   int japs;

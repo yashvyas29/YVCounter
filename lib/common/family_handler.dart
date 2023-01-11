@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
@@ -110,3 +111,4 @@ class FamilyHandler {
     isar.writeTxn(() async => await isar.relations.delete(id));
   }
 }
+*/

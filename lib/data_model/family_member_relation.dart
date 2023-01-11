@@ -1,3 +1,4 @@
+/*
 import 'package:isar/isar.dart';
 part 'family_member_relation.g.dart';
 
@@ -64,3 +65,4 @@ class Relation {
 }
 
 enum Gender { male, female }
+*/
