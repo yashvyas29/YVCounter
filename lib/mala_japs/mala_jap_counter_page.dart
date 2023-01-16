@@ -82,7 +82,7 @@ class MyHomePage extends StatefulWidget {
                     final columnValue = columnData.value;
                     switch (columnIndex) {
                       case 0:
-                        date = columnValue;
+                        date = columnValue.toString();
                         break;
                       case 1:
                         malasCount = columnValue;

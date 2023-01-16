@@ -82,8 +82,8 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     super.dispose();
   }
 
-  void _handleSaveExcelSuccess() {
-    showAlertDialog(context, 'Excel file saved successfully.');
+  Future<void> _handleSaveExcelSuccess() async {
+    await showAlertDialog(context, 'Excel file saved successfully.');
   }
 
   void _handleSaveExcelFailure(String error) {

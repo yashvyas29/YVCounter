@@ -127,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (error) {
       debugPrint(error.toString());
       if (!mounted) return;
-      showSnackBar(context, "Google Drive backup not available.");
+      showSnackBar(context, "Google Drive backup not available.\n$error");
     }
   }
 
@@ -159,21 +159,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _restoreExcelBackup() async {
     debugPrint("_restoreExcelBackup");
-    final malas = await widget._getMalasFromExcel();
-    if (!mounted) return;
-    if (malas.isEmpty) {
-      showSnackBar(context, "No malas loaded from backup.");
-    } else {
-      _malaList.removeWhere((mala) => malas.contains(mala));
-      malas.addAll(_malaList);
-      _malaList = malas;
-      _sharedPref.saveList(Mala.key, malas);
-      // widget._saveMalas(_malaList);
-      final mala = malas.firstWhere((mala) => mala.date == _today);
-      setState(() {
-        _mala = mala;
-      });
-      await showAlertDialog(context, "Excel restore successful.");
+    try {
+      final malas = await widget._getMalasFromExcel();
+      if (!mounted) return;
+      if (malas.isEmpty) {
+        showSnackBar(context, "No malas loaded from backup.");
+      } else {
+        _malaList.removeWhere((mala) => malas.contains(mala));
+        malas.addAll(_malaList);
+        _malaList = malas;
+        _sharedPref.saveList(Mala.key, malas);
+        // widget._saveMalas(_malaList);
+        final mala = malas.firstWhere((mala) => mala.date == _today);
+        setState(() {
+          _mala = mala;
+        });
+        await showAlertDialog(context, "Excel restore successful.");
+      }
+    } catch (error) {
+      showSnackBar(context, "Excel restore failed.\n$error");
     }
   }
 
@@ -240,11 +244,13 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _handleExcelBackupSuccess() {
-    showAlertDialog(context, 'Excel backup done successfully.');
+  Future<void> _handleExcelBackupSuccess() async {
+    await showAlertDialog(context, 'Excel backup done successfully.');
   }
 
-  void _handleExcelBackupFailure(String error) {}
+  void _handleExcelBackupFailure(String error) {
+    showSnackBar(context, "Excel backup failed.\n$error");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -255,12 +261,9 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             tooltip: 'Open Mala History',
             icon: const Icon(Icons.menu),
-            onPressed: () async {
-              final malas = await _sharedPref.readList(Mala.key);
-              // final malas = await widget._getMalas();
-              if (!mounted) return;
+            onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => MalaDataTablePage(malas: malas)));
+                  builder: (context) => MalaDataTablePage(malas: _malaList)));
             },
           ),
           IconButton(
@@ -297,12 +300,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   await _restoreBackup();
                   break;
                 case Menu.backupExcel:
+                  showProgressIndicator(context, "Excel Backup in Progress");
+                  _malaList.sort((a, b) => a.compareTo(b));
                   final fileHandler = MalaJapExcelFileHandler(_malaList);
-                  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+                  if (kIsWeb) {
+                    await fileHandler.saveExcel(
+                        _handleExcelBackupSuccess, _handleExcelBackupFailure);
+                  } else if (Platform.isAndroid || Platform.isIOS) {
                     await fileHandler.createAndSaveExcelOnMobile(
                         _handleExcelBackupSuccess, _handleExcelBackupFailure);
                   } else {
-                    await fileHandler.saveExcel(
+                    await fileHandler.createAndSaveExcelOnDesktop(
                         _handleExcelBackupSuccess, _handleExcelBackupFailure);
                   }
                   break;

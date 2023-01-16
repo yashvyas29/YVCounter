@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:excel/excel.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:path/path.dart';
@@ -50,8 +51,8 @@ class MalaJapExcelFileHandler {
     return excel;
   }
 
-  Future<void> saveExcel(
-      final Function() onSuccess, final Function(String) onFailure) async {
+  Future<void> saveExcel(final Future<void> Function() onSuccess,
+      final void Function(String) onFailure) async {
     final Excel excel = await _createExcel();
     if (kIsWeb) {
       excel.save(fileName: 'malas.xlsx');
@@ -62,11 +63,8 @@ class MalaJapExcelFileHandler {
       if (fileBytes != null && fileBytes.isNotEmpty) {
         final file = File(await _getExcelFilePath());
         try {
-          if (!await file.exists()) {
-            await file.create(recursive: true);
-          }
           await file.writeAsBytes(fileBytes);
-          onSuccess.call();
+          await onSuccess.call();
         } catch (error) {
           debugPrint(error.toString());
           onFailure.call(error.toString());
@@ -77,20 +75,29 @@ class MalaJapExcelFileHandler {
     }
   }
 
-  Future<void> createAndSaveExcelOnMobile(
-      final Function() onSuccess, final Function(String) onFailure) async {
+  Future<void> createAndSaveExcelOnDesktop(
+      final Future<void> Function() onSuccess,
+      final void Function(String) onFailure) async {
     final Excel excel = await _createExcel();
-    // List<int>? fileBytes = excel.encode();
     List<int>? fileBytes = excel.save();
     if (fileBytes != null && fileBytes.isNotEmpty) {
       try {
-        final params = SaveFileDialogParams(
-            data: Uint8List.fromList(fileBytes), fileName: 'malas.xlsx');
-        final filePath = await FlutterFileDialog.saveFile(params: params);
+        const fileName = 'malas.xlsx';
+        final filePath = await FilePicker.platform.saveFile(
+            fileName: fileName,
+            type: FileType.custom,
+            allowedExtensions: ['xlsx']);
+        /*
+        final filePath = await FlutterFileSaver().writeFileAsBytes(
+          fileName: fileName,
+          bytes: Uint8List.fromList(fileBytes),
+        );
+        */
         if (filePath == null) {
           onFailure.call("Cancelled");
         } else {
-          onSuccess.call();
+          await File(filePath).writeAsBytes(fileBytes);
+          await onSuccess.call();
         }
       } catch (error) {
         debugPrint(error.toString());
@@ -100,6 +107,49 @@ class MalaJapExcelFileHandler {
       onFailure.call("");
     }
   }
+
+  Future<void> createAndSaveExcelOnMobile(
+      final Future<void> Function() onSuccess,
+      final void Function(String) onFailure) async {
+    final Excel excel = await _createExcel();
+    // List<int>? fileBytes = excel.encode();
+    List<int>? fileBytes = excel.save();
+    if (fileBytes != null && fileBytes.isNotEmpty) {
+      try {
+        const fileName = 'malas.xlsx';
+        final params = SaveFileDialogParams(
+            data: Uint8List.fromList(fileBytes), fileName: fileName);
+        final filePath = await FlutterFileDialog.saveFile(params: params);
+        /*
+        var file = await _createTempExcel(fileName, fileBytes);
+        final params = SaveFileDialogParams(
+            sourceFilePath: file.path, destinationFileName: fileName);
+        final filePath = await CRFileSaver.saveFileWithDialog(params);
+        file.delete();
+        */
+        if (filePath == null) {
+          onFailure.call("Cancelled");
+        } else {
+          await onSuccess.call();
+        }
+      } catch (error) {
+        debugPrint(error.toString());
+        onFailure.call(error.toString());
+      }
+    } else {
+      onFailure.call("");
+    }
+  }
+
+  /*
+  /// Create example file in temporary directory to work with
+  Future<File> createTempExcel(String fileName, List<int> fileBytes) async {
+    final folder = await getTemporaryDirectory();
+    final filePath = '${folder.path}/$fileName';
+    final file = File(filePath);
+    return await file.writeAsBytes(fileBytes);
+  }
+  */
 
   Future<String> _getExcelFilePath() async {
     Directory directory;
