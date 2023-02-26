@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../famity_tree/models/treemember.dart';
+
 class DBProvider {
   DBProvider._();
 
@@ -27,12 +29,20 @@ class DBProvider {
     final db = await database;
 
     var res = await db.rawQuery('''
-    
     SELECT * FROM sqlite_master WHERE name ='$table' and type='table';
-    
     ''');
 
     return res.isNotEmpty;
+  }
+
+  Future<int> getRowCount(String table) async {
+    final db = await database;
+
+    var res = await db.rawQuery('''
+      SELECT COUNT(*) from '$table';
+      ''');
+
+    return res.length;
   }
 
   Future<bool> checkIfValueExists(
@@ -40,11 +50,10 @@ class DBProvider {
     final db = await database;
 
     var res = await db.rawQuery('''
-    
-    SELECT * FROM '$tableName' WHERE '$columnName' ='$columnValue';
-    
+    SELECT * FROM '$tableName' WHERE $columnName = '$columnValue';
     ''');
 
+    // debugPrint(res.toString());
     return res.isNotEmpty;
   }
 
@@ -75,7 +84,7 @@ class DBProvider {
   Future<List<Map>> cleanTable(String table) async {
     final db = await database;
     var res = await db.rawQuery('''
-    delete from $table;
+    delete from '$table';
     ''');
     return res;
   }
@@ -93,5 +102,48 @@ class DBProvider {
     await db.rawQuery('''
     ALTER TABLE '$oldName' RENAME TO '$newName';
     ''');
+  }
+
+  Future<int> insertMember(TreeMember treeMember, String table) async {
+    final db = await database;
+
+    var res = await db.rawInsert('''
+    INSERT INTO '$table' (id, name, c)
+    VALUES (?, ?, ?);
+    ''', [treeMember.id, treeMember.name, treeMember.c]);
+
+    //print(res);
+    return res;
+  }
+
+  Future<void> updateMember(String table, TreeMember treeMember) async {
+    final db = await database;
+    await db.rawInsert('''
+     REPLACE INTO '$table' (id, name, c)
+      VALUES (?, ?, ?);
+     ''', [treeMember.id, treeMember.name, treeMember.c]);
+  }
+
+  Future<int> removeMember(TreeMember treeMember, String table) async {
+    final db = await database;
+
+    var res = await db.rawDelete('''
+     DELETE FROM '$table' WHERE id = ?;
+     ''', [treeMember.id]);
+
+    //print(res);
+    return res;
+  }
+
+  Future<List<Map>> getMembers(String table) async {
+    final db = await database;
+    var res = await db.rawQuery('''
+    SELECT * FROM '$table';
+    ''');
+    //print(res);
+    if (res.isEmpty || res.isEmpty) {
+      return Future.error("No data found.");
+    }
+    return res;
   }
 }

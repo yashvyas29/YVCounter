@@ -6,6 +6,9 @@ import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 
+import '../common/sqlite_db_provider.dart';
+import '../famity_tree/models/treemember.dart';
+
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
 
@@ -297,7 +300,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
   }
 
-  void updateNode(List edges) {
+  Future<void> updateNode(List edges) async {
     debugPrint("updateNode");
     debugPrint(edges.length.toString());
     // debugPrint(edges.toString());
@@ -344,6 +347,44 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         var fromNodeId = element['from'];
         var toNodeId = element['to'];
         graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
+      }
+
+      var rowCount = await DBProvider.db.getRowCount(widget.title);
+      // debugPrint(rowCount.toString());
+      if (rowCount > 1) {
+        await DBProvider.db.cleanTable(widget.title);
+        // debugPrint("Cleaned ${widget.title} Table");
+        final nodes = _data[nodesKey];
+
+        for (final element in edges) {
+          var fromNodeId = element['from'];
+          var toNodeId = element['to'];
+
+          final nodeIndex =
+              nodes.indexWhere((node) => node['id'] == fromNodeId);
+          final nodeValue = nodes[nodeIndex];
+          final value = nodeValue['label'].toString();
+          if (!await DBProvider.db
+              .checkIfValueExists(widget.title, 'name', value)) {
+            await DBProvider.db
+                .insertMember(TreeMember(value, fromNodeId), widget.title);
+            // debugPrint("From Inserted $value:$fromNodeId");
+          }
+
+          final nodeIndex1 = nodes.indexWhere((node) => node['id'] == toNodeId);
+          final nodeValue1 = nodes[nodeIndex1];
+          final value1 = nodeValue1['label'].toString();
+          if (!await DBProvider.db
+              .checkIfValueExists(widget.title, 'name', value1)) {
+            await DBProvider.db.insertMember(
+                TreeMember(value1, fromNodeId, toNodeId), widget.title);
+            // debugPrint("To Inserted $value:$fromNodeId");
+          } else {
+            await DBProvider.db.updateMember(
+                widget.title, TreeMember(value1, fromNodeId, toNodeId));
+            // debugPrint("To Updated $value1:$fromNodeId");
+          }
+        }
       }
     }
   }

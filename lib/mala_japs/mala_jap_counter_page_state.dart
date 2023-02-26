@@ -280,6 +280,19 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
+            tooltip: 'Open My Family',
+            icon: const Icon(Icons.family_restroom),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(
+                    title: 'Famaily',
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
             tooltip: 'Open About',
             icon: const Icon(Icons.info_outline),
             onPressed: () {

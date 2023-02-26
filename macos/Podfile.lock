@@ -1,6 +1,4 @@
 PODS:
-  - flutter_file_manager_macos (0.0.1):
-    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
@@ -14,7 +12,6 @@ PODS:
     - FMDB (>= 2.7.5)
 
 DEPENDENCIES:
-  - flutter_file_manager_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_file_manager_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - path_provider_macos (from `Flutter/ephemeral/.symlinks/plugins/path_provider_macos/macos`)
   - shared_preferences_macos (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_macos/macos`)
@@ -25,8 +22,6 @@ SPEC REPOS:
     - FMDB
 
 EXTERNAL SOURCES:
-  flutter_file_manager_macos:
-    :path: Flutter/ephemeral/.symlinks/plugins/flutter_file_manager_macos/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   path_provider_macos:
@@ -37,7 +32,6 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/sqflite/macos
 
 SPEC CHECKSUMS:
-  flutter_file_manager_macos: 11df72b919a6e010c8e03ec6adf7439f0319032b
   FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   path_provider_macos: 3c0c3b4b0d4a76d2bf989a913c2de869c5641a19
