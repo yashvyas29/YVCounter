@@ -157,9 +157,9 @@ class _GraphViewPageState extends State<TreeViewPage> {
                   color: Colors.grey,
                   height: 200,
                   width: 200,
-                  child: Column(
+                  child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text(
                         'Loading...',
                         textAlign: TextAlign.center,

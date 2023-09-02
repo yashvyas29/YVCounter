@@ -122,7 +122,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
 
   Future<void> _resetMessage() async {
     Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
+      if (!context.mounted) return;
       setState(() {
         _message = "";
       });

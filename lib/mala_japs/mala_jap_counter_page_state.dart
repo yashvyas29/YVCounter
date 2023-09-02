@@ -37,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     } catch (error) {
       debugPrint(error.toString());
+      if (!context.mounted) return;
       showSnackBar(context, "Nothing found!");
     }
   }
@@ -122,11 +123,11 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         await file.delete();
       }
-      if (!mounted) return;
+      if (!context.mounted) return;
       await showAlertDialog(context, "Google Drive restore successful.");
     } catch (error) {
       debugPrint(error.toString());
-      if (!mounted) return;
+      if (!context.mounted) return;
       showSnackBar(context, "Google Drive backup not available.\n$error");
     }
   }
@@ -146,13 +147,13 @@ class _MyHomePageState extends State<MyHomePage> {
           _mala = mala;
         });
       } else {
-        if (!mounted) return;
+        if (!context.mounted) return;
         showSnackBar(context, "Malas backup not available.");
       }
       debugPrint('Malas restored successfully.');
     } catch (error) {
       debugPrint(error.toString());
-      if (!mounted) return;
+      if (!context.mounted) return;
       showSnackBar(context, "Malas backup not available.");
     }
   }
@@ -161,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
     debugPrint("_restoreExcelBackup");
     try {
       final malas = await widget._getMalasFromExcel();
-      if (!mounted) return;
+      if (!context.mounted) return;
       if (malas.isEmpty) {
         showSnackBar(context, "No malas loaded from backup.");
       } else {
@@ -177,6 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
         await showAlertDialog(context, "Excel restore successful.");
       }
     } catch (error) {
+      if (!context.mounted) return;
       showSnackBar(context, "Excel restore failed.\n$error");
     }
   }
@@ -206,9 +208,10 @@ class _MyHomePageState extends State<MyHomePage> {
       GoogleDrive.fileName = p.basename(dbFilePath);
       await _googleDrive.uploadFileToGoogleDrive(dbFile);
       debugPrint('Database file uploaded successfully.');
-      if (!mounted) return;
+      if (!context.mounted) return;
       await showAlertDialog(context, "Backup done successfully.");
     } catch (error) {
+      if (!context.mounted) return;
       showSnackBar(context, error.toString());
     }
   }
@@ -309,10 +312,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   await _saveBackup();
                   break;
                 case Menu.restore:
+                  if (!context.mounted) return;
                   showProgressIndicator(context, "Restoring from Backup");
                   await _restoreBackup();
                   break;
                 case Menu.backupExcel:
+                  if (!context.mounted) return;
                   showProgressIndicator(context, "Excel Backup in Progress");
                   _malaList.sort((a, b) => a.compareTo(b));
                   final fileHandler = MalaJapExcelFileHandler(_malaList);
@@ -328,21 +333,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                   break;
                 case Menu.restoreExcel:
+                  if (!context.mounted) return;
                   showProgressIndicator(context, "Restoring from Excel");
                   await _restoreExcelBackup();
                   break;
                 case Menu.delete:
+                  if (!context.mounted) return;
                   showProgressIndicator(context, "Deleting Backup");
                   try {
                     await _googleDrive.deleteAppDataFolderFiles();
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     await showAlertDialog(context,
                         "App data deleted successfully from Google Drive.");
                   } catch (error) {
+                    if (!context.mounted) return;
                     showSnackBar(context, error.toString());
                   }
                   break;
                 case Menu.signOut:
+                  if (!context.mounted) return;
                   showProgressIndicator(context, "Signing Out");
                   await _googleDrive.signOut();
               }
@@ -350,7 +359,7 @@ class _MyHomePageState extends State<MyHomePage> {
               setState(() {
                 _user = user;
               });
-              if (!mounted) return;
+              if (!context.mounted) return;
               hideProgressIndicator(context);
             },
             itemBuilder: (context) {
