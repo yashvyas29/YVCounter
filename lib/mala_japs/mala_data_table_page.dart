@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yv_counter/common/date_time_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/data_model/mala.dart';
 
@@ -116,7 +117,11 @@ class _DessertDataSource extends DataTableSource {
       },
       */
       cells: [
-        DataCell(Text(dessert.date)),
+        DataCell(Text(DateTimeHandler.getString(
+            dessert.date,
+            DateTimeHandler.isToday(dessert.date)
+                ? DateTimeHandler.dateTimeFormat
+                : DateTimeHandler.dateFormat))),
         DataCell(Text('${dessert.count}')),
         DataCell(Text('${dessert.japs}')),
       ],

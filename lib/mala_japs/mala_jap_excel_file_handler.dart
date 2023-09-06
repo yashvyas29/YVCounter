@@ -7,6 +7,7 @@ import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:yv_counter/common/date_time_handler.dart';
 
 import '../data_model/mala.dart';
 
@@ -38,8 +39,11 @@ class MalaJapExcelFileHandler {
     cell3.cellStyle = cellStyle;
 
     malas.asMap().forEach((index, mala) {
-      sheetObject
-          .insertRowIterables([mala.date, mala.count, mala.japs], index + 1);
+      sheetObject.insertRowIterables([
+        DateTimeHandler.getString(mala.date, DateTimeHandler.dateFormat),
+        mala.count,
+        mala.japs
+      ], index + 1);
     });
 
     final defaultSheet = excel.getDefaultSheet();

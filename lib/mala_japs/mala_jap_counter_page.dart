@@ -6,17 +6,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
-import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 // import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/about_page.dart';
+import 'package:yv_counter/common/date_time_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
 import 'package:yv_counter/family_members/family_list_page.dart';
 import 'package:yv_counter/common/google_drive.dart';
 import 'package:yv_counter/data_model/mala.dart';
-import 'package:yv_counter/famity_tree/pages/homepage.dart';
+// import 'package:yv_counter/famity_tree/pages/homepage.dart';
 import 'package:yv_counter/mala_japs/mala_data_table_page.dart';
 import 'package:yv_counter/common/shared_pref.dart';
 import 'package:yv_counter/data_model/user.dart';
@@ -60,45 +60,57 @@ class MyHomePage extends StatefulWidget {
     final file = result?.files.single;
     if (file != null) {
       debugPrint(file.name);
-      final filePath = file.path;
-      debugPrint(filePath);
-      if (filePath != null) {
-        final file = File(filePath);
-        final fileBytes = await file.readAsBytes();
-        final excel = Excel.decodeBytes(fileBytes);
-        for (final table in excel.tables.keys) {
-          debugPrint(table); //sheet Name
-          final sheet = excel.tables[table];
-          if (sheet != null) {
-            debugPrint(sheet.maxCols.toString());
-            debugPrint(sheet.maxRows.toString());
-            final List<Mala> malas = [];
-            sheet.rows.asMap().forEach((rowIndex, rowValue) {
-              if (rowIndex > 0) {
-                late String date;
-                late int malasCount;
-                late int japs;
-                rowValue.asMap().forEach((columnIndex, columnData) {
-                  if (columnData != null) {
-                    final columnValue = columnData.value;
-                    switch (columnIndex) {
-                      case 0:
-                        date = columnValue.toString();
-                        break;
-                      case 1:
-                        malasCount = columnValue;
-                        break;
-                      case 2:
-                        japs = columnValue;
-                    }
-                  }
-                });
-                malas.add(Mala(date, malasCount, japs));
+      final fileBytes = file.bytes;
+      if (fileBytes != null) {
+        return await _restoreMalasFromExcel(fileBytes);
+      } else {
+        final filePath = file.path;
+        if (filePath != null) {
+          final file = File(filePath);
+          final fileBytes = await file.readAsBytes();
+          return await _restoreMalasFromExcel(fileBytes);
+        }
+      }
+    }
+    return [];
+  }
+
+  Future<List<Mala>> _restoreMalasFromExcel(Uint8List fileBytes) async {
+    final excel = Excel.decodeBytes(fileBytes);
+    for (final table in excel.tables.keys) {
+      debugPrint(table); //sheet Name
+      final sheet = excel.tables[table];
+      if (sheet != null) {
+        debugPrint(sheet.maxCols.toString());
+        debugPrint(sheet.maxRows.toString());
+        final List<Mala> malas = [];
+        sheet.rows.asMap().forEach((rowIndex, rowValue) {
+          if (rowIndex > 0) {
+            late String date;
+            late int malasCount;
+            late int japs;
+            rowValue.asMap().forEach((columnIndex, columnData) {
+              if (columnData != null) {
+                final columnValue = columnData.value;
+                switch (columnIndex) {
+                  case 0:
+                    date = columnValue.toString();
+                    break;
+                  case 1:
+                    malasCount = columnValue;
+                    break;
+                  case 2:
+                    japs = columnValue;
+                }
               }
             });
-            return malas;
+            malas.add(Mala(
+                DateTimeHandler.getDateTime(date, DateTimeHandler.dateFormat),
+                malasCount,
+                japs));
           }
-        }
+        });
+        return malas;
       }
     }
     return [];

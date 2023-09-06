@@ -6,7 +6,7 @@ class Mala implements Comparable<Mala> {
   // final Id id = Isar.autoIncrement;
   // Id get isarId => fastHash(date);
   // @Index(unique: true, replace: true, caseSensitive: false)
-  final String date;
+  DateTime date;
   int count;
   int japs;
 
@@ -16,12 +16,12 @@ class Mala implements Comparable<Mala> {
   Mala(this.date, this.count, this.japs);
 
   Mala.fromJson(Map<String, dynamic> json)
-      : date = json['date'],
+      : date = DateTime.parse(json['date']),
         count = json['count'],
         japs = json['japs'];
 
   Map<String, dynamic> toJson() => {
-        'date': date,
+        'date': date.toIso8601String(),
         'count': count,
         'japs': japs,
       };

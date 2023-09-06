@@ -7,10 +7,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final GoogleDrive _googleDrive = GoogleDrive();
   final SharedPref _sharedPref = SharedPref();
-  final String _today = DateFormat(dateFormat).format(DateTime.now());
   final List<bool> _selections = [true, false];
-
-  static const dateFormat = 'yyyy-MM-dd';
 
   @override
   void initState() {
@@ -22,7 +19,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       });
     });
-    _mala = Mala(_today, 0, 0);
+    _mala = Mala(DateTimeHandler.today, 0, 0);
     _loadMala();
     // FamilyHandler().loadFamily();
   }
@@ -31,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       // _malaList = await widget._getMalas();
       _malaList = await _sharedPref.readList(Mala.key);
-      final todayMala = _malaList.firstWhere((mala) => mala.date == _today);
+      final todayMala = _malaList.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
       setState(() {
         _mala = todayMala;
       });
@@ -48,10 +45,16 @@ class _MyHomePageState extends State<MyHomePage> {
       _malaList.add(_mala);
     }
     setState(() {
-      _selections.first ? _mala.count += 1 : _mala.japs += 1;
-      _selections.first
-          ? _mala.japs = _mala.count * Mala.japsPerMala
-          : _mala.count = _mala.japs ~/ Mala.japsPerMala;
+      if (DateTimeHandler.isToday(_mala.date)) {
+        _mala.date = DateTimeHandler.today;
+      }
+      if (_selections.first) {
+        _mala.count += 1;
+        _mala.japs = _mala.count * Mala.japsPerMala;
+      } else {
+        _mala.japs += 1;
+        _mala.count = _mala.japs ~/ Mala.japsPerMala;
+      }
     });
     _sharedPref.saveList(Mala.key, _malaList);
     // widget._saveMalas(_malaList);
@@ -142,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _malaList = malas;
         _sharedPref.saveList(Mala.key, malas);
         // widget._saveMalas(_malaList);
-        final mala = malas.firstWhere((mala) => mala.date == _today);
+        final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
         setState(() {
           _mala = mala;
         });
@@ -171,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _malaList = malas;
         _sharedPref.saveList(Mala.key, malas);
         // widget._saveMalas(_malaList);
-        final mala = malas.firstWhere((mala) => mala.date == _today);
+        final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
         setState(() {
           _mala = mala;
         });
@@ -228,11 +231,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (pickedDate != null) {
       setState(() {
-        final date = DateFormat(dateFormat).format(pickedDate);
         try {
-          _mala = _malaList.firstWhere((mala) => mala.date == date);
+          _mala = _malaList.firstWhere((mala) => DateUtils.isSameDay(mala.date, pickedDate));
         } catch (excepetion) {
-          _mala = Mala(date, 0, 0);
+          _mala = Mala(pickedDate, 0, 0);
         }
       });
     }
@@ -282,6 +284,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
+          /*
           IconButton(
             tooltip: 'Open My Family',
             icon: const Icon(Icons.family_restroom),
@@ -294,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             },
-          ),
+          ), */
           IconButton(
             tooltip: 'Open About',
             icon: const Icon(Icons.info_outline),
@@ -443,11 +446,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           size: 18,
                         ),
                         label: Text(
-                          _mala.date,
+                          DateTimeHandler.getString(_mala.date, DateTimeHandler.dateFormat),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         onPressed: _pickDate,
                       ),
+                      if (!_selections.first) const SizedBox(height: 10),
                       Text(
                         '${_selections.first ? _mala.count : getJapsPerMala()}',
                         style: _selections.first
@@ -455,6 +459,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             : Theme.of(context).textTheme.displayMedium,
                         textAlign: TextAlign.center,
                       ),
+                      if (!_selections.first) const SizedBox(height: 10),
                       Text(
                         '${!_selections.first ? 'Malas' : 'Japs'}: ${!_selections.first ? _mala.count : _mala.japs}',
                         style: Theme.of(context).textTheme.titleSmall,
