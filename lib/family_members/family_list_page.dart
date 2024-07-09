@@ -35,7 +35,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
 
   Future<List<String>> _getFamilies() async {
     final families = await DBProvider.db.getFamilies();
-    debugPrint(families.toString());
+    // debugPrint(families.toString());
     setState(() {
       _families.addAll(families.map((e) => e['name'].toString()));
       _setReadOnlyList();
@@ -203,6 +203,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
                     );
                     return ListTile(
                       title: TextField(
+                        style: const TextStyle(color: Colors.white),
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         controller: _controllers[index],
@@ -211,8 +212,10 @@ class _FamilyListPageState extends State<FamilyListPage> {
                         enabled: !readOnly,
                         autofocus: !readOnly,
                       ),
+                      /*
                       tileColor: Colors.white,
                       focusColor: Colors.white,
+                      */
                       trailing: readOnly
                           ? Row(
                               mainAxisSize: MainAxisSize.min,

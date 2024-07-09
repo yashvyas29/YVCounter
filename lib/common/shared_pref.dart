@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yv_counter/data_model/mala.dart';
 
@@ -26,7 +25,7 @@ class SharedPref {
 
   saveList(String key, List<Mala> malas) async {
     final list = malas.map((mala) => json.encode(mala.toJson())).toList();
-    debugPrint(list.join('\n'));
+    // debugPrint(list.join('\n'));
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList(key, list);
   }

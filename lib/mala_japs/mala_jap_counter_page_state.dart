@@ -451,15 +451,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         onPressed: _pickDate,
                       ),
-                      if (!_selections.first) const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      // if (!_selections.first) const SizedBox(height: 10),
                       Text(
                         '${_selections.first ? _mala.count : getJapsPerMala()}',
-                        style: _selections.first
-                            ? Theme.of(context).textTheme.displayLarge
-                            : Theme.of(context).textTheme.displayMedium,
+                        style: Theme.of(context).textTheme.displayMedium,
+                        // style: _selections.first
+                        //     ? Theme.of(context).textTheme.displayLarge
+                        //     : Theme.of(context).textTheme.displayMedium,
                         textAlign: TextAlign.center,
                       ),
-                      if (!_selections.first) const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      // if (!_selections.first) const SizedBox(height: 10),
                       Text(
                         '${!_selections.first ? 'Malas' : 'Japs'}: ${!_selections.first ? _mala.count : _mala.japs}',
                         style: Theme.of(context).textTheme.titleSmall,
@@ -474,12 +477,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           });
                         },
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8)),
+                        borderRadius: const BorderRadius.all(Radius.circular(8)),
+                        /*
                         selectedBorderColor: Colors.red[700],
                         selectedColor: Colors.white,
                         fillColor: Colors.red[200],
                         color: Colors.red[400],
+                        */
                         constraints: const BoxConstraints(
                           minHeight: 40.0,
                           minWidth: 80.0,
@@ -493,30 +497,44 @@ class _MyHomePageState extends State<MyHomePage> {
                       Flexible(
                         child: SizedBox.expand(
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 50),
+                            padding: const EdgeInsets.all(30),
                             child: ElevatedButton.icon(
-                              icon: const Icon(Icons.add, color: Colors.white),
-                              label: const Text('Add',
-                                  style: TextStyle(fontSize: 20)),
+                              icon: const Icon(
+                                Icons.add,
+                                // color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Add',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  // color: Colors.white,
+                                ),
+                              ),
                               onPressed: _incrementCounter,
                               style: ButtonStyle(
                                 shape: WidgetStateProperty.all(
-                                    const CircleBorder()),
+                                  const CircleBorder(),
+                                ),
                                 padding: WidgetStateProperty.all(
-                                    const EdgeInsets.all(20)),
+                                  const EdgeInsets.all(20),
+                                ),
+                                /*
                                 backgroundColor: WidgetStateProperty.all(
-                                    Colors.blue), // <-- Button color
+                                  Colors.red[200],
+                                ), // <-- Button color
                                 overlayColor:
                                     WidgetStateProperty.resolveWith<Color?>(
                                         (states) {
                                   if (states.contains(WidgetState.pressed)) {
-                                    return Colors.red; // <-- Splash color
+                                    return Colors.blueGrey[700]; // <-- Splash color
                                   } else {
                                     return null;
                                   }
                                 }),
+                                */
                                 minimumSize: WidgetStateProperty.all(
-                                    const Size(150, 150)),
+                                  const Size(150, 150),
+                                ),
                               ),
                             ),
                           ),
