@@ -81,7 +81,7 @@ class MyHomePage extends StatefulWidget {
       debugPrint(table); //sheet Name
       final sheet = excel.tables[table];
       if (sheet != null) {
-        debugPrint(sheet.maxCols.toString());
+        debugPrint(sheet.maxColumns.toString());
         debugPrint(sheet.maxRows.toString());
         final List<Mala> malas = [];
         sheet.rows.asMap().forEach((rowIndex, rowValue) {
@@ -91,16 +91,16 @@ class MyHomePage extends StatefulWidget {
             late int japs;
             rowValue.asMap().forEach((columnIndex, columnData) {
               if (columnData != null) {
-                final columnValue = columnData.value;
+                final columnValue = columnData.value.toString();
                 switch (columnIndex) {
                   case 0:
-                    date = columnValue.toString();
+                    date = columnValue;
                     break;
                   case 1:
-                    malasCount = columnValue;
+                    malasCount = int.parse(columnValue);
                     break;
                   case 2:
-                    japs = columnValue;
+                    japs = int.parse(columnValue);
                 }
               }
             });

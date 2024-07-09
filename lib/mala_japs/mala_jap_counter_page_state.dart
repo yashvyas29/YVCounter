@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     } catch (error) {
       debugPrint(error.toString());
-      if (!context.mounted) return;
+      if (!mounted) return;
       showSnackBar(context, "Nothing found!");
     }
   }
@@ -126,11 +126,11 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         await file.delete();
       }
-      if (!context.mounted) return;
+      if (!mounted) return;
       await showAlertDialog(context, "Google Drive restore successful.");
     } catch (error) {
       debugPrint(error.toString());
-      if (!context.mounted) return;
+      if (!mounted) return;
       showSnackBar(context, "Google Drive backup not available.\n$error");
     }
   }
@@ -150,13 +150,13 @@ class _MyHomePageState extends State<MyHomePage> {
           _mala = mala;
         });
       } else {
-        if (!context.mounted) return;
+        if (!mounted) return;
         showSnackBar(context, "Malas backup not available.");
       }
       debugPrint('Malas restored successfully.');
     } catch (error) {
       debugPrint(error.toString());
-      if (!context.mounted) return;
+      if (!mounted) return;
       showSnackBar(context, "Malas backup not available.");
     }
   }
@@ -165,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
     debugPrint("_restoreExcelBackup");
     try {
       final malas = await widget._getMalasFromExcel();
-      if (!context.mounted) return;
+      if (!mounted) return;
       if (malas.isEmpty) {
         showSnackBar(context, "No malas loaded from backup.");
       } else {
@@ -181,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
         await showAlertDialog(context, "Excel restore successful.");
       }
     } catch (error) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       showSnackBar(context, "Excel restore failed.\n$error");
     }
   }
@@ -211,10 +211,10 @@ class _MyHomePageState extends State<MyHomePage> {
       GoogleDrive.fileName = p.basename(dbFilePath);
       await _googleDrive.uploadFileToGoogleDrive(dbFile);
       debugPrint('Database file uploaded successfully.');
-      if (!context.mounted) return;
+      if (!mounted) return;
       await showAlertDialog(context, "Backup done successfully.");
     } catch (error) {
-      if (!context.mounted) return;
+      if (!mounted) return;
       showSnackBar(context, error.toString());
     }
   }
@@ -500,22 +500,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                   style: TextStyle(fontSize: 20)),
                               onPressed: _incrementCounter,
                               style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
+                                shape: WidgetStateProperty.all(
                                     const CircleBorder()),
-                                padding: MaterialStateProperty.all(
+                                padding: WidgetStateProperty.all(
                                     const EdgeInsets.all(20)),
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                     Colors.blue), // <-- Button color
                                 overlayColor:
-                                    MaterialStateProperty.resolveWith<Color?>(
+                                    WidgetStateProperty.resolveWith<Color?>(
                                         (states) {
-                                  if (states.contains(MaterialState.pressed)) {
+                                  if (states.contains(WidgetState.pressed)) {
                                     return Colors.red; // <-- Splash color
                                   } else {
                                     return null;
                                   }
                                 }),
-                                minimumSize: MaterialStateProperty.all(
+                                minimumSize: WidgetStateProperty.all(
                                     const Size(150, 150)),
                               ),
                             ),

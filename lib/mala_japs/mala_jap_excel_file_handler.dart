@@ -21,28 +21,28 @@ class MalaJapExcelFileHandler {
     Sheet sheetObject = excel['Mala History'];
 
     CellStyle cellStyle = CellStyle(
-        backgroundColorHex: "#1AFF1A",
+        backgroundColorHex: ExcelColor.fromHexString("#1AFF1A"),
         fontFamily: getFontFamily(FontFamily.Calibri));
 
     cellStyle.underline = Underline.Single; // or Underline.Double
 
     var cell1 = sheetObject.cell(CellIndex.indexByString("A1"));
-    cell1.value = 'Date'; // dynamic values support provided;
+    cell1.value = const TextCellValue('Date'); // dynamic values support provided;
     cell1.cellStyle = cellStyle;
 
     var cell2 = sheetObject.cell(CellIndex.indexByString("B1"));
-    cell2.value = 'Malas'; // dynamic values support provided;
+    cell2.value = const TextCellValue('Malas'); // dynamic values support provided;
     cell2.cellStyle = cellStyle;
 
     var cell3 = sheetObject.cell(CellIndex.indexByString("C1"));
-    cell3.value = 'Japs'; // dynamic values support provided;
+    cell3.value = const TextCellValue('Japs'); // dynamic values support provided;
     cell3.cellStyle = cellStyle;
 
     malas.asMap().forEach((index, mala) {
       sheetObject.insertRowIterables([
-        DateTimeHandler.getString(mala.date, DateTimeHandler.dateFormat),
-        mala.count,
-        mala.japs
+        TextCellValue(DateTimeHandler.getString(mala.date, DateTimeHandler.dateFormat)),
+        IntCellValue(mala.count),
+        IntCellValue(mala.japs)
       ], index + 1);
     });
 

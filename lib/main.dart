@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
         scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: MaterialStateProperty.all<bool>(true),
+          thumbVisibility: WidgetStateProperty.all<bool>(true),
         ),
       ),
       home: const MyHomePage(title: 'YVCounter'),
