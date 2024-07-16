@@ -33,9 +33,11 @@ class _MyHomePageState extends State<MyHomePage> {
         _mala = todayMala;
       });
     } catch (error) {
-      debugPrint(error.toString());
+      debugPrint('No malas found for today.\n$error');
+      /*
       if (!mounted) return;
-      showSnackBar(context, "Nothing found!");
+      showSnackBar(context, "No malas found for today.");
+      */
     }
   }
 
@@ -145,19 +147,25 @@ class _MyHomePageState extends State<MyHomePage> {
         _malaList = malas;
         _sharedPref.saveList(Mala.key, malas);
         // widget._saveMalas(_malaList);
-        final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
-        setState(() {
-          _mala = mala;
-        });
+
+        try {
+          final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
+          setState(() {
+            _mala = mala;
+          });
+        } catch (error) {
+          debugPrint('No malas found for today.\n$error');
+        }
+
+        debugPrint('Malas restored successfully.');
       } else {
         if (!mounted) return;
         showSnackBar(context, "Malas backup not available.");
       }
-      debugPrint('Malas restored successfully.');
     } catch (error) {
       debugPrint(error.toString());
       if (!mounted) return;
-      showSnackBar(context, "Malas backup not available.");
+      showSnackBar(context, "Malas backup not available.\n$error");
     }
   }
 
@@ -174,10 +182,14 @@ class _MyHomePageState extends State<MyHomePage> {
         _malaList = malas;
         _sharedPref.saveList(Mala.key, malas);
         // widget._saveMalas(_malaList);
-        final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
-        setState(() {
-          _mala = mala;
-        });
+        try {
+          final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
+          setState(() {
+            _mala = mala;
+          });
+        } catch(error) {
+          debugPrint('No malas found for today.\n$error');
+        }
         await showAlertDialog(context, "Excel restore successful.");
       }
     } catch (error) {
@@ -197,26 +209,35 @@ class _MyHomePageState extends State<MyHomePage> {
       await _googleDrive.uploadFileToGoogleDrive(file);
       file.delete();
       debugPrint('Malas file uploaded successfully.');
-      final files = await const JsonFileHandler().files();
-      for (final filePath in files) {
-        debugPrint('File to upload with path: $filePath');
-        final file = File(filePath);
-        GoogleDrive.fileName = p.basename(filePath);
-        await _googleDrive.uploadFileToGoogleDrive(file);
-      }
-      debugPrint('Family json files uploaded successfully.');
-      final dbFilePath = await DBProvider.db.getDatabasePath();
-      debugPrint('File to upload with path: $dbFilePath');
-      final dbFile = File(dbFilePath);
-      GoogleDrive.fileName = p.basename(dbFilePath);
-      await _googleDrive.uploadFileToGoogleDrive(dbFile);
-      debugPrint('Database file uploaded successfully.');
-      if (!mounted) return;
-      await showAlertDialog(context, "Backup done successfully.");
     } catch (error) {
       if (!mounted) return;
       showSnackBar(context, error.toString());
     }
+
+    try {
+        final files = await const JsonFileHandler().files();
+        for (final filePath in files) {
+          debugPrint('File to upload with path: $filePath');
+          final file = File(filePath);
+          GoogleDrive.fileName = p.basename(filePath);
+          await _googleDrive.uploadFileToGoogleDrive(file);
+        }
+        debugPrint('Family json files uploaded successfully.');
+
+        final dbFilePath = await DBProvider.db.getDatabasePath();
+        debugPrint('File to upload with path: $dbFilePath');
+        final dbFile = File(dbFilePath);
+        if (await dbFile.exists()) {
+          GoogleDrive.fileName = p.basename(dbFilePath);
+          await _googleDrive.uploadFileToGoogleDrive(dbFile);
+          debugPrint('Database file uploaded successfully.');
+        }
+      } catch (error) {
+        debugPrint(error.toString());
+      }
+
+      if (!mounted) return;
+      await showAlertDialog(context, "Backup done successfully.");
   }
 
   Future<void> _pickDate() async {
@@ -233,8 +254,9 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         try {
           _mala = _malaList.firstWhere((mala) => DateUtils.isSameDay(mala.date, pickedDate));
-        } catch (excepetion) {
+        } catch (error) {
           _mala = Mala(pickedDate, 0, 0);
+          debugPrint('No malas found for today.\n$error');
         }
       });
     }
@@ -442,7 +464,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       TextButton.icon(
                         icon: const Icon(
                           Icons.calendar_today,
-                          color: Colors.black,
+                          // color: Colors.black,
                           size: 18,
                         ),
                         label: Text(

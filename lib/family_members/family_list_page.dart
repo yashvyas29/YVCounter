@@ -203,7 +203,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
                     );
                     return ListTile(
                       title: TextField(
-                        style: const TextStyle(color: Colors.white),
+                        style: Theme.of(context).textTheme.bodyLarge,
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         controller: _controllers[index],

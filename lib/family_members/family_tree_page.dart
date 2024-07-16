@@ -96,11 +96,9 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
-          /*
           boxShadow: [
-            BoxShadow(color: Colors.blue[100]!, spreadRadius: 1),
+            BoxShadow(color: Colors.red[400]!, spreadRadius: 1),
           ],
-          */
         ),
         child: Row(children: [
           Expanded(
@@ -292,7 +290,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         graph: graph,
         algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
         paint: Paint()
-          // ..color = Colors.green
+          ..color = Colors.green
           ..strokeWidth = 1
           ..style = PaintingStyle.stroke,
         builder: (Node node) {
