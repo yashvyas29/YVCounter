@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/treemember.dart';
+import '../../data_model/treemember.dart';
 import 'infopage.dart';
 
 class GetNodeText extends StatefulWidget {

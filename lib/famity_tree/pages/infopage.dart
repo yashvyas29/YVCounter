@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yv_counter/famity_tree/tools/string_extension.dart';
 
-import '../models/treemember.dart';
+import '../../data_model/treemember.dart';
 
 class InfoPage extends StatefulWidget {
   final TreeMember treeMember;

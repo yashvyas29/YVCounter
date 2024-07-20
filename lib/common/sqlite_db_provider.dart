@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-import '../famity_tree/models/treemember.dart';
+import '../data_model/treemember.dart';
 
 class DBProvider {
   DBProvider._();

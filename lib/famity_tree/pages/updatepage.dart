@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:yv_counter/famity_tree/tools/string_extension.dart';
 
 import '../../common/sqlite_db_provider.dart';
-import '../models/treemember.dart';
+import '../../data_model/treemember.dart';
 
 class UpdatePage extends StatefulWidget {
   const UpdatePage({super.key});

@@ -5,7 +5,7 @@ import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 
 import '../common/sqlite_db_provider.dart';
-import '../famity_tree/models/treemember.dart';
+import '../data_model/treemember.dart';
 
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
@@ -286,11 +286,16 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   Widget _graphView() {
     final edges = _data[edgesKey];
     updateNode(edges);
+
+    final contextSize = MediaQuery.sizeOf(context);
+    final horizontalInsets = contextSize.width - 200;
+    final verticalInsets = contextSize.height - 200;
+
     return InteractiveViewer(
       constrained: false,
-      boundaryMargin: const EdgeInsets.all(double.infinity),
+      boundaryMargin: EdgeInsets.symmetric(horizontal: horizontalInsets, vertical: verticalInsets),
       minScale: 0.05,
-      maxScale: 2.5,
+      maxScale: 1,
       transformationController: _transformationController,
       child: GraphView(
         graph: _graph,
