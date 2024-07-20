@@ -1,6 +1,4 @@
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
@@ -41,11 +39,12 @@ class FamilyTreePage extends StatefulWidget {
 
 class _FamilyTreePageState extends State<FamilyTreePage> {
   Map<String, dynamic> _data = {};
-  final TransformationController _transformationController =
-      TransformationController();
+  final TransformationController _transformationController = TransformationController();
 
   static const nodesKey = 'nodes';
   static const edgesKey = 'edges';
+
+  static const spacing = 20.0;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +57,10 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
               onPressed: () {
                 debugPrint("Reset to family pressed.");
                 widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
-                graph = Graph()..isTree = true;
+                if (_transformationController.value != Matrix4.identity()) {
+                  _jumpToNode(1);
+                }
+                _graph = Graph()..isTree = true;
                 setState(() {
                   _data.clear();
                 });
@@ -186,33 +188,36 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     _data[nodesKey].removeWhere((element) => element['id'] == id);
     _data[edgesKey]
         .removeWhere((edge) => edge['from'] == id || edge['to'] == id);
-    if (graph.isTree) {
-      graph
+    if (_graph.isTree) {
+      _graph
           .successorsOf(node)
           .forEach((nodeElement) => _removeNodeFromData(nodeElement));
     }
-    graph.removeNode(node);
-    if (graph.edges.length < 50) {
-      _transformationController.value = Matrix4.identity();
-    }
+    _graph.removeNode(node);
   }
 
-  Graph graph = Graph()..isTree = true;
-  final BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
+  Graph _graph = Graph()..isTree = true;
+  final BuchheimWalkerConfiguration _builder = BuchheimWalkerConfiguration();
+  late final _CallbackBuchheimWalkerAlgorithm _algorithm;
 
   @override
   void initState() {
     debugPrint("initState");
     super.initState();
-    builder
-      ..siblingSeparation = (10)
-      ..levelSeparation = (15)
-      ..subtreeSeparation = (15);
-    // ..orientation = (BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM);
 
-    _transformationController.value = Matrix4.identity();
+    _builder
+      ..siblingSeparation = (spacing.toInt())
+      ..levelSeparation = (spacing.toInt())
+      ..subtreeSeparation = (spacing.toInt());
+
+    _algorithm = _CallbackBuchheimWalkerAlgorithm(
+      _builder,
+      TreeEdgeRenderer(_builder),
+      onFirstCalculated: () => _jumpToNode(1),
+    );
   }
 
+  /*
   void setupTransformationController() {
     // const zoomFactor = 1.0;
     final double xTranslate;
@@ -250,6 +255,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     });
     */
   }
+  */
 
   Widget _futureBuilder() {
     return _data.isEmpty
@@ -282,13 +288,13 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     updateNode(edges);
     return InteractiveViewer(
       constrained: false,
-      boundaryMargin: const EdgeInsets.all(1111),
-      minScale: 0.1,
-      maxScale: 4.4,
+      boundaryMargin: const EdgeInsets.all(double.infinity),
+      minScale: 0.05,
+      maxScale: 2.5,
       transformationController: _transformationController,
       child: GraphView(
-        graph: graph,
-        algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
+        graph: _graph,
+        algorithm: _algorithm,
         paint: Paint()
           ..color = Colors.green
           ..strokeWidth = 1
@@ -300,14 +306,27 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
   }
 
+  Future<void> _jumpToNode(int nodeId) async {
+    final startNode = _graph.nodes.firstWhere(
+      (node) => node.key!.value == nodeId,
+    );
+
+    // Positions are custom for our page. You might need something different.
+    final position = Offset(
+      -(startNode.x - MediaQuery.sizeOf(context).width/2 + startNode.width/2),
+      spacing,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _transformationController.value = Matrix4.identity()
+        ..translate(position.dx, position.dy);
+    });
+  }
+
   Future<void> updateNode(List edges) async {
     debugPrint("updateNode");
     debugPrint(edges.length.toString());
     // debugPrint(edges.toString());
-    if (edges.length > 80 &&
-        _transformationController.value == Matrix4.identity()) {
-      setupTransformationController();
-    }
+
     if (edges.isEmpty) {
       final nodes = _data[nodesKey];
       final int firstId;
@@ -341,12 +360,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       _data[edgesKey].add(
         {"from": firstId, "to": secondId},
       );
-      graph.addEdge(fromNode, toNode);
+      _graph.addEdge(fromNode, toNode);
     } else {
       for (final element in edges) {
         var fromNodeId = element['from'];
         var toNodeId = element['to'];
-        graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
+        _graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
       }
 
       var rowCount = await DBProvider.db.getRowCount(widget.title);
@@ -387,5 +406,22 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         }
       }
     }
+  }
+}
+
+class _CallbackBuchheimWalkerAlgorithm extends BuchheimWalkerAlgorithm {
+  _CallbackBuchheimWalkerAlgorithm(super.configuration, super.renderer, {required this.onFirstCalculated});
+
+  bool _wasCalculated = false;
+  void Function() onFirstCalculated;
+
+  @override
+  Size run(Graph? graph, double shiftX, double shiftY) {
+    final size = super.run(graph, shiftX, shiftY);
+    if (!_wasCalculated) {
+      onFirstCalculated();
+      _wasCalculated = true;
+    }
+    return size;
   }
 }

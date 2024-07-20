@@ -1,7 +1,7 @@
 {
     "nodes": [
         {
-            "id": 8,
+            "id": 1,
             "label": "Moti Lal Ji Dharmawat"
         },
         {
@@ -99,7 +99,7 @@
     ],
     "edges": [
         {
-            "from": 8,
+            "from": 1,
             "to": 9
         },
         {
