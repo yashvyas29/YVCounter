@@ -21,7 +21,7 @@ class _CreatePageState extends State<CreatePage> {
     String name = _name.text;
     var table = await DBProvider.db.checkIfTableExists(name);
     if (table == false) {
-      DBProvider.db.createNewTable(
+      DBProvider.db.createTable(
         name,
         // TreeMember(name, null, 1),
       );

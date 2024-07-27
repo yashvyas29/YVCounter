@@ -153,7 +153,7 @@ class GoogleDrive {
         await driveApi.files.update(
           fileToUpload,
           fileId,
-          uploadMedia: ga.Media(file.openRead(), file.lengthSync()),
+          uploadMedia: ga.Media(file.openRead(), await file.length()),
         );
         // _printFileMetaData(uploadedFile);
       } catch (error) {
@@ -164,7 +164,7 @@ class GoogleDrive {
         try {
           // final uploadedFile =
           await driveApi.files.create(fileToUpload,
-              uploadMedia: ga.Media(file.openRead(), file.lengthSync()));
+              uploadMedia: ga.Media(file.openRead(), await file.length()));
           // _printFileMetaData(uploadedFile);
         } catch (error) {
           debugPrint(error.toString());

@@ -80,7 +80,7 @@ class JsonFileHandler {
     try {
       final file = await localFile(fileName);
       // Delete the file
-      file.deleteSync();
+      await file.delete();
     } catch (error) {
       debugPrint(error.toString());
     }

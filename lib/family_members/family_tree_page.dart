@@ -1,11 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
-
-import '../common/sqlite_db_provider.dart';
-import '../data_model/treemember.dart';
 
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
@@ -56,7 +52,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           IconButton(
               onPressed: () {
                 debugPrint("Reset to family pressed.");
-                widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
+                // widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
                 if (_transformationController.value != Matrix4.identity()) {
                   _jumpToNode(1);
                 }
@@ -293,7 +289,10 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
     return InteractiveViewer(
       constrained: false,
-      boundaryMargin: EdgeInsets.symmetric(horizontal: horizontalInsets, vertical: verticalInsets),
+      boundaryMargin: EdgeInsets.symmetric(
+        horizontal: horizontalInsets,
+        vertical: verticalInsets,
+      ),
       minScale: 0.05,
       maxScale: 1,
       transformationController: _transformationController,
@@ -319,7 +318,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     // Positions are custom for our page. You might need something different.
     final position = Offset(
       -(startNode.x - MediaQuery.sizeOf(context).width/2 + startNode.width/2),
-      spacing,
+      -(startNode.y - spacing),
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _transformationController.value = Matrix4.identity()
@@ -373,6 +372,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         _graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
       }
 
+      /*
       var rowCount = await DBProvider.db.getRowCount(widget.title);
       // debugPrint(rowCount.toString());
       if (rowCount > 1) {
@@ -410,15 +410,20 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           }
         }
       }
+      */
     }
   }
 }
 
 class _CallbackBuchheimWalkerAlgorithm extends BuchheimWalkerAlgorithm {
-  _CallbackBuchheimWalkerAlgorithm(super.configuration, super.renderer, {required this.onFirstCalculated});
-
   bool _wasCalculated = false;
   void Function() onFirstCalculated;
+
+  _CallbackBuchheimWalkerAlgorithm(
+    super.configuration,
+    super.renderer, {
+    required this.onFirstCalculated,
+  });
 
   @override
   Size run(Graph? graph, double shiftX, double shiftY) {

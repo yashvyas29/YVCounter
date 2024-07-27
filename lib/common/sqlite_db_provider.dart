@@ -46,7 +46,10 @@ class DBProvider {
   }
 
   Future<bool> checkIfValueExists(
-      String tableName, String columnName, String columnValue) async {
+    String tableName,
+    String columnName,
+    String columnValue,
+  ) async {
     final db = await database;
 
     var res = await db.rawQuery('''
@@ -57,7 +60,7 @@ class DBProvider {
     return res.isNotEmpty;
   }
 
-  Future<void> createNewTable(String familyName) async {
+  Future<void> createTable(String familyName) async {
     final db = await database;
 
     db
@@ -71,14 +74,6 @@ class DBProvider {
      REPLACE INTO '$familyName' (id, name, c)
       VALUES (?, ?, ?);
      ''', [1, familyName, null]);
-  }
-
-  Future<List<Map>> getFamilies() async {
-    final db = await database;
-    var res = await db.rawQuery('''
-    SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_%';
-    ''');
-    return res;
   }
 
   Future<List<Map>> cleanTable(String table) async {
@@ -102,6 +97,14 @@ class DBProvider {
     await db.rawQuery('''
     ALTER TABLE '$oldName' RENAME TO '$newName';
     ''');
+  }
+
+  Future<List<Map>> getFamilies() async {
+    final db = await database;
+    var res = await db.rawQuery('''
+    SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_%';
+    ''');
+    return res;
   }
 
   Future<int> insertMember(TreeMember treeMember, String table) async {

@@ -2,7 +2,7 @@
     "nodes": [
         {
             "id": 1,
-            "label": "Ganpat Ji Kadvawat\nSohan Bai"
+            "label": "Ganpat Ji Kadvawat\nSohan Devi"
         },
         {
             "id": 2,
@@ -10,7 +10,7 @@
         },
         {
             "id": 3,
-            "label": "Banshi Lal Ji\nWife"
+            "label": "Banshi Lal Ji\nKashi Devi"
         },
         {
             "id": 4,
@@ -37,12 +37,28 @@
             "label": "Omendra"
         },
         {
+            "id": 27,
+            "label": "Girl"
+        },
+        {
             "id": 10,
             "label": "Apeksha Devi\nBhupendr Ji Joshi"
         },
         {
             "id": 11,
             "label": "Yash\nPooja Choubisa"
+        },
+        {
+            "id": 19,
+            "label": "Kovid"
+        },
+        {
+            "id": 20,
+            "label": "Buddhi"
+        },
+        {
+            "id": 21,
+            "label": "Girl"
         },
         {
             "id": 12,
@@ -71,6 +87,27 @@
         {
             "id": 18,
             "label": "Bharti Devi\nManoj Ji Vyas"
+        },
+        {
+            "id": 22,
+            "label": "Prakhar"
+        },
+        {
+            "id": 23,
+            "label": "Jalaj"
+        },
+        {
+            "id": 24,
+            "label": "Pulkit"
+        },
+        {
+            "id": 25,
+            "label": "Boy"
+        },
+        {
+            "id": 26,
+            "label": "Girl",
+            "next": 28
         }
     ],
     "edges": [
@@ -103,6 +140,10 @@
             "to": 8
         },
         {
+            "from": 8,
+            "to": 27
+        },
+        {
             "from": 4,
             "to": 9
         },
@@ -111,8 +152,20 @@
             "to": 10
         },
         {
+            "from": 10,
+            "to": 19
+        },
+        {
+            "from": 10,
+            "to": 20
+        },
+        {
             "from": 5,
             "to": 11
+        },
+        {
+            "from": 11,
+            "to": 21
         },
         {
             "from": 6,
@@ -135,12 +188,32 @@
             "to": 16
         },
         {
+            "from": 16,
+            "to": 24
+        },
+        {
             "from": 3,
             "to": 17
         },
         {
+            "from": 17,
+            "to": 22
+        },
+        {
+            "from": 17,
+            "to": 23
+        },
+        {
             "from": 3,
             "to": 18
+        },
+        {
+            "from": 18,
+            "to": 25
+        },
+        {
+            "from": 18,
+            "to": 26
         }
     ]
 }

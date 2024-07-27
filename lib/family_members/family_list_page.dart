@@ -55,7 +55,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
   Future<void> _addFamily(String name) async {
     var isExist = await DBProvider.db.checkIfTableExists(name);
     if (!isExist) {
-      await DBProvider.db.createNewTable(name);
+      await DBProvider.db.createTable(name);
       setState(() {
         name == widget.newFamilyName
             ? _readOnlyList.add(false)
@@ -140,6 +140,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
+          /*
           if (_families.isEmpty)
             IconButton(
                 onPressed: () async {
@@ -149,6 +150,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
                   }
                 },
                 icon: const Icon(Icons.restore)),
+          */
           IconButton(
               onPressed: () async {
                 debugPrint("Add family pressed.");
