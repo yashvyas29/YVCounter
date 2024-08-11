@@ -289,7 +289,7 @@ class _AddPageState extends State<AddPage> {
                                   checkName(_selected1, _name.text.trim());
                                   Future.delayed(const Duration(seconds: 3),
                                       () {
-                                    dialog == true
+                                    dialog == true && context.mounted
                                         ? showDialog(
                                             context: context,
                                             builder: (context) => AlertDialog(
@@ -352,7 +352,7 @@ class _AddPageState extends State<AddPage> {
                                   checkName(_selected1, res);
                                   Future.delayed(const Duration(seconds: 3),
                                       () {
-                                    dialog == true
+                                    dialog == true && context.mounted
                                         ? showDialog(
                                             context: context,
                                             builder: (context) => AlertDialog(
