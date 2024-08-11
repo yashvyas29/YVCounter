@@ -5,7 +5,7 @@ class DateTimeHandler {
   static const dateFormat = 'yyyy-MM-dd';
   static const dateTimeFormat = 'yyyy-MM-dd\nhh:mm a';
   static DateTime get today => DateTime.now();
-  
+
   static String getString(DateTime dateTime, String format) {
     return DateFormat(format).format(dateTime);
   }

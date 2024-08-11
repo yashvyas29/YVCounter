@@ -35,7 +35,8 @@ class FamilyTreePage extends StatefulWidget {
 
 class _FamilyTreePageState extends State<FamilyTreePage> {
   Map<String, dynamic> _data = {};
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
 
   static const nodesKey = 'nodes';
   static const edgesKey = 'edges';
@@ -95,7 +96,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
-            BoxShadow(color: Colors.red[400]!, spreadRadius: 1),
+            BoxShadow(color: Colors.red[300]!, spreadRadius: 1),
           ],
         ),
         child: Row(children: [
@@ -317,7 +318,9 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
     // Positions are custom for our page. You might need something different.
     final position = Offset(
-      -(startNode.x - MediaQuery.sizeOf(context).width/2 + startNode.width/2),
+      -(startNode.x -
+          MediaQuery.sizeOf(context).width / 2 +
+          startNode.width / 2),
       -(startNode.y - spacing),
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {

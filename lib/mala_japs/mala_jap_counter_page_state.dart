@@ -28,7 +28,8 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       // _malaList = await widget._getMalas();
       _malaList = await _sharedPref.readList(Mala.key);
-      final todayMala = _malaList.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
+      final todayMala =
+          _malaList.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
       setState(() {
         _mala = todayMala;
       });
@@ -149,7 +150,8 @@ class _MyHomePageState extends State<MyHomePage> {
         // widget._saveMalas(_malaList);
 
         try {
-          final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
+          final mala =
+              malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
           setState(() {
             _mala = mala;
           });
@@ -183,11 +185,12 @@ class _MyHomePageState extends State<MyHomePage> {
         _sharedPref.saveList(Mala.key, malas);
         // widget._saveMalas(_malaList);
         try {
-          final mala = malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
+          final mala =
+              malas.firstWhere((mala) => DateTimeHandler.isToday(mala.date));
           setState(() {
             _mala = mala;
           });
-        } catch(error) {
+        } catch (error) {
           debugPrint('No malas found for today.\n$error');
         }
         await showAlertDialog(context, "Excel restore successful.");
@@ -215,29 +218,29 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     try {
-        final files = await const JsonFileHandler().files();
-        for (final filePath in files) {
-          debugPrint('File to upload with path: $filePath');
-          final file = File(filePath);
-          GoogleDrive.fileName = p.basename(filePath);
-          await _googleDrive.uploadFileToGoogleDrive(file);
-        }
-        debugPrint('Family json files uploaded successfully.');
-
-        final dbFilePath = await DBProvider.db.getDatabasePath();
-        debugPrint('File to upload with path: $dbFilePath');
-        final dbFile = File(dbFilePath);
-        if (await dbFile.exists()) {
-          GoogleDrive.fileName = p.basename(dbFilePath);
-          await _googleDrive.uploadFileToGoogleDrive(dbFile);
-          debugPrint('Database file uploaded successfully.');
-        }
-      } catch (error) {
-        debugPrint(error.toString());
+      final files = await const JsonFileHandler().files();
+      for (final filePath in files) {
+        debugPrint('File to upload with path: $filePath');
+        final file = File(filePath);
+        GoogleDrive.fileName = p.basename(filePath);
+        await _googleDrive.uploadFileToGoogleDrive(file);
       }
+      debugPrint('Family json files uploaded successfully.');
 
-      if (!mounted) return;
-      await showAlertDialog(context, "Backup done successfully.");
+      final dbFilePath = await DBProvider.db.getDatabasePath();
+      debugPrint('File to upload with path: $dbFilePath');
+      final dbFile = File(dbFilePath);
+      if (await dbFile.exists()) {
+        GoogleDrive.fileName = p.basename(dbFilePath);
+        await _googleDrive.uploadFileToGoogleDrive(dbFile);
+        debugPrint('Database file uploaded successfully.');
+      }
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+
+    if (!mounted) return;
+    await showAlertDialog(context, "Backup done successfully.");
   }
 
   Future<void> _pickDate() async {
@@ -253,7 +256,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (pickedDate != null) {
       setState(() {
         try {
-          _mala = _malaList.firstWhere((mala) => DateUtils.isSameDay(mala.date, pickedDate));
+          _mala = _malaList
+              .firstWhere((mala) => DateUtils.isSameDay(mala.date, pickedDate));
         } catch (error) {
           _mala = Mala(pickedDate, 0, 0);
           debugPrint('No malas found for today.\n$error');
@@ -468,7 +472,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           size: 18,
                         ),
                         label: Text(
-                          DateTimeHandler.getString(_mala.date, DateTimeHandler.dateFormat),
+                          DateTimeHandler.getString(
+                              _mala.date, DateTimeHandler.dateFormat),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         onPressed: _pickDate,
@@ -499,7 +504,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           });
                         },
-                        borderRadius: const BorderRadius.all(Radius.circular(8)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
                         /*
                         selectedBorderColor: Colors.red[700],
                         selectedColor: Colors.white,

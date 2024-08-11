@@ -36,7 +36,8 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     _dessertsDataSource ??= _DessertDataSource(context, widget.malas);
     switch (_sortColumnIndex.value) {
       case 0:
-        _dessertsDataSource!._sort<DateTime>((d) => d.date, _sortAscending.value);
+        _dessertsDataSource!
+            ._sort<DateTime>((d) => d.date, _sortAscending.value);
         break;
       case 1:
         _dessertsDataSource!._sort<num>((d) => d.count, _sortAscending.value);
@@ -123,8 +124,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                     textAlign: TextAlign.center,
                   )
                 : PaginatedDataTable(
-                    header:
-                        Text('Malas: $totalMalas, Japs: $totalJaps'),
+                    header: Text('Malas: $totalMalas, Japs: $totalJaps'),
                     availableRowsPerPage: [
                       rowsPerPage,
                       rowsPerPage * 2,
