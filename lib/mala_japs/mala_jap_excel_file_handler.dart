@@ -26,18 +26,15 @@ class MalaJapExcelFileHandler {
     cellStyle.underline = Underline.Single; // or Underline.Double
 
     var cell1 = sheetObject.cell(CellIndex.indexByString("A1"));
-    cell1.value =
-        const TextCellValue('Date'); // dynamic values support provided;
+    cell1.value = TextCellValue('Date'); // dynamic values support provided;
     cell1.cellStyle = cellStyle;
 
     var cell2 = sheetObject.cell(CellIndex.indexByString("B1"));
-    cell2.value =
-        const TextCellValue('Malas'); // dynamic values support provided;
+    cell2.value = TextCellValue('Malas'); // dynamic values support provided;
     cell2.cellStyle = cellStyle;
 
     var cell3 = sheetObject.cell(CellIndex.indexByString("C1"));
-    cell3.value =
-        const TextCellValue('Japs'); // dynamic values support provided;
+    cell3.value = TextCellValue('Japs'); // dynamic values support provided;
     cell3.cellStyle = cellStyle;
 
     malas.asMap().forEach((index, mala) {

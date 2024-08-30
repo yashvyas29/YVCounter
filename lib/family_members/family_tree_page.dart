@@ -95,7 +95,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
-            BoxShadow(color: Colors.red[400]!, spreadRadius: 1),
+            BoxShadow(color: Colors.red[300]!, spreadRadius: 1),
           ],
         ),
         child: Row(children: [

@@ -10,7 +10,7 @@
         },
         {
             "id": 3,
-            "label": "Banshi Lal Ji\nKashi Devi"
+            "label": "Banshi Lal Ji\nSita Devi"
         },
         {
             "id": 4,
@@ -38,7 +38,7 @@
         },
         {
             "id": 27,
-            "label": "Girl"
+            "label": "Chandr Prabha (Kripa)"
         },
         {
             "id": 10,
@@ -58,7 +58,7 @@
         },
         {
             "id": 21,
-            "label": "Girl"
+            "label": "Hemakshi"
         },
         {
             "id": 12,
@@ -101,13 +101,17 @@
             "label": "Pulkit"
         },
         {
+            "id": 28,
+            "label": "Vedik"
+        },
+        {
             "id": 25,
-            "label": "Boy"
+            "label": "Jatin"
         },
         {
             "id": 26,
-            "label": "Girl",
-            "next": 28
+            "label": "Ridhhi",
+            "next": 29
         }
     ],
     "edges": [
@@ -190,6 +194,10 @@
         {
             "from": 16,
             "to": 24
+        },
+        {
+            "from": 16,
+            "to": 28
         },
         {
             "from": 3,
