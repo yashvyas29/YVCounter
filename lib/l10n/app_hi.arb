@@ -1,0 +1,105 @@
+{
+  "title": "माला गणक",
+  "welcomeUser": "स्वागत है {name} जी",
+  "@welcomeUser" : {
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "यश"
+        }
+      }
+  },
+  "mala": "माला",
+  "jap": "जप",
+  "completedForDate": "आपकी पूर्ण की गई {malaJapString}",
+  "@completedForDate" : {
+      "placeholders": {
+        "malaJapString": {
+          "type": "String",
+          "example": "माला"
+        }
+      }
+  },
+  "add": "जोड़े",
+
+  "malaHistory": "माला इतिहास",
+  "date": "दिनांक",
+  "familyList": "परिवार सूची",
+  "about": "जानकारी",
+  "myName": "यश व्यास",
+  "aboutText": "माला गणक अनुप्रयोग माला या जप की गिनती के एक सामान्य परिदृश्य को हल करने के लिए बनाया गया है जो हिंदू धर्म के लोगों द्वारा ध्यान के दौरान किया जाता है।\n\nहिंदू धर्म में जप माला का उपयोग ध्यान के दौरान मंत्रों के पाठ को निर्देशित करने और गिनने के लिए किया जाता है। इसमें आमतौर पर जीवन की चक्रीय प्रकृति का प्रतिनिधित्व करने के लिए एक चक्र में पिरोए गए 108 मोती होते हैं।",
+  "menu": "सूची",
+
+  "changeLanguageTo": "भाषा को {language} में बदलें",
+  "@changeLanguageTo" : {
+      "placeholders": {
+        "language": {
+          "type": "String",
+          "example": "हिंदी"
+        }
+      }
+  },
+  "english": "अंग्रेज़ी",
+  "hindi": "हिन्दी",
+  
+  "backupToExcel": "एक्सेल में माला का बैकअप लें",
+  "restoreFromExcel": "एक्सेल से माला पुनर्स्थापित करें",
+  "backupToGD": "गूगल ड्राइव पर बैकअप लें",
+  "restoreFromGD": "गूगल ड्राइव से पुनर्स्थापित करें",
+  "deleteBackupFromGD": "गूगल ड्राइव से बैकअप हटाएं",
+  "signOutFromGD": "गूगल ड्राइव से साइन आउट करें",
+
+  "newFamily": "नया परिवार",
+  "vyasFamily": "व्यास परिवार",
+  "kadvawatFamily": "कड़वावत परिवार",
+  "dharmawatFamily": "धर्मावत परिवार",
+
+  "excelSaveSuccessful": "एक्सेल सफलतापूर्वक सहेजा गया।",
+  "gdRestoreSuccessful": "गूगल ड्राइव पुनःस्थापना सफल रहा।",
+  "excelRestoreSuccessful": "एक्सेल पुनर्स्थापना सफल रहा।",
+  "gdBackupSuccessful": "गूगल ड्राइव बैकअप सफलतापूर्वक किया गया।",
+  "excelBackupSuccessful": "एक्सेल बैकअप सफलतापूर्वक किया गया।",
+  "gdDataDeleteSuccessful": "गूगल ड्राइव से ऐप डेटा सफलतापूर्वक हटा दिया गया।",
+
+  "changingLanguage": "भाषा बदल रहे है।",
+  "backupInProgress": "बैकअप कर रहे है।",
+  "restoringFromBackup": "बैकअप से पुनर्स्थापित कर रहे है।",
+  "excelBackupInProgress": "एक्सेल बैकअप प्रगति पर है।",
+  "restoringFromExcel": "एक्सेल से पुनर्स्थापित कर रहे है।",
+  "deletingBackupFromGD": "गूगल ड्राइव से बैकअप हटा रहे है।",
+  "signingOutFromGD": "गूगल ड्राइव से साइन आउट कर रहे है।",
+
+  "malaNotAvailable": "कोई माला उपलब्ध नहीं है।",
+  "familyNotAvailable": "कोई परिवार उपलब्ध नहीं है।",
+  "backupNotAvailable": "बैकअप उपलब्ध नहीं है।",
+
+  "saveError": "सहेजना विफल रहा।",
+  "backupError": "बैकअप विफल रहा।",
+  "restoreError": "Restore विफल रहा।",
+  "deleteError": "पुनर्स्थापन विफल रहा।",
+
+  "deleteConfirmation": "क्या आप वाकई {name} को हटाना चाहते हैं?",
+  "@deleteConfirmation" : {
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "Yash"
+        }
+      }
+  },
+
+  "alert": "सूचना",
+  "delete": "मिटाए",
+  "cancel": "रद्द करे",
+
+  "renameToYourFamilyName": "नाम बदलकर अपने पारिवार का नाम रखें।",
+  "added": "जोड़ दिया गया है।",
+  "updated": "अपडेट कर दिया गया है।",
+  "deleted": "हटा दिया गया है।",
+  "alreadyExists": "पहले से ही मौजूद है।",
+  "enterFamilyName": "परिवार का नाम प्रविष्ट करे।",
+  "enterParentsName": "अभिभावको का नाम प्रविष्ट करें।",
+  "enterChildAndSpouseName": "बच्चे और उसके जीवनसाथी का नाम प्रविष्ट करें।",
+
+  "commonError": "कुछ गलत हो गया है। कृपया बाद में दोबारा प्रयास करें।"
+}

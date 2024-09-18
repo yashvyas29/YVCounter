@@ -9,10 +9,12 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:path/path.dart' as p;
 // import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:yv_counter/about_page.dart';
 import 'package:yv_counter/common/date_time_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
+import 'package:yv_counter/data_model/locale_model.dart';
 import 'package:yv_counter/family_members/family_list_page.dart';
 import 'package:yv_counter/common/google_drive.dart';
 import 'package:yv_counter/data_model/mala.dart';
@@ -21,6 +23,7 @@ import 'package:yv_counter/mala_japs/mala_data_table_page.dart';
 import 'package:yv_counter/common/shared_pref.dart';
 import 'package:yv_counter/data_model/user.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'mala_jap_excel_file_handler.dart';
 
@@ -29,9 +32,7 @@ import 'mala_jap_excel_file_handler.dart';
 part '../mala_japs/mala_jap_counter_page_state.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -139,4 +140,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 // This is the type used by the popup menu below.
-enum Menu { backup, restore, backupExcel, restoreExcel, delete, signOut }
+enum Menu {
+  language,
+  backup,
+  restore,
+  backupExcel,
+  restoreExcel,
+  delete,
+  signOut
+}
+
+// enum LanguageMenu { english, hindi }

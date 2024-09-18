@@ -2,153 +2,153 @@
     "nodes": [
         {
             "id": 1,
-            "label": "Ganpat Ji Kadvawat\nSohan Devi",
+            "label": "गणपत जी कड़वावत\nसोहन बाई",
             "isRoot": true
         },
         {
             "id": 2,
-            "label": "Shobha Lal Ji\nParvati Devi"
+            "label": "शोभा लाल जी\nपार्वती देवी"
         },
         {
             "id": 3,
-            "label": "Banshi Lal Ji\nSita Devi"
+            "label": "बंशी लाल जी\nसीता देवी"
         },
         {
             "id": 4,
-            "label": "Fulmala Devi\nAniruddh Ji Vyas"
+            "label": "फूलमाला देवी\nअनिरुद्ध जी व्यास"
         },
         {
             "id": 5,
-            "label": "Shakuntala Devi\nChaitanya Prakash Ji Vyas"
+            "label": "शकुंतला देवी\nचैतन्य प्रकाश जी व्यास"
         },
         {
             "id": 6,
-            "label": "Uma Devi\nKaushal Ji Vyas"
+            "label": "उमा देवी\nकौशल जी व्यास"
         },
         {
             "id": 7,
-            "label": "Atal Ji\nSavita Devi Vyas"
+            "label": "अटल जी\nसविता देवी व्यास"
         },
         {
             "id": 8,
-            "label": "Ruchika\nSanjay Ji Joshi"
+            "label": "रुचिका\nसंजय जी जोशी"
         },
         {
             "id": 9,
-            "label": "Omendra"
+            "label": "ओमेन्द्र"
         },
         {
             "id": 27,
-            "label": "Chandr Prabha (Kripa)"
+            "label": "चन्द्रप्रभा (कृपा)"
         },
         {
             "id": 10,
-            "label": "Apeksha Devi\nBhupendr Ji Joshi"
+            "label": "अपेक्षा देवी\nभूपेन्द्र जी जोशी"
         },
         {
             "id": 11,
-            "label": "Yash\nPooja Choubisa"
+            "label": "यश\nपूजा चौबीसा"
         },
         {
             "id": 19,
-            "label": "Kovid"
+            "label": "कोविद"
         },
         {
             "id": 20,
-            "label": "Buddhi"
+            "label": "बुद्धि"
         },
         {
             "id": 21,
-            "label": "Hemakshi"
+            "label": "हेमाक्षी"
         },
         {
             "id": 12,
-            "label": "Harshit\nRinku Joshi"
+            "label": "हर्षित\nरिंकु जोशी"
         },
         {
             "id": 13,
-            "label": "Neeraj"
+            "label": "नीरज"
         },
         {
             "id": 14,
-            "label": "Gandhar"
+            "label": "गणधर"
         },
         {
             "id": 15,
-            "label": "Akshar"
+            "label": "अक्षर"
         },
         {
             "id": 16,
-            "label": "Hemlata Devi\nHusband"
+            "label": "हेमलता देवी\nपति"
         },
         {
             "id": 17,
-            "label": "Yashwant Ji\nJyoti Devi"
+            "label": "यशवंत जी\nज्योति देवी"
         },
         {
             "id": 18,
-            "label": "Bharti Devi\nManoj Ji Vyas"
+            "label": "भारती देवी\nमनोज जी व्यास"
         },
         {
             "id": 22,
-            "label": "Prakhar"
+            "label": "प्रखर"
         },
         {
             "id": 23,
-            "label": "Jalaj"
+            "label": "जलज"
         },
         {
             "id": 24,
-            "label": "Pulkit"
+            "label": "पुलकित"
         },
         {
             "id": 28,
-            "label": "Vedik"
+            "label": "वैदिक"
         },
         {
             "id": 25,
-            "label": "Jatin"
+            "label": "जतिन"
         },
         {
             "id": 26,
-            "label": "Ridhhi"
+            "label": "रिद्धि"
         },
         {
             "id": 29,
-            "label": "Lalita Devi\nPrem Shankar Ji Vyas"
+            "label": "ललिता देवी\nप्रेम शंकर जी व्यास"
         },
         {
             "id": 30,
-            "label": "Gopal Ji\nLeela Devi"
+            "label": "गोपाल जी\nलीला देवी"
         },
         {
             "id": 31,
-            "label": "Kailash Ji\nSonu Devi\nVimla Devi"
+            "label": "कैलाश जी\nसोनू देवी\nविमला देवी"
         },
         {
             "id": 32,
-            "label": "Deepak"
+            "label": "दीपक"
         },
         {
             "id": 33,
-            "label": "Sumit"
+            "label": "सुमित"
         },
         {
             "id": 34,
-            "label": "Dev Kanya"
+            "label": "देवकन्या"
         },
         {
             "id": 35,
-            "label": "Jiyansh"
+            "label": "जियांश"
         },
         {
             "id": 36,
-            "label": "Vidhya Devi\nHusband"
+            "label": "विद्या देवी\nपति"
         }
         ,
         {
             "id": 37,
-            "label": "Boy",
+            "label": "लड़का",
             "next": 38
         }
     ],

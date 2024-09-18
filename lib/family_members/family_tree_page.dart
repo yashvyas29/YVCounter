@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
@@ -42,6 +45,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   static const edgesKey = 'edges';
 
   static const spacing = 20.0;
+  static const boxSide = 200.0;
 
   @override
   Widget build(BuildContext context) {
@@ -50,26 +54,31 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          IconButton(
-              onPressed: () {
-                debugPrint("Reset to family pressed.");
-                // widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
-                if (_transformationController.value != Matrix4.identity()) {
-                  _jumpToNode(1);
-                }
-                _graph = Graph()..isTree = true;
-                setState(() {
-                  _data.clear();
-                });
-              },
-              icon: const Icon(Icons.restore)),
+          IconButton(onPressed: _reset, icon: const Icon(Icons.restore)),
         ],
       ),
       body: _futureBuilder(),
     );
   }
 
-  Widget rectangleWidget(Node node) {
+  void _reset() {
+    debugPrint("Reset to family pressed.");
+    if (_transformationController.value != Matrix4.identity()) {
+      final currentRoot = _data[nodesKey].firstWhere(
+        (node) => node['isRoot'] == true,
+      );
+      _jumpToNode(currentRoot['id']);
+    }
+    /*
+    widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
+    _graph = Graph()..isTree = true;
+    setState(() {
+      _data.clear();
+    });
+    */
+  }
+
+  Widget _rectangleWidget(Node node) {
     // debugPrint("rectangleWidget: ${node.toString()}");
     final nodes = _data[nodesKey];
     final id = node.key!.value;
@@ -79,19 +88,25 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     // debugPrint(nodeValue.toString());
     final value = nodeValue['label'].toString();
     final readOnly = nodeValue['readOnly'] ?? true;
+    final isRoot = nodeValue['isRoot'] ?? false;
+    final isRootChild = nodeValue['isRootChild'] ?? false;
+    final localizations = AppLocalizations.of(context);
+    final hintText = isRoot
+        ? localizations.enterParentsName
+        : localizations.enterChildAndSpouseName;
     InputDecoration inputDecoration = InputDecoration(
       border: readOnly ? InputBorder.none : const OutlineInputBorder(),
-      hintText: "Enter Name",
+      hintText: hintText,
     );
     TextEditingController textController = TextEditingController();
     textController.text = value;
-    // debugPrint(value);
+
     return InkWell(
       onTap: () {
         debugPrint('Node $value clicked at ${node.toString()}.');
       },
       child: Container(
-        width: 200,
+        width: boxSide,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
@@ -106,73 +121,130 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
               maxLines: null,
               controller: textController,
               decoration: inputDecoration,
+              // textAlignVertical: TextAlignVertical.center,
               readOnly: readOnly,
+              autofocus: !readOnly,
             ),
           ),
           Column(
             children: [
-              IconButton(
-                  onPressed: () {
-                    debugPrint("Delete for $value pressed.");
-                    showDeleteConfirmationDialog(
-                        context, 'Are you sure you want to delete ?', () {
-                      setState(() {
-                        _removeNodeFromData(node);
+              if (!isRoot && ((!isRootChild && nodes.length > 2) || readOnly))
+                IconButton(
+                    onPressed: () {
+                      debugPrint("Delete for $value pressed.");
+                      showDeleteConfirmationDialog(
+                          context,
+                          AppLocalizations.of(context)
+                              .deleteConfirmation(name: value), () async {
+                        setState(() {
+                          _removeNodeFromData(node);
+                        });
+                        Navigator.pop(context);
+                        await widget.writeJsonData(_data);
+                        if (_data[edgesKey].length <= 1) {
+                          _reset();
+                        }
+                        if (!mounted) return;
+                        showSnackBar(
+                            context, "$value ${localizations.deleted}");
                       });
-                      Navigator.pop(context);
-                      // debugPrint(graph.nodes.toString());
-                      // debugPrint(graph.edges.toString());
-                      widget.writeJsonData(_data);
-                      // debugPrint(_data.toString());
-                    });
-                  },
-                  icon: const Icon(Icons.delete)),
+                    },
+                    icon: const Icon(Icons.delete))
+              else if (isRoot && readOnly)
+                IconButton(
+                    onPressed: () async {
+                      debugPrint("Add on top for $value pressed.");
+                      final nodes = _data[nodesKey];
+                      final newId = nodes.fold(0, (previousValue, element) {
+                            final currentValue = element['id'] ?? 0;
+                            return previousValue < currentValue
+                                ? previousValue
+                                : currentValue;
+                          }) -
+                          1;
+                      final currentRoot = nodes.firstWhere(
+                        (node) => node['isRoot'] == true,
+                      );
+                      currentRoot.remove('isRoot');
+                      currentRoot['isRootChild'] = true;
+                      final currentRootChild = nodes.firstWhere(
+                        (node) => node['isRootChild'] == true,
+                      );
+                      currentRootChild.remove('isRootChild');
+                      final newNodeValue = {
+                        "id": newId,
+                        "label": "",
+                        "readOnly": false,
+                        "isRoot": true
+                      };
+                      debugPrint(newNodeValue.toString());
+                      setState(() {
+                        _data[nodesKey].add(newNodeValue);
+                        final edgeValue = {"from": newId, "to": id};
+                        debugPrint(edgeValue.toString());
+                        _data[edgesKey].add(edgeValue);
+                      });
+                      await widget.writeJsonData(_data);
+                      if (!mounted) return;
+                      showSnackBar(context, "$value ${localizations.added}");
+                    },
+                    icon: const Icon(Icons.add_box)),
               readOnly
                   ? IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         debugPrint("Edit for $value pressed.");
                         setState(() {
                           nodeValue['readOnly'] = false;
                           // _data[nodesKey][nodeIndex] = nodeValue;
                         });
-                        widget.writeJsonData(_data);
+                        await widget.writeJsonData(_data);
                       },
                       icon: const Icon(Icons.edit))
                   : IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         debugPrint("Done for $value pressed.");
-                        setState(() {
-                          nodeValue['label'] = textController.text;
-                          nodeValue['readOnly'] = true;
-                          // _data[nodesKey][nodeIndex] = nodeValue;
-                        });
-                        widget.writeJsonData(_data);
+                        final text = textController.text;
+                        if (text.isNotEmpty) {
+                          setState(() {
+                            nodeValue['label'] = textController.text;
+                            nodeValue['readOnly'] = true;
+                            // _data[nodesKey][nodeIndex] = nodeValue;
+                          });
+                          await widget.writeJsonData(_data);
+                          if (!mounted) return;
+                          final message = value.isEmpty
+                              ? "$text ${localizations.added}"
+                              : "$value ${localizations.updated}";
+                          showSnackBar(context, message);
+                        } else {
+                          debugPrint(hintText);
+                        }
                       },
                       icon: const Icon(Icons.done_outline)),
-              IconButton(
-                  onPressed: () {
-                    debugPrint("Add for $value pressed.");
-                    final newId =
-                        _data[nodesKey].fold(0, (previousValue, element) {
-                              final currentValue = element['id'] ?? 0;
-                              return previousValue > currentValue
-                                  ? previousValue
-                                  : currentValue;
-                            }) +
-                            1;
-                    // debugPrint(newId.toString());
-                    final newNodeValue = {"id": newId, "label": ""};
-                    newNodeValue['readOnly'] = false;
-                    // debugPrint(newNodeValue.toString());
-                    setState(() {
-                      _data[nodesKey].add(newNodeValue);
-                      final edgeValue = {"from": id, "to": newId};
-                      // debugPrint(edgeValue.toString());
-                      _data[edgesKey].add(edgeValue);
-                    });
-                    widget.writeJsonData(_data);
-                  },
-                  icon: const Icon(Icons.add_circle)),
+              if (readOnly)
+                IconButton(
+                    onPressed: () {
+                      debugPrint("Add for $value pressed.");
+                      final newId =
+                          _data[nodesKey].fold(0, (previousValue, element) {
+                                final currentValue = element['id'] ?? 0;
+                                return previousValue > currentValue
+                                    ? previousValue
+                                    : currentValue;
+                              }) +
+                              1;
+                      final newNodeValue = {"id": newId, "label": ""};
+                      newNodeValue['readOnly'] = false;
+                      // debugPrint(newNodeValue.toString());
+                      setState(() {
+                        _data[nodesKey].add(newNodeValue);
+                        final edgeValue = {"from": id, "to": newId};
+                        // debugPrint(edgeValue.toString());
+                        _data[edgesKey].add(edgeValue);
+                      });
+                      widget.writeJsonData(_data);
+                    },
+                    icon: const Icon(Icons.add_circle)),
             ],
           ),
         ]),
@@ -193,7 +265,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     _graph.removeNode(node);
   }
 
-  Graph _graph = Graph()..isTree = true;
+  final _graph = Graph()..isTree = true;
   final BuchheimWalkerConfiguration _builder = BuchheimWalkerConfiguration();
   late final _CallbackBuchheimWalkerAlgorithm _algorithm;
 
@@ -271,8 +343,8 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 _data = snapshot.data;
                 return _graphView();
               } else {
-                return const Center(
-                  child: Text("Something went wrong, please try again later."),
+                return Center(
+                  child: Text(AppLocalizations.of(context).commonError),
                 );
               }
             },
@@ -282,11 +354,15 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
   Widget _graphView() {
     final edges = _data[edgesKey];
-    updateNode(edges);
+    _updateNode(edges);
 
     final contextSize = MediaQuery.sizeOf(context);
-    final horizontalInsets = contextSize.width - 200;
-    final verticalInsets = contextSize.height - 200;
+    final horizontalInsets = contextSize.width - boxSide - spacing;
+    final topToExclude = Platform.isAndroid
+        ? MediaQuery.viewPaddingOf(context).top + kToolbarHeight
+        : 0;
+    final verticalInsets =
+        contextSize.height - boxSide - spacing - topToExclude;
 
     return InteractiveViewer(
       constrained: false,
@@ -305,7 +381,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           ..strokeWidth = 1
           ..style = PaintingStyle.stroke,
         builder: (Node node) {
-          return rectangleWidget(node);
+          return _rectangleWidget(node);
         },
       ),
     );
@@ -329,13 +405,19 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     });
   }
 
-  Future<void> updateNode(List edges) async {
+  Future<void> _updateNode(List edges) async {
+    /*
     debugPrint("updateNode");
-    debugPrint(edges.length.toString());
-    // debugPrint(edges.toString());
+    debugPrint("Edges count: ${edges.length.toString()}");
+    debugPrint("Edges value: ${edges.toString()}");
+    */
 
     if (edges.isEmpty) {
       final nodes = _data[nodesKey];
+      /*
+      debugPrint("Nodes count: ${nodes.length.toString()}");
+      debugPrint("Nodes value: ${nodes.toString()}");
+      */
       final int firstId;
       final int secondId;
       final bool firstReadOnly;
@@ -358,12 +440,26 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       }
       final fromNode = Node.Id(firstId);
       final toNode = Node.Id(secondId);
-      _data[nodesKey].add(
-        {"id": firstId, "label": "", "readOnly": firstReadOnly},
-      );
-      _data[nodesKey].add(
-        {"id": secondId, "label": "", "readOnly": secondReadOnly},
-      );
+      if (!firstReadOnly) {
+        _data[nodesKey].add(
+          {
+            "id": firstId,
+            "label": "",
+            "readOnly": firstReadOnly,
+            "isRoot": true
+          },
+        );
+      }
+      if (!secondReadOnly) {
+        _data[nodesKey].add(
+          {
+            "id": secondId,
+            "label": "",
+            "readOnly": secondReadOnly,
+            "isRootChild": true
+          },
+        );
+      }
       _data[edgesKey].add(
         {"from": firstId, "to": secondId},
       );

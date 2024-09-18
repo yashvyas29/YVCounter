@@ -1,0 +1,6 @@
+nullable-getter: false
+format: true
+use-escaping: true
+relax-syntax: true
+use-named-parameters: true
+# untranslated-messages-file: untranslatedMessages.txt

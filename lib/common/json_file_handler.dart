@@ -12,6 +12,7 @@ class JsonFileHandler {
   Future<String> localPath() async {
     final directory = await getApplicationDocumentsDirectory();
     final jsonsDir = await Directory(join(directory.path, 'jsons')).create();
+    // debugPrint(jsonsDir.path);
     return jsonsDir.path;
   }
 
@@ -87,7 +88,16 @@ class JsonFileHandler {
   }
 
   String getFamilyFileName(String name) {
-    return name.trim().toLowerCase().replaceAll(RegExp(' '), '_');
+    final trimedName = name.trim();
+    if (trimedName == 'व्यास परिवार') {
+      return 'vyas_family_hi';
+    } else if (trimedName == 'कड़वावत परिवार') {
+      return 'kadvawat_family_hi';
+    } else if (trimedName == 'धर्मावत परिवार') {
+      return 'dharmawat_family_hi';
+    } else {
+      return trimedName.toLowerCase().replaceAll(RegExp(' '), '_');
+    }
   }
 
   Future<File> renameFile(String oldFileName, String newFileName) async {

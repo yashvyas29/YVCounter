@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yv_counter/common/date_time_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/data_model/mala.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'mala_jap_excel_file_handler.dart';
 

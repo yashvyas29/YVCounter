@@ -2,100 +2,100 @@
     "nodes": [
         {
             "id": 1,
-            "label": "Moti Lal Ji Dharmawat",
+            "label": "मोती लाल जी धर्मावत",
             "isRoot": true
         },
         {
             "id": 9,
-            "label": "Shankar Lal Ji"
+            "label": "शंकर लाल जी"
         },
         {
             "id": 10,
-            "label": "Jagannath Ji\nHeera Bai"
+            "label": "जगन्नाथ जी\nहीरा बाई"
         },
         {
             "id": 21,
-            "label": "Sajjan Devi\nGirja Lal Ji Vyas"
+            "label": "सज्जन देवी\nगिरजा लाल जी व्यास"
         },
         {
             "id": 11,
-            "label": "Bhanwar Lal Ji\nDurga Devi"
+            "label": "भँवर लाल जी\nदुर्गा देवी"
         },
         {
             "id": 22,
-            "label": "Sundar Lal Ji\nAmba Devi"
+            "label": "सुंदर लाल जी\nअंबा देवी"
         },
         {
             "id": 19,
-            "label": "Pushpa Devi\nBheru Lal Ji Choubisa"
+            "label": "पुष्पा देवी\nभेरु लाल जी चौबीसा"
         },
         {
             "id": 20,
-            "label": "Heera Lal Ji\nRukman Devi"
+            "label": "हीरा लाल जी\nरुक्मण देवी"
         },
         {
             "id": 12,
-            "label": "Girl"
+            "label": "लड़की"
         },
         {
             "id": 13,
-            "label": "Mithhu Lal Ji\nNirmala Devi"
+            "label": "मिट्ठू लाल जी\nनिर्मला देवी"
         },
         {
             "id": 14,
-            "label": "Deepika Devi\nVinod Ji Choubisa"
+            "label": "दीपिका देवी\nविनोद जी चौबीसा"
         },
         {
             "id": 15,
-            "label": "Pooja\nYash Vyas"
+            "label": "पूजा\nयश व्यास"
         },
         {
             "id": 16,
-            "label": "Ayush"
+            "label": "आयुष"
         },
         {
             "id": 17,
-            "label": "Abhishek"
+            "label": "अभिषेक"
         },
         {
             "id": 18,
-            "label": "Parth"
+            "label": "पार्थ"
         },
         {
             "id": 23,
-            "label": "Chandra Prakash Ji\nBhagvati Devi"
+            "label": "चन्द्र प्रकाश जी\nभगवती देवी"
         },
         {
             "id": 24,
-            "label": "Deepak Ji\nDurga Devi"
+            "label": "दीपक जी\nदुर्गा देवी"
         },
         {
             "id": 25,
-            "label": "Elakshi"
+            "label": "एलाक्षी"
         },
         {
             "id": 26,
-            "label": "Prayag"
+            "label": "प्रयाग"
         },
         {
             "id": 27,
-            "label": "Rajshree"
+            "label": "राजश्री"
         },
         {
             "id": 28,
-            "label": "Vaideh"
+            "label": "वैदेश"
         },
         {
             "id": 29,
-            "label": "Devkanya Devi\nRadheshyam Ji Choubisa"
+            "label": "देवकन्या देवी\nराधेश्याम जी चौबीसा"
         },
         {
             "id": 30,
-            "label": "Lokesh Ji\nDeepmala Devi"
+            "label": "लोकेश जी\nदीपमाला देवी"
         },
         {
             "id": 31,
-            "label": "Bhagvati Devi\nMahesh Ji Choubisa"
+            "label": "भगवती देवी\nमहेश जी चौबीसा"
         }
     ],
     "edges": [
