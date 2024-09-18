@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void showSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -34,12 +35,13 @@ Future<void> showAlertDialog(BuildContext context, String massage) async {
 
 Future<void> showDeleteConfirmationDialog(BuildContext context, String massage,
     void Function() confirmPressed) async {
+  final localizations = AppLocalizations.of(context);
   return showDialog<void>(
     context: context,
     barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Alert'),
+        title: Text(localizations.alert),
         content: Text(massage),
         actions: <Widget>[
           TextButton(
@@ -47,13 +49,13 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, String massage,
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Delete'),
+            child: Text(localizations.delete),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text('Cancel'),
+            child: Text(localizations.cancel),
           ),
         ],
       );

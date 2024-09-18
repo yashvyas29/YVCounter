@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
@@ -115,7 +116,9 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                   onPressed: () {
                     debugPrint("Delete for $value pressed.");
                     showDeleteConfirmationDialog(
-                        context, 'Are you sure you want to delete ?', () {
+                        context,
+                        AppLocalizations.of(context)
+                            .deleteConfirmation(name: value), () {
                       setState(() {
                         _removeNodeFromData(node);
                       });

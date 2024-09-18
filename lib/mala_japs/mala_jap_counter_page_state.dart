@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
       debugPrint('No malas found for today.\n$error');
       /*
       if (!mounted) return;
-      showSnackBar(context, "No malas found for today.");
+      showSnackBar(context, AppLocalizations.of(context).noMalaAvailable);
       */
     }
   }
@@ -130,11 +130,13 @@ class _MyHomePageState extends State<MyHomePage> {
         await file.delete();
       }
       if (!mounted) return;
-      await showAlertDialog(context, "Google Drive restore successful.");
+      await showAlertDialog(
+          context, AppLocalizations.of(context).gdRestoreSuccessful);
     } catch (error) {
       debugPrint(error.toString());
       if (!mounted) return;
-      showSnackBar(context, "Google Drive backup not available.\n$error");
+      showSnackBar(context,
+          "${AppLocalizations.of(context).backupNotAvailable}\n$error");
     }
   }
 
@@ -162,12 +164,13 @@ class _MyHomePageState extends State<MyHomePage> {
         debugPrint('Malas restored successfully.');
       } else {
         if (!mounted) return;
-        showSnackBar(context, "Malas backup not available.");
+        showSnackBar(context, AppLocalizations.of(context).backupNotAvailable);
       }
     } catch (error) {
       debugPrint(error.toString());
       if (!mounted) return;
-      showSnackBar(context, "Malas backup not available.\n$error");
+      showSnackBar(context,
+          "${AppLocalizations.of(context).backupNotAvailable}\n$error");
     }
   }
 
@@ -177,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final malas = await widget._getMalasFromExcel();
       if (!mounted) return;
       if (malas.isEmpty) {
-        showSnackBar(context, "No malas loaded from backup.");
+        showSnackBar(context, AppLocalizations.of(context).malaNotAvailable);
       } else {
         _malaList.removeWhere((mala) => malas.contains(mala));
         malas.addAll(_malaList);
@@ -193,11 +196,13 @@ class _MyHomePageState extends State<MyHomePage> {
         } catch (error) {
           debugPrint('No malas found for today.\n$error');
         }
-        await showAlertDialog(context, "Excel restore successful.");
+        await showAlertDialog(
+            context, AppLocalizations.of(context).excelRestoreSuccessful);
       }
     } catch (error) {
       if (!mounted) return;
-      showSnackBar(context, "Excel restore failed.\n$error");
+      showSnackBar(
+          context, "${AppLocalizations.of(context).restoreError}\n$error");
     }
   }
 
@@ -214,7 +219,8 @@ class _MyHomePageState extends State<MyHomePage> {
       debugPrint('Malas file uploaded successfully.');
     } catch (error) {
       if (!mounted) return;
-      showSnackBar(context, error.toString());
+      showSnackBar(
+          context, "${AppLocalizations.of(context).backupError}\n$error");
     }
 
     try {
@@ -240,7 +246,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if (!mounted) return;
-    await showAlertDialog(context, "Backup done successfully.");
+    await showAlertDialog(
+        context, AppLocalizations.of(context).gdBackupSuccessful);
   }
 
   Future<void> _pickDate() async {
@@ -276,35 +283,41 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _handleExcelBackupSuccess() async {
-    await showAlertDialog(context, 'Excel backup done successfully.');
+    await showAlertDialog(
+        context, AppLocalizations.of(context).excelBackupSuccessful);
   }
 
   void _handleExcelBackupFailure(String error) {
-    showSnackBar(context, "Excel backup failed.\n$error");
+    showSnackBar(
+        context, "${AppLocalizations.of(context).backupError}\n$error");
   }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    var language = Localizations.localeOf(context).toString();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(AppLocalizations.of(context).title),
         actions: [
           IconButton(
-            tooltip: 'Open Mala History',
+            tooltip: localizations.malaHistory,
             icon: const Icon(Icons.menu),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => MalaDataTablePage(malas: _malaList)));
+                builder: (context) => MalaDataTablePage(malas: _malaList),
+              ));
             },
           ),
           IconButton(
-            tooltip: 'Open My Family Tree',
+            tooltip: localizations.familyList,
             icon: const Icon(Icons.grass_sharp),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const FamilyListPage(
-                    title: 'Famaily List',
+                  builder: (context) => FamilyListPage(
+                    title: localizations.familyList,
                   ),
                 ),
               );
@@ -318,121 +331,184 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const HomePage(
-                    title: 'Famaily',
+                    title: 'Family',
                   ),
                 ),
               );
             },
-          ), */
+          ),
+          */
           IconButton(
-            tooltip: 'Open About',
+            tooltip: localizations.about,
             icon: const Icon(Icons.info_outline),
             onPressed: () {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const AboutPage()));
             },
           ),
-          PopupMenuButton<Menu>(
-            tooltip: "Google Drive",
-            onSelected: (menu) async {
-              switch (menu) {
-                case Menu.backup:
-                  showProgressIndicator(context, "Backup in Progress");
-                  await _saveBackup();
-                  break;
-                case Menu.restore:
-                  if (!context.mounted) return;
-                  showProgressIndicator(context, "Restoring from Backup");
-                  await _restoreBackup();
-                  break;
-                case Menu.backupExcel:
-                  if (!context.mounted) return;
-                  showProgressIndicator(context, "Excel Backup in Progress");
-                  _malaList.sort((a, b) => a.compareTo(b));
-                  final fileHandler = MalaJapExcelFileHandler(_malaList);
-                  if (kIsWeb) {
-                    await fileHandler.saveExcel(
-                        _handleExcelBackupSuccess, _handleExcelBackupFailure);
-                  } else if (Platform.isAndroid || Platform.isIOS) {
-                    await fileHandler.createAndSaveExcelOnMobile(
-                        _handleExcelBackupSuccess, _handleExcelBackupFailure);
-                  } else {
-                    await fileHandler.createAndSaveExcelOnDesktop(
-                        _handleExcelBackupSuccess, _handleExcelBackupFailure);
-                  }
-                  break;
-                case Menu.restoreExcel:
-                  if (!context.mounted) return;
-                  showProgressIndicator(context, "Restoring from Excel");
-                  await _restoreExcelBackup();
-                  break;
-                case Menu.delete:
-                  if (!context.mounted) return;
-                  showProgressIndicator(context, "Deleting Backup");
-                  try {
-                    await _googleDrive.deleteAppDataFolderFiles();
-                    if (!context.mounted) return;
-                    await showAlertDialog(context,
-                        "App data deleted successfully from Google Drive.");
-                  } catch (error) {
-                    if (!context.mounted) return;
-                    showSnackBar(context, error.toString());
-                  }
-                  break;
-                case Menu.signOut:
-                  if (!context.mounted) return;
-                  showProgressIndicator(context, "Signing Out");
-                  await _googleDrive.signOut();
-              }
-              final user = await _googleDrive.getUser();
-              setState(() {
-                _user = user;
-              });
-              if (!context.mounted) return;
-              hideProgressIndicator(context);
-            },
-            itemBuilder: (context) {
-              return [
-                const PopupMenuItem(
-                  value: Menu.backupExcel,
-                  child: Text(
-                    'Backup Malas to Excel',
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: Menu.restoreExcel,
-                  child: Text(
-                    'Restore Malas from Excel',
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: Menu.backup,
-                  child: Text(
-                    'Backup to Google Drive',
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: Menu.restore,
-                  child: Text(
-                    'Restore from Google Drive',
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: Menu.delete,
-                  child: Text(
-                    'Delete Backup from Google Drive',
-                  ),
-                ),
-                if (_user != null)
+          Consumer<LocaleModel>(builder: (context, localeModel, child) {
+            language = localeModel.locale.languageCode;
+            final changeToLanguage = language == 'en' ? 'hi' : 'en';
+            /*
+            PopupMenuButton<LanguageMenu>(
+              tooltip: localizations.menu,
+              icon: const Icon(Icons.language),
+              initialValue: localeModel.locale?.languageCode == 'hi' ? LanguageMenu.hindi : LanguageMenu.english,
+              onSelected: (menu) async {
+                switch (menu) {
+                  case LanguageMenu.english:
+                    localeModel.set(const Locale('en'));
+                    break;
+                  case LanguageMenu.hindi:
+                    localeModel.set(const Locale('hi'));
+                    break;
+                }
+              },
+              itemBuilder: (context) {
+                return [
                   const PopupMenuItem(
-                    value: Menu.signOut,
+                    value: LanguageMenu.english,
                     child: Text(
-                      'Sign Out from Google Drive',
+                      'English',
                     ),
                   ),
-              ];
-            },
-          ),
+                  const PopupMenuItem(
+                    value: LanguageMenu.hindi,
+                    child: Text(
+                      'हिन्दी',
+                    ),
+                  ),
+                ];
+              },
+            ),
+            */
+            return PopupMenuButton<Menu>(
+              tooltip: localizations.menu,
+              onSelected: (menu) async {
+                switch (menu) {
+                  case Menu.language:
+                    if (!context.mounted) return;
+                    showProgressIndicator(
+                        context, localizations.changingLanguage);
+                    localeModel.set(
+                      Locale(changeToLanguage),
+                    );
+                  case Menu.backup:
+                    if (!context.mounted) return;
+                    showProgressIndicator(
+                        context, localizations.backupInProgress);
+                    await _saveBackup();
+                    break;
+                  case Menu.restore:
+                    if (!context.mounted) return;
+                    showProgressIndicator(
+                        context, localizations.restoringFromBackup);
+                    await _restoreBackup();
+                    break;
+                  case Menu.backupExcel:
+                    if (!context.mounted) return;
+                    showProgressIndicator(
+                        context, localizations.excelBackupInProgress);
+                    _malaList.sort((a, b) => a.compareTo(b));
+                    final fileHandler = MalaJapExcelFileHandler(_malaList);
+                    if (kIsWeb) {
+                      await fileHandler.saveExcel(
+                          _handleExcelBackupSuccess, _handleExcelBackupFailure);
+                    } else if (Platform.isAndroid || Platform.isIOS) {
+                      await fileHandler.createAndSaveExcelOnMobile(
+                          _handleExcelBackupSuccess, _handleExcelBackupFailure);
+                    } else {
+                      await fileHandler.createAndSaveExcelOnDesktop(
+                          _handleExcelBackupSuccess, _handleExcelBackupFailure);
+                    }
+                    break;
+                  case Menu.restoreExcel:
+                    if (!context.mounted) return;
+                    showProgressIndicator(
+                        context, localizations.restoringFromExcel);
+                    await _restoreExcelBackup();
+                    break;
+                  case Menu.delete:
+                    if (!context.mounted) return;
+                    showProgressIndicator(
+                        context, localizations.deletingBackupFromGD);
+                    try {
+                      await _googleDrive.deleteAppDataFolderFiles();
+                      if (!context.mounted) return;
+                      await showAlertDialog(
+                          context, localizations.gdDataDeleteSuccessful);
+                    } catch (error) {
+                      if (!context.mounted) return;
+                      showSnackBar(context,
+                          "${AppLocalizations.of(context).deleteError}\n$error");
+                    }
+                    break;
+                  case Menu.signOut:
+                    if (!context.mounted) return;
+                    showProgressIndicator(
+                        context, localizations.signingOutFromGD);
+                    await _googleDrive.signOut();
+                }
+                final user = await _googleDrive.getUser();
+                setState(() {
+                  _user = user;
+                });
+                if (!context.mounted) return;
+                hideProgressIndicator(context);
+              },
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    value: Menu.language,
+                    child: Text(
+                      localizations.changeLanguageTo(
+                        language: changeToLanguage == 'hi'
+                            ? localizations.hindi
+                            : localizations.english,
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: Menu.backupExcel,
+                    child: Text(
+                      localizations.backupToExcel,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: Menu.restoreExcel,
+                    child: Text(
+                      localizations.restoreFromExcel,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: Menu.backup,
+                    child: Text(
+                      localizations.backupToGD,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: Menu.restore,
+                    child: Text(
+                      localizations.restoreFromGD,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: Menu.delete,
+                    child: Text(
+                      localizations.deleteBackupFromGD,
+                    ),
+                  ),
+                  if (_user != null)
+                    PopupMenuItem(
+                      value: Menu.signOut,
+                      child: Text(
+                        localizations.signOutFromGD,
+                      ),
+                    ),
+                ];
+              },
+            );
+          }),
         ],
       ),
       body: Center(
@@ -440,6 +516,8 @@ class _MyHomePageState extends State<MyHomePage> {
         // in the middle of the parent.
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            final malaString = AppLocalizations.of(context).mala;
+            final japString = AppLocalizations.of(context).jap;
             return SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -453,13 +531,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 20),
                       if (_user?.name != null)
                         Text(
-                          'Welcome ${_user?.name}',
+                          localizations.welcomeUser(
+                              name: _user?.name ?? 'User'),
                           style: Theme.of(context).textTheme.titleMedium,
                           textAlign: TextAlign.center,
                         ),
                       const SizedBox(height: 10),
                       Text(
-                        'Your completed ${_selections.first ? 'malas' : 'japs'} on',
+                        AppLocalizations.of(context).completedForDate(
+                          malaJapString:
+                              _selections.first ? malaString : japString,
+                        ),
                         style: Theme.of(context).textTheme.headlineSmall,
                         // maxLines: 3,
                         // overflow: TextOverflow.ellipsis,
@@ -491,7 +573,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 10),
                       // if (!_selections.first) const SizedBox(height: 10),
                       Text(
-                        '${!_selections.first ? 'Malas' : 'Japs'}: ${!_selections.first ? _mala.count : _mala.japs}',
+                        '${!_selections.first ? malaString : japString}: ${!_selections.first ? _mala.count : _mala.japs}',
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       const SizedBox(height: 20),
@@ -517,9 +599,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           minWidth: 80.0,
                         ),
                         isSelected: _selections,
-                        children: const [
-                          Text('Mala'),
-                          Text('Jap'),
+                        children: [
+                          Text(malaString),
+                          Text(japString),
                         ],
                       ),
                       Flexible(
@@ -531,9 +613,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Icons.add,
                                 // color: Colors.white,
                               ),
-                              label: const Text(
-                                'Add',
-                                style: TextStyle(
+                              label: Text(
+                                AppLocalizations.of(context).add,
+                                style: const TextStyle(
                                   fontSize: 20,
                                   // color: Colors.white,
                                 ),

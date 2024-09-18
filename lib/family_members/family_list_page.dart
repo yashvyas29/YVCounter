@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../common/json_file_handler.dart';
 import '../common/snackbar_dialog.dart';
 import 'family_tree_page.dart';
@@ -13,14 +15,6 @@ class FamilyListPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _FamilyListPageState();
 
-  final families = const [
-    'Vyas Family',
-    'Kadvawat Family',
-    'Dharmawat Family',
-  ];
-
-  final newFamilyName = "New Family";
-
   String getFamilyFileName(String name) {
     return _jsonFileHandler.getFamilyFileName(name);
   }
@@ -30,8 +24,12 @@ class _FamilyListPageState extends State<FamilyListPage> {
   final List<bool> _readOnlyList = [];
   final List<String> _families = [];
   final List<TextEditingController> _controllers = [];
+
   String _message = '';
   bool isDataLoaded = false;
+
+  late List<String> families;
+  late String newFamilyName;
 
   Future<List<String>> _getFamilies() async {
     final families = await DBProvider.db.getFamilies();
@@ -48,8 +46,8 @@ class _FamilyListPageState extends State<FamilyListPage> {
 
   void _setReadOnlyList() {
     _readOnlyList.clear();
-    _readOnlyList.addAll(_families
-        .map((family) => family == widget.newFamilyName ? false : true));
+    _readOnlyList.addAll(
+        _families.map((family) => family == newFamilyName ? false : true));
   }
 
   Future<void> _addFamily(String name) async {
@@ -57,7 +55,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
     if (!isExist) {
       await DBProvider.db.createTable(name);
       setState(() {
-        name == widget.newFamilyName
+        name == newFamilyName
             ? _readOnlyList.add(false)
             : _readOnlyList.add(true);
         _families.add(name);
@@ -74,7 +72,8 @@ class _FamilyListPageState extends State<FamilyListPage> {
 
   Future<void> _deleteFamily(String name, int index) async {
     showDeleteConfirmationDialog(
-        context, 'Are you sure you want to delete $name ?', () async {
+        context, AppLocalizations.of(context).deleteConfirmation(name: name),
+        () async {
       await DBProvider.db.deleteTable(name);
       await widget._jsonFileHandler
           .deleteLocalFile(widget.getFamilyFileName(name));
@@ -102,7 +101,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
         final oldFileExists = await oldFile.exists();
         if (oldFileExists) {
           await widget._jsonFileHandler.renameFile(oldFileName, newFileName);
-        } else if (widget.families.contains(oldName)) {
+        } else if (families.contains(oldName)) {
           final content = await widget._jsonFileHandler
               .readJsonStringFromBundle(oldFileName);
           await widget._jsonFileHandler.writeJson(newFileName, content);
@@ -136,6 +135,13 @@ class _FamilyListPageState extends State<FamilyListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    newFamilyName = localizations.newFamily;
+    families = [
+      localizations.vyasFamily,
+      localizations.kadvawatFamily,
+      localizations.dharmawatFamily,
+    ];
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -154,7 +160,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
           IconButton(
               onPressed: () async {
                 debugPrint("Add family pressed.");
-                await _addFamily(widget.newFamilyName);
+                await _addFamily(newFamilyName);
               },
               icon: const Icon(Icons.add_circle)),
         ],
@@ -242,7 +248,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
                           : Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                title == widget.newFamilyName
+                                title == newFamilyName
                                     ? IconButton(
                                         onPressed: () async {
                                           debugPrint(
@@ -264,7 +270,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
                                       debugPrint("Done for $title pressed.");
                                       final newTitle =
                                           _controllers[index].text.trim();
-                                      if (newTitle == widget.newFamilyName) {
+                                      if (newTitle == newFamilyName) {
                                         setState(() {
                                           _message =
                                               "Rename to your family name!";
@@ -300,8 +306,8 @@ class _FamilyListPageState extends State<FamilyListPage> {
               ),
             ],
           )
-        : const Center(
-            child: Text("No families available."),
+        : Center(
+            child: Text(AppLocalizations.of(context).familyNotAvailable),
           );
   }
 

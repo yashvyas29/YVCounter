@@ -84,11 +84,12 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
   }
 
   Future<void> _handleSaveExcelSuccess() async {
-    await showAlertDialog(context, 'Excel file saved successfully.');
+    await showAlertDialog(
+        context, AppLocalizations.of(context).excelSaveSuccessful);
   }
 
   void _handleSaveExcelFailure(String error) {
-    showSnackBar(context, 'Can not save excel file.\n$error');
+    showSnackBar(context, '${AppLocalizations.of(context).saveError}\n$error');
   }
 
   @override
@@ -99,15 +100,18 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     var isRowCountLessDefaultRowsPerPage = tableItemsCount < _rowsPerPage.value;
     final rowsPerPage =
         isRowCountLessDefaultRowsPerPage ? tableItemsCount : _rowsPerPage.value;
+    final localizations = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mala History'),
+        title: Text(localizations.malaHistory),
         actions: [
           if (tableItemsCount > 0)
             IconButton(
                 onPressed: () async => await fileHandler.saveExcel(
-                    _handleSaveExcelSuccess, _handleSaveExcelFailure),
+                      _handleSaveExcelSuccess,
+                      _handleSaveExcelFailure,
+                    ),
                 icon: const Icon(Icons.file_download)),
         ],
       ),
@@ -119,12 +123,13 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
           padding: const EdgeInsets.all(16),
           children: [
             tableItemsCount == 0
-                ? const Text(
-                    'No malas or japs completed yet.',
+                ? Text(
+                    localizations.malaNotAvailable,
                     textAlign: TextAlign.center,
                   )
                 : PaginatedDataTable(
-                    header: Text('Malas: $totalMalas, Japs: $totalJaps'),
+                    header: Text(
+                        '${localizations.mala}: $totalMalas, ${localizations.jap}: $totalJaps'),
                     availableRowsPerPage: [
                       rowsPerPage,
                       rowsPerPage * 2,
@@ -151,18 +156,18 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                     showFirstLastButtons: !isRowCountLessDefaultRowsPerPage,
                     columns: [
                       DataColumn(
-                        label: const Text('Date'),
+                        label: Text(localizations.date),
                         onSort: (columnIndex, ascending) => _sort<DateTime>(
                             (d) => d.date, columnIndex, ascending),
                       ),
                       DataColumn(
-                        label: const Text('Malas'),
+                        label: Text(localizations.mala),
                         numeric: true,
                         onSort: (columnIndex, ascending) =>
                             _sort<num>((d) => d.count, columnIndex, ascending),
                       ),
                       DataColumn(
-                        label: const Text('Japs'),
+                        label: Text(localizations.jap),
                         numeric: true,
                         onSort: (columnIndex, ascending) =>
                             _sort<num>((d) => d.japs, columnIndex, ascending),

@@ -1,0 +1,94 @@
+{
+  "title": "YVCounter",
+  "welcomeUser": "Welcome {name}",
+  "@welcomeUser" : {
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "Yash"
+        }
+      }
+  },
+  "mala": "Mala",
+  "jap": "Jap",
+  "completedForDate": "Your completed {malaJapString} on",
+  "@completedForDate" : {
+      "placeholders": {
+        "malaJapString": {
+          "type": "String",
+          "example": "Mala"
+        }
+      }
+  },
+  "add": "Add",
+
+  "malaHistory": "Mala History",
+  "date": "Date",
+  "familyList": "Family List",
+  "about": "About",
+  "myName": "Yash Vyas",
+  "aboutText": "YVCounter app is created for solving a common scenario of counting malas or japs which is done by hindu religion pepole during meditation.\n\nIn Hinduism the jap mala is used to direct and count the recitation of mantras during meditation. It usually consists of 108 beads strung in a circle to represent the cyclic nature of life.",
+  "menu": "Menu",
+
+  "changeLanguageTo": "Change Language to {language}",
+  "@changeLanguageTo" : {
+      "placeholders": {
+        "language": {
+          "type": "String",
+          "example": "English"
+        }
+      }
+  },
+  "english": "English",
+  "hindi": "Hindi",
+
+  "backupToExcel": "Backup Mala to Excel",
+  "restoreFromExcel": "Restore Mala from Excel",
+  "backupToGD": "Backup to Google Drive",
+  "restoreFromGD": "Restore from Google Drive",
+  "deleteBackupFromGD": "Delete Backup from Google Drive",
+  "signOutFromGD": "Sign Out from Google Drive",
+
+  "newFamily": "New Family",
+  "vyasFamily": "Vyas Family",
+  "kadvawatFamily": "Kadvawat Family",
+  "dharmawatFamily": "Dharmawat Family",
+
+  "excelSaveSuccessful": "Excel saved successfully.",
+  "gdRestoreSuccessful": "Google Drive restore successful.",
+  "excelRestoreSuccessful": "Excel restore successful.",
+  "gdBackupSuccessful": "Google Drive backup done successfully.",
+  "excelBackupSuccessful": "Excel backup done successfully.",
+  "gdDataDeleteSuccessful": "App data deleted successfully from Google Drive.",
+
+  "changingLanguage": "Changing Language",
+  "backupInProgress": "Backup in Progress",
+  "restoringFromBackup": "Restoring from Backup",
+  "excelBackupInProgress": "Excel Backup in Progress",
+  "restoringFromExcel": "Restoring from Excel",
+  "deletingBackupFromGD": "Deleting Backup from Google Drive",
+  "signingOutFromGD": "Signing Out from Google Drive",
+
+  "malaNotAvailable": "No mala available.",
+  "familyNotAvailable": "No family available.",
+  "backupNotAvailable": "Backup not available.",
+
+  "saveError": "Save failed.",
+  "backupError": "Backup failed.",
+  "restoreError": "Restore failed.",
+  "deleteError": "Delete failed.",
+
+  "deleteConfirmation": "Are you sure you want to delete {name} ?",
+  "@deleteConfirmation" : {
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "Yash"
+        }
+      }
+  },
+
+  "alert": "Alert",
+  "delete": "Delete",
+  "cancel": "Cancel"
+}
