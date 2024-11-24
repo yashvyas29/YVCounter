@@ -143,13 +143,16 @@
         },
         {
             "id": 36,
-            "label": "Vidhya Devi\nHusband"
-        }
-        ,
+            "label": "Vidhya Devi\nNatvar Ji"
+        },
         {
             "id": 37,
-            "label": "Boy",
-            "next": 38
+            "label": "Mayank"
+        },
+        {
+            "id": 38,
+            "label": "Shivani",
+            "next": 39
         }
     ],
     "edges": [
@@ -296,6 +299,10 @@
         {
             "from": 36,
             "to": 37
+        },
+        {
+            "from": 36,
+            "to": 38
         }
     ]
 }
