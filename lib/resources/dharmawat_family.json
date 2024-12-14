@@ -7,7 +7,8 @@
         },
         {
             "id": 9,
-            "label": "Shankar Lal Ji"
+            "label": "Shankar Lal Ji",
+            "isRootChild": true
         },
         {
             "id": 10,

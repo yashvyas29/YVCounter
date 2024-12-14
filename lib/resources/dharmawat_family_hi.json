@@ -7,7 +7,8 @@
         },
         {
             "id": 9,
-            "label": "शंकर लाल जी"
+            "label": "शंकर लाल जी",
+            "isRootChild": true
         },
         {
             "id": 10,

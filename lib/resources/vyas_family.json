@@ -2,7 +2,8 @@
     "nodes": [
         {
             "id": 7,
-            "label": "Heera Lal Ji"
+            "label": "Heera Lal Ji",
+            "isRootChild": true
         },
         {
             "id": 2,

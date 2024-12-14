@@ -51,7 +51,7 @@ class JsonFileHandler {
       return jsonDecode(content);
     } catch (error) {
       debugPrint(error.toString());
-      return {'nodes': [], 'edges': []};
+      return {};
     }
   }
 
@@ -62,7 +62,7 @@ class JsonFileHandler {
       return await jsonDecode(content);
     } catch (error) {
       debugPrint(error.toString());
-      return {'nodes': [], 'edges': []};
+      return {};
     }
   }
 

@@ -24,7 +24,7 @@ class FamilyTreePage extends StatefulWidget {
   Future<Map<String, dynamic>> readJsonData() async {
     final fileName = getFileName();
     final data = await _jsonFileHandler.readJson(fileName);
-    if (data[edgesKey].isEmpty) {
+    if (data.isEmpty) {
       return await _jsonFileHandler.readJsonFromBundle(fileName);
     } else {
       return data;
@@ -54,7 +54,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          IconButton(onPressed: _reset, icon: const Icon(Icons.restore)),
+          IconButton(
+              onPressed: () {
+                debugPrint("Reset to family pressed.");
+                _reset();
+              },
+              icon: const Icon(Icons.restore)),
         ],
       ),
       body: _futureBuilder(),
@@ -62,7 +67,6 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 
   void _reset() {
-    debugPrint("Reset to family pressed.");
     if (_transformationController.value != Matrix4.identity()) {
       _jumpToRootNode();
     }
@@ -118,9 +122,10 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
               maxLines: null,
               controller: textController,
               decoration: inputDecoration,
-              // textAlignVertical: TextAlignVertical.center,
+              textAlignVertical: TextAlignVertical.center,
               readOnly: readOnly,
               autofocus: !readOnly,
+              // enabled: !readOnly,
             ),
           ),
           Column(
@@ -136,12 +141,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                         setState(() {
                           _removeNodeFromData(node);
                         });
-                        Navigator.pop(context);
                         await widget.writeJsonData(_data);
                         if (_data[edgesKey].length <= 1) {
                           _reset();
                         }
                         if (!mounted) return;
+                        Navigator.pop(context);
                         showSnackBar(
                             context, "$value ${localizations.deleted}");
                       });
@@ -152,49 +157,45 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     onPressed: () async {
                       debugPrint("Add on top for $value pressed.");
                       final nodes = _data[nodesKey];
-                      final newId = nodes.fold(0, (previousValue, element) {
-                            final currentValue = element['id'] ?? 0;
-                            return previousValue < currentValue
-                                ? previousValue
-                                : currentValue;
-                          }) -
-                          1;
+                      final newId = _getNewNodeId();
                       final currentRoot = nodes.firstWhere(
                         (node) => node['isRoot'] == true,
                       );
                       currentRoot.remove('isRoot');
+                      try {
+                        final currentRootChild = nodes.firstWhere(
+                          (node) => node['isRootChild'] == true,
+                        );
+                        currentRootChild.remove('isRootChild');
+                      } catch (error) {
+                        debugPrint("No root child found.\n$error");
+                      }
                       currentRoot['isRootChild'] = true;
-                      final currentRootChild = nodes.firstWhere(
-                        (node) => node['isRootChild'] == true,
-                      );
-                      currentRootChild.remove('isRootChild');
-                      final newNodeValue = {
-                        "id": newId,
-                        "label": "",
-                        "readOnly": false,
-                        "isRoot": true
-                      };
-                      debugPrint(newNodeValue.toString());
+                      final newNode = _getNewNodeMap(newId, isRoot: true);
+                      final newEdge = {"from": newId, "to": id};
                       setState(() {
-                        _data[nodesKey].add(newNodeValue);
-                        final edgeValue = {"from": newId, "to": id};
-                        debugPrint(edgeValue.toString());
-                        _data[edgesKey].add(edgeValue);
+                        _data[nodesKey].add(newNode);
+                        _data[edgesKey].add(newEdge);
                       });
                       await widget.writeJsonData(_data);
-                      if (!mounted) return;
-                      showSnackBar(context, "$value ${localizations.added}");
                     },
                     icon: const Icon(Icons.add_box)),
               readOnly
                   ? IconButton(
-                      onPressed: () async {
+                      onPressed: () {
                         debugPrint("Edit for $value pressed.");
+                        try {
+                          final currentEditableNode = nodes.firstWhere(
+                            (node) => node['readOnly'] == false,
+                          );
+                          currentEditableNode['readOnly'] = true;
+                        } catch (error) {
+                          debugPrint("No editable node found.\n$error");
+                        }
                         setState(() {
                           nodeValue['readOnly'] = false;
-                          // _data[nodesKey][nodeIndex] = nodeValue;
                         });
-                        await widget.writeJsonData(_data);
+                        // await widget.writeJsonData(_data);
                       },
                       icon: const Icon(Icons.edit))
                   : IconButton(
@@ -205,7 +206,6 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           setState(() {
                             nodeValue['label'] = textController.text;
                             nodeValue['readOnly'] = true;
-                            // _data[nodesKey][nodeIndex] = nodeValue;
                           });
                           await widget.writeJsonData(_data);
                           if (!mounted) return;
@@ -218,35 +218,52 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                         }
                       },
                       icon: const Icon(Icons.done_outline)),
-              if (readOnly)
-                IconButton(
-                    onPressed: () {
-                      debugPrint("Add for $value pressed.");
-                      final newId =
-                          _data[nodesKey].fold(0, (previousValue, element) {
-                                final currentValue = element['id'] ?? 0;
-                                return previousValue > currentValue
-                                    ? previousValue
-                                    : currentValue;
-                              }) +
-                              1;
-                      final newNodeValue = {"id": newId, "label": ""};
-                      newNodeValue['readOnly'] = false;
-                      // debugPrint(newNodeValue.toString());
-                      setState(() {
-                        _data[nodesKey].add(newNodeValue);
-                        final edgeValue = {"from": id, "to": newId};
-                        // debugPrint(edgeValue.toString());
-                        _data[edgesKey].add(edgeValue);
-                      });
-                      widget.writeJsonData(_data);
-                    },
-                    icon: const Icon(Icons.add_circle)),
+              readOnly
+                  ? IconButton(
+                      onPressed: () async {
+                        debugPrint("Add for $value pressed.");
+                        final newId = _getNewNodeId();
+                        final newNode = _getNewNodeMap(newId);
+                        final newEdge = {"from": id, "to": newId};
+                        setState(() {
+                          _data[nodesKey].add(newNode);
+                          _data[edgesKey].add(newEdge);
+                        });
+                        await widget.writeJsonData(_data);
+                      },
+                      icon: const Icon(Icons.add_circle))
+                  : IconButton(
+                      onPressed: () {
+                        debugPrint("Cancel for $value pressed.");
+                        setState(() {
+                          nodeValue['readOnly'] = true;
+                        });
+                        // await widget.writeJsonData(_data);
+                      },
+                      icon: const Icon(Icons.cancel))
             ],
           ),
         ]),
       ),
     );
+  }
+
+  int _getNewNodeId() {
+    return _data[nodesKey].fold(0, (previousValue, element) {
+          final currentValue = element['id'] ?? 0;
+          return previousValue > currentValue ? previousValue : currentValue;
+        }) +
+        1;
+  }
+
+  Map<String, dynamic> _getNewNodeMap(int id, {bool isRoot = false}) {
+    final newNodeValue = {"id": id, "label": ""};
+    newNodeValue['readOnly'] = false;
+    if (isRoot) {
+      newNodeValue['isRoot'] = isRoot;
+    }
+    // debugPrint(newNodeValue.toString());
+    return newNodeValue;
   }
 
   void _removeNodeFromData(Node node) {
@@ -337,7 +354,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 );
               } else if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
-                _data = snapshot.data;
+                final data = snapshot.data;
+                if (data.isEmpty) {
+                  _data = {nodesKey: [], edgesKey: []};
+                } else {
+                  _data = data;
+                }
                 return _graphView();
               } else {
                 return Center(

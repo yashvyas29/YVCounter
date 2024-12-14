@@ -7,7 +7,8 @@
         },
         {
             "id": 2,
-            "label": "Shobha Lal Ji\nParvati Devi"
+            "label": "Shobha Lal Ji\nParvati Devi",
+            "isRootChild": true
         },
         {
             "id": 3,
