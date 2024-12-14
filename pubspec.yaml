@@ -46,7 +46,7 @@ dependencies:
   extension_google_sign_in_as_googleapis_auth: ^2.0.12
   http: ^1.2.2
   file: ^7.0.1
-  file_picker: ^8.1.4
+  file_picker: 8.1.4
   graphview: ^1.2.0
   flutter_file_dialog: ^3.0.2
   sqflite: ^2.4.1
