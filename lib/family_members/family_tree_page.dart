@@ -64,10 +64,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   void _reset() {
     debugPrint("Reset to family pressed.");
     if (_transformationController.value != Matrix4.identity()) {
-      final currentRoot = _data[nodesKey].firstWhere(
-        (node) => node['isRoot'] == true,
-      );
-      _jumpToNode(currentRoot['id']);
+      _jumpToRootNode();
     }
     /*
     widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
@@ -282,7 +279,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     _algorithm = _CallbackBuchheimWalkerAlgorithm(
       _builder,
       TreeEdgeRenderer(_builder),
-      onFirstCalculated: () => _jumpToNode(1),
+      onFirstCalculated: () => _jumpToRootNode(),
     );
   }
 
@@ -387,7 +384,14 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
   }
 
-  Future<void> _jumpToNode(int nodeId) async {
+  void _jumpToRootNode() {
+    final currentRoot = _data[nodesKey].firstWhere(
+      (node) => node['isRoot'] == true,
+    );
+    _jumpToNode(currentRoot['id']);
+  }
+
+  void _jumpToNode(int nodeId) {
     final startNode = _graph.nodes.firstWhere(
       (node) => node.key!.value == nodeId,
     );
@@ -405,7 +409,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     });
   }
 
-  Future<void> _updateNode(List edges) async {
+  void _updateNode(List edges) {
     /*
     debugPrint("updateNode");
     debugPrint("Edges count: ${edges.length.toString()}");
