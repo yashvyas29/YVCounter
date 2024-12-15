@@ -98,6 +98,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     InputDecoration inputDecoration = InputDecoration(
       border: readOnly ? InputBorder.none : const OutlineInputBorder(),
       hintText: hintText,
+      isDense: true,
     );
     TextEditingController textController = TextEditingController();
     textController.text = value;
@@ -117,16 +118,19 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         ),
         child: Row(children: [
           Expanded(
-            child: TextField(
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              controller: textController,
-              decoration: inputDecoration,
-              textAlignVertical: TextAlignVertical.center,
-              readOnly: readOnly,
-              autofocus: !readOnly,
-              // enabled: !readOnly,
-            ),
+            child: readOnly
+                ? Text(
+                    value,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  )
+                : TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    controller: textController,
+                    decoration: inputDecoration,
+                    readOnly: readOnly,
+                    autofocus: !readOnly,
+                  ),
           ),
           Column(
             children: [
@@ -186,7 +190,9 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                         debugPrint("Edit for $value pressed.");
                         try {
                           final currentEditableNode = nodes.firstWhere(
-                            (node) => node['readOnly'] == false,
+                            (node) =>
+                                node['readOnly'] == false &&
+                                !node['label'].isEmpty,
                           );
                           currentEditableNode['readOnly'] = true;
                         } catch (error) {
@@ -218,29 +224,30 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                         }
                       },
                       icon: const Icon(Icons.done_outline)),
-              readOnly
-                  ? IconButton(
-                      onPressed: () async {
-                        debugPrint("Add for $value pressed.");
-                        final newId = _getNewNodeId();
-                        final newNode = _getNewNodeMap(newId);
-                        final newEdge = {"from": id, "to": newId};
-                        setState(() {
-                          _data[nodesKey].add(newNode);
-                          _data[edgesKey].add(newEdge);
-                        });
-                        await widget.writeJsonData(_data);
-                      },
-                      icon: const Icon(Icons.add_circle))
-                  : IconButton(
-                      onPressed: () {
-                        debugPrint("Cancel for $value pressed.");
-                        setState(() {
-                          nodeValue['readOnly'] = true;
-                        });
-                        // await widget.writeJsonData(_data);
-                      },
-                      icon: const Icon(Icons.cancel))
+              if (readOnly)
+                IconButton(
+                    onPressed: () async {
+                      debugPrint("Add for $value pressed.");
+                      final newId = _getNewNodeId();
+                      final newNode = _getNewNodeMap(newId);
+                      final newEdge = {"from": id, "to": newId};
+                      setState(() {
+                        _data[nodesKey].add(newNode);
+                        _data[edgesKey].add(newEdge);
+                      });
+                      await widget.writeJsonData(_data);
+                    },
+                    icon: const Icon(Icons.add_circle))
+              else if (value.isNotEmpty)
+                IconButton(
+                    onPressed: () {
+                      debugPrint("Cancel for $value pressed.");
+                      setState(() {
+                        nodeValue['readOnly'] = true;
+                      });
+                      // await widget.writeJsonData(_data);
+                    },
+                    icon: const Icon(Icons.cancel)),
             ],
           ),
         ]),

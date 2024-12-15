@@ -565,9 +565,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       Text(
                         '${_selections.first ? _mala.count : getJapsPerMala()}',
                         style: Theme.of(context).textTheme.displayMedium,
-                        // style: _selections.first
-                        //     ? Theme.of(context).textTheme.displayLarge
-                        //     : Theme.of(context).textTheme.displayMedium,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 10),
