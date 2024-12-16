@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
+import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:yv_counter/family_members/family_member_page.dart';
 
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
@@ -38,14 +40,40 @@ class FamilyTreePage extends StatefulWidget {
 
 class _FamilyTreePageState extends State<FamilyTreePage> {
   Map<String, dynamic> _data = {};
-  final TransformationController _transformationController =
-      TransformationController();
+  final Map<int, dynamic> _images = {};
+  late ImageFileHandler imageFileHandler;
 
   static const nodesKey = 'nodes';
   static const edgesKey = 'edges';
 
   static const spacing = 20.0;
-  static const boxSide = 200.0;
+  static const boxSide = 320.0;
+  static const imageSide = 100.0;
+
+  final _graph = Graph()..isTree = true;
+  final BuchheimWalkerConfiguration _builder = BuchheimWalkerConfiguration();
+  late final _CallbackBuchheimWalkerAlgorithm _algorithm;
+  final TransformationController _transformationController =
+      TransformationController();
+
+  @override
+  void initState() {
+    debugPrint("initState");
+    super.initState();
+
+    imageFileHandler = ImageFileHandler(prefix: widget.getFileName());
+
+    _builder
+      ..siblingSeparation = (spacing.toInt())
+      ..levelSeparation = (spacing.toInt())
+      ..subtreeSeparation = (spacing.toInt());
+
+    _algorithm = _CallbackBuchheimWalkerAlgorithm(
+      _builder,
+      TreeEdgeRenderer(_builder),
+      onFirstCalculated: () => _jumpToRootNode(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +107,36 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     */
   }
 
+  Widget _borderedWidget(Widget widget) {
+    return Container(
+      padding: const EdgeInsets.all(2.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).primaryColor),
+      ),
+      child: widget,
+    );
+  }
+
+  /*
+  Widget _clipRectWidget(Widget widget, double radius) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: widget,
+    );
+  }
+  */
+
+  Widget _imageWidget(File image) {
+    return _borderedWidget(
+      Image.file(
+        image,
+        width: imageSide,
+        height: imageSide,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
   Widget _rectangleWidget(Node node) {
     // debugPrint("rectangleWidget: ${node.toString()}");
     final nodes = _data[nodesKey];
@@ -102,14 +160,31 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
     TextEditingController textController = TextEditingController();
     textController.text = value;
+    final image = _images[id];
 
     return InkWell(
       onTap: () {
         debugPrint('Node $value clicked at ${node.toString()}.');
+        Navigator.of(context)
+            .push(
+          MaterialPageRoute(
+            builder: (context) => FamilyMemberPage(
+              id: id,
+              name: value,
+              familyFileName: widget.getFileName(),
+            ),
+          ),
+        )
+            .then((val) {
+          setState(() {
+            _data.clear();
+            _images.clear();
+          });
+        });
       },
       child: Container(
         width: boxSide,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
@@ -117,6 +192,27 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           ],
         ),
         child: Row(children: [
+          image != null
+              ? _imageWidget(image)
+              : FutureBuilder(
+                  future: imageFileHandler.loadImage(id),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      final image = snapshot.data!;
+                      _images[id] = image;
+                      return _imageWidget(image);
+                    } else {
+                      return _borderedWidget(
+                        Icon(
+                          Icons.person,
+                          size: imageSide,
+                        ),
+                      );
+                    }
+                  },
+                ),
+          SizedBox(width: 8),
           Expanded(
             child: readOnly
                 ? Text(
@@ -132,6 +228,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     autofocus: !readOnly,
                   ),
           ),
+          SizedBox(width: 4),
           Column(
             children: [
               if (!isRoot && ((!isRootChild && nodes.length > 2) || readOnly))
@@ -286,27 +383,6 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     _graph.removeNode(node);
   }
 
-  final _graph = Graph()..isTree = true;
-  final BuchheimWalkerConfiguration _builder = BuchheimWalkerConfiguration();
-  late final _CallbackBuchheimWalkerAlgorithm _algorithm;
-
-  @override
-  void initState() {
-    debugPrint("initState");
-    super.initState();
-
-    _builder
-      ..siblingSeparation = (spacing.toInt())
-      ..levelSeparation = (spacing.toInt())
-      ..subtreeSeparation = (spacing.toInt());
-
-    _algorithm = _CallbackBuchheimWalkerAlgorithm(
-      _builder,
-      TreeEdgeRenderer(_builder),
-      onFirstCalculated: () => _jumpToRootNode(),
-    );
-  }
-
   /*
   void setupTransformationController() {
     // const zoomFactor = 1.0;
@@ -361,7 +437,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 );
               } else if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
-                final data = snapshot.data;
+                final data = snapshot.data!;
                 if (data.isEmpty) {
                   _data = {nodesKey: [], edgesKey: []};
                 } else {

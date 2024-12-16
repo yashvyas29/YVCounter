@@ -101,5 +101,10 @@
   "enterParentsName": "Enter parents name.",
   "enterChildAndSpouseName": "Enter child and his or her spouse name.",
 
+  "familyMemberDetails": "Family Member Details",
+  "memberName": "Member Name",
+  "spouseName": "Spouse Name",
+  "image": "image",
+
   "commonError": "Something went wrong, please try again later."
 }

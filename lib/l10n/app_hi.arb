@@ -101,5 +101,10 @@
   "enterParentsName": "अभिभावको का नाम प्रविष्ट करें।",
   "enterChildAndSpouseName": "बच्चे और उसके जीवनसाथी का नाम प्रविष्ट करें।",
 
+  "familyMemberDetails": "परिवार के सदस्य का विवरण",
+  "memberName": "सदस्य का नाम",
+  "spouseName": "जीवनसाथी का नाम",
+  "image": "चित्र",
+
   "commonError": "कुछ गलत हो गया है। कृपया बाद में दोबारा प्रयास करें।"
 }

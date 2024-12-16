@@ -108,3 +108,16 @@ class JsonFileHandler {
     return file.rename(newPath);
   }
 }
+
+class FamilyJsonKey {
+  static const nodes = "nodes";
+  static const id = "id";
+  static const label = "label";
+  static const readOnly = "readOnly";
+  static const isRoot = "isRoot";
+  static const isRootChild = "isRootChild";
+
+  static const edges = "edges";
+  static const from = "from";
+  static const to = "to";
+}
