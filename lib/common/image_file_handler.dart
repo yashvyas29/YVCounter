@@ -1,15 +1,27 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImageFileHandler {
   final String prefix;
   const ImageFileHandler({required this.prefix});
 
+  Future<String> localPath() async {
+    final directory = await imagesDirectory();
+    return directory.path;
+  }
+
   Future<String> getImagePath(int id) async {
-    final directory = await getApplicationDocumentsDirectory();
-    return '${directory.path}/${prefix}_$id.png';
+    final path = await localPath();
+    return '$path/${prefix}_$id.jpg';
+  }
+
+  Future<String> getThumbnailImagePath(int id) async {
+    final path = await localPath();
+    return '$path/${prefix}_${id}_thumb.jpg';
   }
 
   Future<File> saveImage(String pickedPath, int id) async {
@@ -23,7 +35,19 @@ class ImageFileHandler {
     if (await tempFile.exists()) {
       await tempFile.delete();
     }
+    await saveThumbnail(id);
     return newFile;
+  }
+
+  Future<void> saveThumbnail(int id, [int side = 100]) async {
+    final fromPath = await getImagePath(id);
+    final toPath = await getThumbnailImagePath(id);
+    await FlutterImageCompress.compressAndGetFile(
+      fromPath,
+      toPath,
+      minWidth: side,
+      minHeight: side,
+    );
   }
 
   Future<File> loadImage(int id) async {
@@ -36,8 +60,24 @@ class ImageFileHandler {
     }
   }
 
+  Future<File> loadThumbnail(int id) async {
+    final path = await getThumbnailImagePath(id);
+    final imageFile = File(path);
+    if (await imageFile.exists()) {
+      return imageFile;
+    } else {
+      return Future.error(FileSystemException("File Not Found", path));
+    }
+  }
+
   Future<void> deleteImage(int id) async {
     final path = await getImagePath(id);
+    deleteFile(path);
+    await deleteThumbnail(id);
+  }
+
+  Future<void> deleteThumbnail(int id) async {
+    final path = await getThumbnailImagePath(id);
     deleteFile(path);
   }
 
@@ -47,6 +87,24 @@ class ImageFileHandler {
       await file.delete();
     } else {
       return Future.error(FileSystemException("File Not Found", path));
+    }
+  }
+
+  static Future<Directory> imagesDirectory() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagesDir = await Directory(join(directory.path, 'images')).create();
+    return imagesDir;
+  }
+
+  static Future<void> deleteFiles(String name) async {
+    final directory = await imagesDirectory();
+    if (await directory.exists()) {
+      directory.list().forEach((file) async {
+        String fileName = file.path.split('/').last;
+        if (fileName.contains("${name}_")) {
+          await file.delete();
+        }
+      });
     }
   }
 }

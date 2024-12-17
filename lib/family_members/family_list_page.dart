@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -75,8 +76,9 @@ class _FamilyListPageState extends State<FamilyListPage> {
         context, AppLocalizations.of(context).deleteConfirmation(name: name),
         () async {
       await DBProvider.db.deleteTable(name);
-      await widget._jsonFileHandler
-          .deleteLocalFile(widget.getFamilyFileName(name));
+      final prefix = widget.getFamilyFileName(name);
+      await widget._jsonFileHandler.deleteLocalFile(prefix);
+      await ImageFileHandler.deleteFiles(prefix);
       setState(() {
         _families.removeAt(index);
         _readOnlyList.removeAt(index);

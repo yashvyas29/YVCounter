@@ -112,7 +112,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     return Container(
       padding: const EdgeInsets.all(2.0),
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
+        color: Theme.of(context).textTheme.bodyLarge?.color,
         borderRadius: BorderRadius.circular(radius),
       ),
       child: widget,
@@ -137,7 +137,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         ),
         boxCornerRadius,
       ),
-      boxCornerRadius,
+      boxCornerRadius + 1,
     );
   }
 
@@ -168,7 +168,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
     return InkWell(
       onTap: () {
-        debugPrint('Node $value clicked at ${node.toString()}.');
+        // debugPrint('Node $value clicked at ${node.toString()}.');
         Navigator.of(context)
             .push(
           MaterialPageRoute(
@@ -200,7 +200,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           image != null
               ? _imageWidget(image)
               : FutureBuilder(
-                  future: imageFileHandler.loadImage(id),
+                  future: imageFileHandler.loadThumbnail(id),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.done &&
                         snapshot.hasData) {

@@ -88,7 +88,9 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
           ],
         ),
         IOSUiSettings(
+          aspectRatioPickerButtonHidden: true,
           // title: 'Cropper',
+          cropStyle: CropStyle.circle,
           aspectRatioPresets: [
             CropAspectRatioPreset.square,
           ],
