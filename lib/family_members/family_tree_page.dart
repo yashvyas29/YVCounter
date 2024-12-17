@@ -48,6 +48,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
   static const spacing = 20.0;
   static const boxSide = 320.0;
+  static const boxCornerRadius = 4.0;
   static const imageSide = 100.0;
 
   final _graph = Graph()..isTree = true;
@@ -107,33 +108,36 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     */
   }
 
-  Widget _borderedWidget(Widget widget) {
+  Widget _borderedWidget(Widget widget, double radius) {
     return Container(
       padding: const EdgeInsets.all(2.0),
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).primaryColor),
+        borderRadius: BorderRadius.circular(radius),
       ),
       child: widget,
     );
   }
 
-  /*
   Widget _clipRectWidget(Widget widget, double radius) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: widget,
     );
   }
-  */
 
   Widget _imageWidget(File image) {
     return _borderedWidget(
-      Image.file(
-        image,
-        width: imageSide,
-        height: imageSide,
-        fit: BoxFit.contain,
+      _clipRectWidget(
+        Image.file(
+          image,
+          width: imageSide,
+          height: imageSide,
+          fit: BoxFit.contain,
+        ),
+        boxCornerRadius,
       ),
+      boxCornerRadius,
     );
   }
 
@@ -176,9 +180,10 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           ),
         )
             .then((val) {
+          // debugPrint("Returned from FamilyMemberPage.\n$val");
           setState(() {
-            _data.clear();
-            _images.clear();
+            // Update other data in future when user can edit it.
+            _images.remove(id);
           });
         });
       },
@@ -186,7 +191,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         width: boxSide,
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(boxCornerRadius),
           boxShadow: [
             BoxShadow(color: Colors.red[300]!, spreadRadius: 1),
           ],
@@ -208,6 +213,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           Icons.person,
                           size: imageSide,
                         ),
+                        boxCornerRadius,
                       );
                     }
                   },

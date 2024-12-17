@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
@@ -11,7 +12,11 @@ class FamilyMemberPage extends StatefulWidget {
   final String name;
   final String familyFileName;
 
-  const FamilyMemberPage({super.key, required this.id, required this.name, required this.familyFileName});
+  const FamilyMemberPage(
+      {super.key,
+      required this.id,
+      required this.name,
+      required this.familyFileName});
 
   @override
   FamilyMemberPageState createState() => FamilyMemberPageState();
@@ -19,7 +24,7 @@ class FamilyMemberPage extends StatefulWidget {
 
 class FamilyMemberPageState extends State<FamilyMemberPage> {
   File? _image;
-  static const imageSide = 200.0;
+  Key? _imageKey;
   late ImageFileHandler imageFileHandler;
 
   @override
@@ -36,7 +41,7 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
         _image = image;
       });
     } catch (error) {
-      debugPrint(error.toString());
+      // debugPrint(error.toString());
       setState(() {
         _image = null;
       });
@@ -45,18 +50,66 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 90,
+      requestFullMetadata: false,
+    );
     if (pickedFile != null) {
-      final path = await imageFileHandler.saveImage(pickedFile.path, widget.id);
-      setState(() {
-        _image = File(path);
-      });
+      await _cropImage(pickedFile);
     }
   }
 
+  Future<void> _cropImage(XFile pickedFile) async {
+    final theme = Theme.of(context);
+    final brightness = theme.brightness;
+    final toolbarColor = theme.primaryColor;
+    final toolbarWidgetColor = brightness == Brightness.light
+        ? theme.primaryColorDark
+        : theme.primaryColorLight;
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: pickedFile.path,
+      uiSettings: [
+        AndroidUiSettings(
+          // toolbarTitle: 'Cropper',
+          toolbarColor: toolbarColor,
+          toolbarWidgetColor: toolbarWidgetColor,
+          initAspectRatio: CropAspectRatioPreset.square,
+          lockAspectRatio: true,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+          ],
+        ),
+        IOSUiSettings(
+          // title: 'Cropper',
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+          ],
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+    String filePath;
+    if (croppedFile != null) {
+      await imageFileHandler.deleteFile(pickedFile.path);
+      filePath = croppedFile.path;
+    } else {
+      filePath = pickedFile.path;
+    }
+    // debugPrint('File path: $filePath');
+    final image = await imageFileHandler.saveImage(filePath, widget.id);
+    setState(() {
+      _image = image;
+      _imageKey = UniqueKey();
+    });
+  }
+
   Future<void> _deleteImage(String message) async {
-    showDeleteConfirmationDialog(
-        context, message, () async {
+    showDeleteConfirmationDialog(context, message, () async {
       await imageFileHandler.deleteImage(widget.id);
       setState(() {
         _image = null;
@@ -104,6 +157,7 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
             Column(
               children: [
                 Image.file(
+                  key: _imageKey,
                   _image!,
                   height: _getMinFromWidthAndHeight(),
                   fit: BoxFit.contain,
@@ -116,7 +170,8 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
                     ),
                     IconButton(
                       onPressed: () {
-                        _deleteImage(localizations.deleteConfirmation(name: localizations.image));
+                        _deleteImage(localizations.deleteConfirmation(
+                            name: localizations.image));
                       },
                       icon: Icon(Icons.delete),
                     )
