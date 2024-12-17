@@ -58,7 +58,12 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
       requestFullMetadata: false,
     );
     if (pickedFile != null) {
-      await _cropImage(pickedFile);
+      if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+        // We can use crop_your_image package later for supporting crop for desktop platforms
+        await _saveImage(pickedFile.path);
+      } else {
+        await _cropImage(pickedFile);
+      }
     }
   }
 
@@ -101,7 +106,11 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
       filePath = pickedFile.path;
     }
     // debugPrint('File path: $filePath');
-    final image = await imageFileHandler.saveImage(filePath, widget.id);
+    await _saveImage(filePath);
+  }
+
+  Future<void> _saveImage(String path) async {
+    final image = await imageFileHandler.saveImage(path, widget.id);
     setState(() {
       _image = image;
       _imageKey = UniqueKey();
