@@ -7,6 +7,8 @@ PODS:
     - AppAuth/Core
   - file_selector_macos (0.0.1):
     - FlutterMacOS
+  - flutter_image_compress_macos (1.0.0):
+    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - google_sign_in_ios (0.0.1):
     - AppAuth (>= 1.7.4)
@@ -38,6 +40,7 @@ PODS:
 
 DEPENDENCIES:
   - file_selector_macos (from `Flutter/ephemeral/.symlinks/plugins/file_selector_macos/macos`)
+  - flutter_image_compress_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_image_compress_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - google_sign_in_ios (from `Flutter/ephemeral/.symlinks/plugins/google_sign_in_ios/darwin`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
@@ -54,6 +57,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   file_selector_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/file_selector_macos/macos
+  flutter_image_compress_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/flutter_image_compress_macos/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   google_sign_in_ios:
@@ -68,6 +73,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
   file_selector_macos: 6280b52b459ae6c590af5d78fc35c7267a3c4b31
+  flutter_image_compress_macos: e68daf54bb4bf2144c580fd4d151c949cbf492f0
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   google_sign_in_ios: 0ab078e60da6dfe23cbc55c83502b52bba1aad63
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db

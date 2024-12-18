@@ -42,6 +42,10 @@ class ImageFileHandler {
   Future<void> saveThumbnail(int id, [int side = 100]) async {
     final fromPath = await getImagePath(id);
     final toPath = await getThumbnailImagePath(id);
+    final prevFile = File(toPath);
+    if (await prevFile.exists()) {
+      await FileImage(prevFile).evict();
+    }
     await FlutterImageCompress.compressAndGetFile(
       fromPath,
       toPath,

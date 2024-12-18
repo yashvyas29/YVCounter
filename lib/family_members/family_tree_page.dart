@@ -7,6 +7,7 @@ import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:yv_counter/family_members/family_member_page.dart';
+import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
@@ -49,6 +50,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   static const spacing = 20.0;
   static const boxSide = 320.0;
   static const boxCornerRadius = 4.0;
+  static const borderWidth = 2.0;
   static const imageSide = 100.0;
 
   final _graph = Graph()..isTree = true;
@@ -109,10 +111,11 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 
   Widget _borderedWidget(Widget widget, double radius) {
+    final theme = Theme.of(context);
+    final borderColor = theme.textTheme.bodyLarge?.color ?? theme.primaryColor;
     return Container(
-      padding: const EdgeInsets.all(2.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).textTheme.bodyLarge?.color,
+        border: Border.all(color: borderColor, width: borderWidth),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: widget,
@@ -129,15 +132,17 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   Widget _imageWidget(File image) {
     return _borderedWidget(
       _clipRectWidget(
-        Image.file(
-          image,
-          width: imageSide,
-          height: imageSide,
-          fit: BoxFit.contain,
+        ZoomOverlay(
+          child: Image.file(
+            image,
+            width: imageSide,
+            height: imageSide,
+            fit: BoxFit.contain,
+          ),
         ),
         boxCornerRadius,
       ),
-      boxCornerRadius + 1,
+      boxCornerRadius,
     );
   }
 
@@ -154,13 +159,21 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     final isRoot = nodeValue['isRoot'] ?? false;
     final isRootChild = nodeValue['isRootChild'] ?? false;
     final localizations = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final textStyle = theme.textTheme.bodyLarge;
     final hintText = isRoot
         ? localizations.enterParentsName
         : localizations.enterChildAndSpouseName;
+    final borderColor = textStyle?.color ?? theme.primaryColor;
+    final inputBorder = readOnly
+        ? InputBorder.none
+        : OutlineInputBorder(
+            borderSide: BorderSide(color: borderColor, width: borderWidth),
+          );
     InputDecoration inputDecoration = InputDecoration(
-      border: readOnly ? InputBorder.none : const OutlineInputBorder(),
+      enabledBorder: inputBorder,
+      border: inputBorder,
       hintText: hintText,
-      isDense: true,
     );
     TextEditingController textController = TextEditingController();
     textController.text = value;
@@ -223,13 +236,14 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
             child: readOnly
                 ? Text(
                     value,
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    style: textStyle,
                   )
                 : TextField(
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     controller: textController,
                     decoration: inputDecoration,
+                    style: textStyle,
                     readOnly: readOnly,
                     autofocus: !readOnly,
                   ),

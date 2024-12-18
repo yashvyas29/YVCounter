@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:widget_zoom/widget_zoom.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 
@@ -161,72 +162,79 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
       appBar: AppBar(
         title: Text(localizations.familyMemberDetails),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_image != null)
-            Column(
-              children: [
-                Image.file(
-                  key: _imageKey,
-                  _image!,
-                  height: _getMinFromWidthAndHeight(),
-                  fit: BoxFit.contain,
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: _pickImage,
-                      icon: Icon(Icons.upload),
+      body: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_image != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  WidgetZoom(
+                    heroAnimationTag: 'tag',
+                    zoomWidget: Image.file(
+                      key: _imageKey,
+                      _image!,
+                      height: _getMinFromWidthAndHeight(),
+                      fit: BoxFit.contain,
                     ),
-                    IconButton(
-                      onPressed: () {
-                        _deleteImage(localizations.deleteConfirmation(
-                            name: localizations.image));
-                      },
-                      icon: Icon(Icons.delete),
-                    )
-                  ],
-                ),
-              ],
-            )
-          else
-            IconButton(
-              onPressed: () => _pickImage(),
-              icon: Icon(Icons.upload, size: _getMinFromWidthAndHeight()),
-            ),
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${localizations.memberName}: ${names.first}',
-                ),
-                if (_isMarried())
-                  Column(
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(height: 10),
-                      Text(
-                        '${localizations.spouseName}: ${names.last}',
+                      IconButton(
+                        onPressed: _pickImage,
+                        icon: Icon(Icons.upload),
                       ),
+                      IconButton(
+                        onPressed: () {
+                          _deleteImage(localizations.deleteConfirmation(
+                              name: localizations.image));
+                        },
+                        icon: Icon(Icons.delete),
+                      )
                     ],
                   ),
-                /*
-                SizedBox(height: 10),
-                Text(
-                  'Married: ${_getMarriedValue()}',
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Id: ${widget.id}',
-                ),
-                */
-              ],
+                ],
+              )
+            else
+              IconButton(
+                onPressed: () => _pickImage(),
+                icon: Icon(Icons.upload, size: _getMinFromWidthAndHeight()),
+              ),
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${localizations.memberName}: ${names.first}',
+                  ),
+                  if (_isMarried())
+                    Column(
+                      children: [
+                        SizedBox(height: 10),
+                        Text(
+                          '${localizations.spouseName}: ${names.last}',
+                        ),
+                      ],
+                    ),
+                  /*
+                  SizedBox(height: 10),
+                  Text(
+                    'Married: ${_getMarriedValue()}',
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Id: ${widget.id}',
+                  ),
+                  */
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

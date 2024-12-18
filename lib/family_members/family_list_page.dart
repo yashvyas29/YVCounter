@@ -204,6 +204,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
                   itemCount: _families.length,
                   itemBuilder: (context, index) {
                     final title = _families[index];
+                    final textStyle = Theme.of(context).textTheme.bodyLarge;
                     final readOnly = _readOnlyList[index];
                     InputDecoration inputDecoration = InputDecoration(
                       border: readOnly
@@ -213,19 +214,13 @@ class _FamilyListPageState extends State<FamilyListPage> {
                     );
                     return ListTile(
                       title: TextField(
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
+                        style: textStyle,
                         controller: _controllers[index],
                         decoration: inputDecoration,
                         readOnly: readOnly,
                         enabled: !readOnly,
                         autofocus: !readOnly,
                       ),
-                      /*
-                      tileColor: Colors.white,
-                      focusColor: Colors.white,
-                      */
                       trailing: readOnly
                           ? Row(
                               mainAxisSize: MainAxisSize.min,
