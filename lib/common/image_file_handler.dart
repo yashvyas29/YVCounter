@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -22,6 +23,18 @@ class ImageFileHandler {
   Future<String> getThumbnailImagePath(int id) async {
     final path = await localPath();
     return '$path/${prefix}_${id}_thumb.jpg';
+  }
+
+  Future<File> saveImageData(Uint8List data, int id) async {
+    final path = await getImagePath(id);
+    final prevFile = File(path);
+    if (await prevFile.exists()) {
+      await FileImage(prevFile).evict();
+    }
+    File newFile = await File(path).create();
+    await newFile.writeAsBytes(data);
+    await saveThumbnail(id);
+    return newFile;
   }
 
   Future<File> saveImage(String pickedPath, int id) async {

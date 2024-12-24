@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart' as ic;
+import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:widget_zoom/widget_zoom.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
@@ -25,8 +27,9 @@ class FamilyMemberPage extends StatefulWidget {
 
 class FamilyMemberPageState extends State<FamilyMemberPage> {
   File? _image;
-  Key? _imageKey;
+  // Key? _imageKey;
   late ImageFileHandler imageFileHandler;
+  Uint8List? _imageData;
 
   @override
   void initState() {
@@ -60,8 +63,10 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
     );
     if (pickedFile != null) {
       if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-        // We can use crop_your_image package later for supporting crop for desktop platforms
-        await _saveImage(pickedFile.path);
+        final imageData = await pickedFile.readAsBytes();
+        setState(() {
+          _imageData = imageData;
+        });
       } else {
         await _cropImage(pickedFile);
       }
@@ -75,28 +80,28 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
     final toolbarWidgetColor = brightness == Brightness.light
         ? theme.primaryColorDark
         : theme.primaryColorLight;
-    final croppedFile = await ImageCropper().cropImage(
+    final croppedFile = await ic.ImageCropper().cropImage(
       sourcePath: pickedFile.path,
       uiSettings: [
-        AndroidUiSettings(
+        ic.AndroidUiSettings(
           // toolbarTitle: 'Cropper',
           toolbarColor: toolbarColor,
           toolbarWidgetColor: toolbarWidgetColor,
-          initAspectRatio: CropAspectRatioPreset.square,
+          initAspectRatio: ic.CropAspectRatioPreset.square,
           lockAspectRatio: true,
           aspectRatioPresets: [
-            CropAspectRatioPreset.square,
+            ic.CropAspectRatioPreset.square,
           ],
         ),
-        IOSUiSettings(
+        ic.IOSUiSettings(
           aspectRatioPickerButtonHidden: true,
           // title: 'Cropper',
-          cropStyle: CropStyle.circle,
+          cropStyle: ic.CropStyle.circle,
           aspectRatioPresets: [
-            CropAspectRatioPreset.square,
+            ic.CropAspectRatioPreset.square,
           ],
         ),
-        WebUiSettings(
+        ic.WebUiSettings(
           context: context,
         ),
       ],
@@ -109,14 +114,23 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
       filePath = pickedFile.path;
     }
     // debugPrint('File path: $filePath');
-    await _saveImage(filePath);
+    await _saveImage(path: filePath);
   }
 
-  Future<void> _saveImage(String path) async {
-    final image = await imageFileHandler.saveImage(path, widget.id);
+  Future<void> _saveImage({String? path, Uint8List? data}) async {
+    final File? image;
+    if (path != null) {
+      image = await imageFileHandler.saveImage(path, widget.id);
+    } else if (data != null) {
+      image = await imageFileHandler.saveImageData(data, widget.id);
+    } else {
+      image = null;
+      Future.error(Exception('Can not create image'));
+    }
     setState(() {
       _image = image;
-      _imageKey = UniqueKey();
+      // _imageKey = UniqueKey();
+      _imageData = null;
     });
   }
 
@@ -153,6 +167,82 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
     return width < halfHeight ? width : halfHeight;
   }
 
+  final _cropController = CropController();
+
+  Widget _cropImageWidget(Uint8List imageData) {
+    return Crop(
+      image: imageData,
+      controller: _cropController,
+      onCropped: (result) async {
+        switch (result) {
+          case CropSuccess(:final croppedImage):
+            await _saveImage(data: croppedImage);
+          case CropFailure():
+            debugPrint('Image crop error: $result');
+        }
+      },
+      aspectRatio: 1,
+
+      /*
+    initialRectBuilder: InitialRectBuilder.withBuilder((viewportRect, imageRect) {
+      return Rect.fromLTRB(
+        viewportRect.left + 24,
+        viewportRect.top + 32,
+        viewportRect.right - 24,
+        viewportRect.bottom - 32,
+      );
+    }),
+    */
+      /*
+    initialRectBuilder: InitialRectBuilder.withArea(
+      ImageBasedRect.fromLTWH(240, 212, 800, 600),
+    ),
+    */
+      initialRectBuilder: InitialRectBuilder.withSizeAndRatio(
+        size: 1,
+        aspectRatio: 1,
+      ),
+
+      /*
+    withCircleUi: true,
+    baseColor: Colors.blue.shade900,
+    maskColor: Colors.white.withAlpha(100),
+    overlayBuilder: (context, rect) {
+      return CustomPaint(painter: MyPainter(rect));
+    },
+    */
+
+      progressIndicator: const CircularProgressIndicator(),
+      // radius: 20,
+
+      /*
+      onMoved: (oldRect, newRect) {
+        // do something with current crop rect.
+      },
+      onImageMoved: (newImageRect) {
+        // do something with current image rect.
+      },
+      onStatusChanged: (status) {
+        // do something with current CropStatus
+      },
+      willUpdateScale: (newScale) {
+        // if returning false, scaling will be canceled
+        return newScale < 5;
+      },
+      cornerDotBuilder: (size, edgeAlignment) =>
+          const DotControl(color: Colors.blue),
+      */
+
+      clipBehavior: Clip.none,
+      interactive: true,
+      fixCropRect: true,
+
+      // formatDetector: (image) {},
+      // imageCropper: myCustomImageCropper,
+      // imageParser: (image, {format}) {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final names = _names();
@@ -161,66 +251,78 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.familyMemberDetails),
+        actions: [
+          if (_imageData != null)
+            IconButton(
+              icon: Icon(Icons.done_outline),
+              onPressed: () {
+                _cropController.crop();
+              },
+            ),
+        ],
       ),
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_image != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  WidgetZoom(
-                    heroAnimationTag: 'tag',
-                    zoomWidget: Image.file(
-                      key: _imageKey,
-                      _image!,
-                      height: _getMinFromWidthAndHeight(),
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: _pickImage,
-                        icon: Icon(Icons.upload),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          _deleteImage(localizations.deleteConfirmation(
-                              name: localizations.image));
-                        },
-                        icon: Icon(Icons.delete),
-                      )
-                    ],
-                  ),
-                ],
-              )
-            else
-              IconButton(
-                onPressed: () => _pickImage(),
-                icon: Icon(Icons.upload, size: _getMinFromWidthAndHeight()),
-              ),
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
+      body: _imageData != null
+          ? _cropImageWidget(_imageData!)
+          : Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${localizations.memberName}: ${names.first}',
-                  ),
-                  if (_isMarried())
+                  if (_image != null)
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 10),
-                        Text(
-                          '${localizations.spouseName}: ${names.last}',
+                        WidgetZoom(
+                          heroAnimationTag: 'tag',
+                          zoomWidget: Image.file(
+                            // key: _imageKey,
+                            _image!,
+                            height: _getMinFromWidthAndHeight(),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: _pickImage,
+                              icon: Icon(Icons.upload),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                _deleteImage(localizations.deleteConfirmation(
+                                    name: localizations.image));
+                              },
+                              icon: Icon(Icons.delete),
+                            )
+                          ],
                         ),
                       ],
+                    )
+                  else
+                    IconButton(
+                      onPressed: () => _pickImage(),
+                      icon:
+                          Icon(Icons.upload, size: _getMinFromWidthAndHeight()),
                     ),
-                  /*
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${localizations.memberName}: ${names.first}',
+                        ),
+                        if (_isMarried())
+                          Column(
+                            children: [
+                              SizedBox(height: 10),
+                              Text(
+                                '${localizations.spouseName}: ${names.last}',
+                              ),
+                            ],
+                          ),
+                        /*
                   SizedBox(height: 10),
                   Text(
                     'Married: ${_getMarriedValue()}',
@@ -230,12 +332,12 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
                     'Id: ${widget.id}',
                   ),
                   */
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
