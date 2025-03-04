@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart' as ic;
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:widget_zoom/widget_zoom.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
+import 'package:yv_counter/l10n/app_localizations.dart';
 
 class FamilyMemberPage extends StatefulWidget {
   final int id;

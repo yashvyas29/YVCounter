@@ -1,0 +1,2 @@
+/Users/yash/Documents/Workspace/YVCounter/android/app/.cxx/RelWithDebInfo/h48t2z28/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/yash/Documents/Workspace/YVCounter/android/app/.cxx/RelWithDebInfo/h48t2z28/arm64-v8a/CMakeFiles/rebuild_cache.dir

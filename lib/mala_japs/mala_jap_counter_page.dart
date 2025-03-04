@@ -23,7 +23,7 @@ import 'package:yv_counter/mala_japs/mala_data_table_page.dart';
 import 'package:yv_counter/common/shared_pref.dart';
 import 'package:yv_counter/data_model/user.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:yv_counter/l10n/app_localizations.dart';
 
 import 'mala_jap_excel_file_handler.dart';
 

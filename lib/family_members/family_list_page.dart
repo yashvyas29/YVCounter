@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:yv_counter/l10n/app_localizations.dart';
 
 import '../common/json_file_handler.dart';
 import '../common/snackbar_dialog.dart';

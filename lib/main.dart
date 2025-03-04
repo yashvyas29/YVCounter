@@ -6,8 +6,8 @@ import 'package:yv_counter/data_model/family_member_relation.dart';
 import 'package:yv_counter/data_model/mala.dart';
 */
 import 'package:yv_counter/mala_japs/mala_jap_counter_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:yv_counter/l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

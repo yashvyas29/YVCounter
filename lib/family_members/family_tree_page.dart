@@ -5,9 +5,9 @@ import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:yv_counter/family_members/family_member_page.dart';
 import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
+import 'package:yv_counter/l10n/app_localizations.dart';
 
 class FamilyTreePage extends StatefulWidget {
   const FamilyTreePage({super.key, required this.title});
