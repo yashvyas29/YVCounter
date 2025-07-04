@@ -99,8 +99,11 @@ class GoogleDrive {
           final fileId = file.id;
           final fileName = file.name;
           if (fileId != null && fileName != null) {
-            final downloadedFile =
-                await _downloadFileFromGoogleDrive(fileId, fileName, driveApi);
+            final downloadedFile = await _downloadFileFromGoogleDrive(
+              fileId,
+              fileName,
+              driveApi,
+            );
             downloadedFiles.add(downloadedFile);
           }
         }
@@ -163,8 +166,10 @@ class GoogleDrive {
         debugPrint("Create file");
         try {
           // final uploadedFile =
-          await driveApi.files.create(fileToUpload,
-              uploadMedia: ga.Media(file.openRead(), await file.length()));
+          await driveApi.files.create(
+            fileToUpload,
+            uploadMedia: ga.Media(file.openRead(), await file.length()),
+          );
           // _printFileMetaData(uploadedFile);
         } catch (error) {
           debugPrint(error.toString());
@@ -187,23 +192,34 @@ class GoogleDrive {
   }
 
   Future<File> _downloadFileFromGoogleDrive(
-      String fileId, String fileName, ga.DriveApi driveApi) async {
+    String fileId,
+    String fileName,
+    ga.DriveApi driveApi,
+  ) async {
     try {
-      ga.Media file = await driveApi.files.get(fileId,
-          downloadOptions: ga.DownloadOptions.fullMedia) as ga.Media;
+      ga.Media file =
+          await driveApi.files.get(
+                fileId,
+                downloadOptions: ga.DownloadOptions.fullMedia,
+              )
+              as ga.Media;
       List<int> dataStore = [];
       final completer = Completer<File>();
-      file.stream.listen((data) {
-        dataStore.insertAll(dataStore.length, data);
-      }, onDone: () async {
-        debugPrint("$fileName downloaded.");
-        final file = MemoryFileSystem().file(fileName);
-        await file.writeAsBytes(dataStore);
-        completer.complete(file);
-      }, onError: (error) {
-        debugPrint("downloadGoogleDriveFile Error: $error");
-        completer.completeError(error);
-      });
+      file.stream.listen(
+        (data) {
+          dataStore.insertAll(dataStore.length, data);
+        },
+        onDone: () async {
+          debugPrint("$fileName downloaded.");
+          final file = MemoryFileSystem().file(fileName);
+          await file.writeAsBytes(dataStore);
+          completer.complete(file);
+        },
+        onError: (error) {
+          debugPrint("downloadGoogleDriveFile Error: $error");
+          completer.completeError(error);
+        },
+      );
       return completer.future;
     } catch (error) {
       return Future.error(error);
@@ -211,7 +227,9 @@ class GoogleDrive {
   }
 
   Future<String?> _getFolderIdIfExists(
-      ga.DriveApi driveApi, String folderName) async {
+    ga.DriveApi driveApi,
+    String folderName,
+  ) async {
     final found = await driveApi.files.list(
       q: "mimeType = '$_folderMimeType' and name = '$folderName'",
       $fields: "files(id)",

@@ -14,9 +14,9 @@ import 'package:yv_counter/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(
-      localeModel: LocaleModel(const Locale('en')),
-    ));
+    await tester.pumpWidget(
+      MyApp(localeModel: LocaleModel(const Locale('en'))),
+    );
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

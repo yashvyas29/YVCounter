@@ -105,10 +105,13 @@ class MyHomePage extends StatefulWidget {
                 }
               }
             });
-            malas.add(Mala(
+            malas.add(
+              Mala(
                 DateTimeHandler.getDateTime(date, DateTimeHandler.dateFormat),
                 malasCount,
-                japs));
+                japs,
+              ),
+            );
           }
         });
         return malas;
@@ -147,7 +150,7 @@ enum Menu {
   backupExcel,
   restoreExcel,
   delete,
-  signOut
+  signOut,
 }
 
 // enum LanguageMenu { english, hindi }

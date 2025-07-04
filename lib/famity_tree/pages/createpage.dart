@@ -17,7 +17,7 @@ class _CreatePageState extends State<CreatePage> {
   String _msg = '';
   Color color = Colors.red;
 
-  _start() async {
+  Future<void> _start() async {
     String name = _name.text;
     var table = await DBProvider.db.checkIfTableExists(name);
     if (table == false) {
@@ -46,24 +46,19 @@ class _CreatePageState extends State<CreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Add Family"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Add Family"), centerTitle: true),
       body: Form(
         key: _formKey,
         child: Container(
           alignment: const Alignment(0, 0),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-                colors: [
-                  Color(0xFF3366FF),
-                  Color(0xFF00CCFF),
-                ],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 0.0),
-                stops: [0.0, 1.0],
-                tileMode: TileMode.clamp),
+              colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+              begin: FractionalOffset(0.0, 0.0),
+              end: FractionalOffset(1.0, 0.0),
+              stops: [0.0, 1.0],
+              tileMode: TileMode.clamp,
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(50),
@@ -89,13 +84,12 @@ class _CreatePageState extends State<CreatePage> {
                       },
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.allow(
-                            RegExp("[a-zA-Z\u00C0-\u017F ]")),
+                          RegExp("[a-zA-Z\u00C0-\u017F ]"),
+                        ),
                         FilteringTextInputFormatter.singleLineFormatter,
                       ],
                     ),
-                    const Padding(
-                      padding: EdgeInsets.all(10),
-                    ),
+                    const Padding(padding: EdgeInsets.all(10)),
                     ElevatedButton(
                       onPressed: () {
                         //print(_name.text.replaceAll(RegExp(r"\s+"), ""));
@@ -110,8 +104,10 @@ class _CreatePageState extends State<CreatePage> {
                     ),
                     Text(
                       _msg,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, color: color),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
                   ],
                 ),

@@ -39,7 +39,8 @@ class _FamilyListPageState extends State<FamilyListPage> {
       _families.addAll(families.map((e) => e['name'].toString()));
       _setReadOnlyList();
       _controllers.addAll(
-          _families.map((family) => TextEditingController(text: family)));
+        _families.map((family) => TextEditingController(text: family)),
+      );
       isDataLoaded = true;
     });
     return _families;
@@ -48,7 +49,8 @@ class _FamilyListPageState extends State<FamilyListPage> {
   void _setReadOnlyList() {
     _readOnlyList.clear();
     _readOnlyList.addAll(
-        _families.map((family) => family == newFamilyName ? false : true));
+      _families.map((family) => family == newFamilyName ? false : true),
+    );
   }
 
   Future<void> _addFamily(String name) async {
@@ -73,21 +75,23 @@ class _FamilyListPageState extends State<FamilyListPage> {
 
   Future<void> _deleteFamily(String name, int index) async {
     showDeleteConfirmationDialog(
-        context, AppLocalizations.of(context).deleteConfirmation(name: name),
-        () async {
-      await DBProvider.db.deleteTable(name);
-      final prefix = widget.getFamilyFileName(name);
-      await widget._jsonFileHandler.deleteLocalFile(prefix);
-      await ImageFileHandler.deleteFiles(prefix);
-      setState(() {
-        _families.removeAt(index);
-        _readOnlyList.removeAt(index);
-        _controllers.removeAt(index);
-        Navigator.pop(context);
-        _message = "$name ${AppLocalizations.of(context).deleted}";
-      });
-      await _resetMessage();
-    });
+      context,
+      AppLocalizations.of(context).deleteConfirmation(name: name),
+      () async {
+        await DBProvider.db.deleteTable(name);
+        final prefix = widget.getFamilyFileName(name);
+        await widget._jsonFileHandler.deleteLocalFile(prefix);
+        await ImageFileHandler.deleteFiles(prefix);
+        setState(() {
+          _families.removeAt(index);
+          _readOnlyList.removeAt(index);
+          _controllers.removeAt(index);
+          Navigator.pop(context);
+          _message = "$name ${AppLocalizations.of(context).deleted}";
+        });
+        await _resetMessage();
+      },
+    );
   }
 
   Future<void> _updateFamily(String oldName, String newName, int index) async {
@@ -159,11 +163,12 @@ class _FamilyListPageState extends State<FamilyListPage> {
                 icon: const Icon(Icons.restore)),
           */
           IconButton(
-              onPressed: () async {
-                debugPrint("Add family pressed.");
-                await _addFamily(newFamilyName);
-              },
-              icon: const Icon(Icons.add_circle)),
+            onPressed: () async {
+              debugPrint("Add family pressed.");
+              await _addFamily(newFamilyName);
+            },
+            icon: const Icon(Icons.add_circle),
+          ),
         ],
       ),
       body: _futureBuilder(),
@@ -226,20 +231,22 @@ class _FamilyListPageState extends State<FamilyListPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                    onPressed: () async {
-                                      debugPrint("Delete for $title pressed.");
-                                      await _deleteFamily(title, index);
-                                    },
-                                    icon: const Icon(Icons.delete)),
+                                  onPressed: () async {
+                                    debugPrint("Delete for $title pressed.");
+                                    await _deleteFamily(title, index);
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                ),
                                 IconButton(
-                                    onPressed: () async {
-                                      debugPrint("Edit for $title pressed.");
-                                      _setReadOnlyList();
-                                      setState(() {
-                                        _readOnlyList[index] = false;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.edit))
+                                  onPressed: () async {
+                                    debugPrint("Edit for $title pressed.");
+                                    _setReadOnlyList();
+                                    setState(() {
+                                      _readOnlyList[index] = false;
+                                    });
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                ),
                               ],
                             )
                           : Row(
@@ -249,46 +256,55 @@ class _FamilyListPageState extends State<FamilyListPage> {
                                     ? IconButton(
                                         onPressed: () async {
                                           debugPrint(
-                                              "Delete for $title pressed.");
+                                            "Delete for $title pressed.",
+                                          );
                                           await _deleteFamily(title, index);
                                         },
-                                        icon: const Icon(Icons.delete))
+                                        icon: const Icon(Icons.delete),
+                                      )
                                     : IconButton(
                                         onPressed: () async {
                                           debugPrint(
-                                              "Cancel for $title pressed.");
+                                            "Cancel for $title pressed.",
+                                          );
                                           setState(() {
                                             _readOnlyList[index] = true;
                                           });
                                         },
-                                        icon: const Icon(Icons.cancel)),
+                                        icon: const Icon(Icons.cancel),
+                                      ),
                                 IconButton(
-                                    onPressed: () async {
-                                      debugPrint("Done for $title pressed.");
-                                      final newTitle =
-                                          _controllers[index].text.trim();
-                                      if (newTitle == newFamilyName) {
-                                        setState(() {
-                                          _message = localizations
-                                              .renameToYourFamilyName;
-                                        });
-                                        _resetMessage();
-                                      } else {
-                                        await _updateFamily(
-                                            title, newTitle, index);
-                                        setState(() {
-                                          _setReadOnlyList();
-                                        });
-                                      }
-                                    },
-                                    icon: const Icon(Icons.done_outline)),
+                                  onPressed: () async {
+                                    debugPrint("Done for $title pressed.");
+                                    final newTitle = _controllers[index].text
+                                        .trim();
+                                    if (newTitle == newFamilyName) {
+                                      setState(() {
+                                        _message = localizations
+                                            .renameToYourFamilyName;
+                                      });
+                                      _resetMessage();
+                                    } else {
+                                      await _updateFamily(
+                                        title,
+                                        newTitle,
+                                        index,
+                                      );
+                                      setState(() {
+                                        _setReadOnlyList();
+                                      });
+                                    }
+                                  },
+                                  icon: const Icon(Icons.done_outline),
+                                ),
                               ],
                             ),
                       onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => FamilyTreePage(
-                                  title: title,
-                                )));
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => FamilyTreePage(title: title),
+                          ),
+                        );
                       },
                     );
                   },
@@ -303,9 +319,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
               ),
             ],
           )
-        : Center(
-            child: Text(AppLocalizations.of(context).familyNotAvailable),
-          );
+        : Center(child: Text(AppLocalizations.of(context).familyNotAvailable));
   }
 
   @override

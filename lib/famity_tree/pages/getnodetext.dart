@@ -18,19 +18,18 @@ class _GetNodeTextState extends State<GetNodeText> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => InfoPage(
-                  txt1: widget.txt1,
-                  treeMember: widget.treeMember,
-                )));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) =>
+                InfoPage(txt1: widget.txt1, treeMember: widget.treeMember),
+          ),
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
-          boxShadow: [
-            BoxShadow(color: Colors.blue[100]!, spreadRadius: 1),
-          ],
+          boxShadow: [BoxShadow(color: Colors.blue[100]!, spreadRadius: 1)],
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,10 +41,7 @@ class _GetNodeTextState extends State<GetNodeText> {
                       child: Column(
                         children: [
                           Text(widget.txt1.split("\n")[0]),
-                          const Icon(
-                            Icons.man,
-                            size: 40,
-                          ),
+                          const Icon(Icons.man, size: 40),
                         ],
                       ),
                     ),
@@ -56,10 +52,7 @@ class _GetNodeTextState extends State<GetNodeText> {
                       child: Column(
                         children: [
                           Text(widget.txt1),
-                          const Icon(
-                            Icons.people,
-                            size: 40,
-                          ),
+                          const Icon(Icons.people, size: 40),
                         ],
                       ),
                     ),
@@ -71,10 +64,7 @@ class _GetNodeTextState extends State<GetNodeText> {
                       child: Column(
                         children: [
                           Text(widget.txt1.split("\n")[1]),
-                          const Icon(
-                            Icons.woman,
-                            size: 40,
-                          ),
+                          const Icon(Icons.woman, size: 40),
                         ],
                       ),
                     ),

@@ -20,8 +20,9 @@ class MalaJapExcelFileHandler {
     Sheet sheetObject = excel['Mala History'];
 
     CellStyle cellStyle = CellStyle(
-        backgroundColorHex: ExcelColor.fromHexString("#1AFF1A"),
-        fontFamily: getFontFamily(FontFamily.Calibri));
+      backgroundColorHex: ExcelColor.fromHexString("#1AFF1A"),
+      fontFamily: getFontFamily(FontFamily.Calibri),
+    );
 
     cellStyle.underline = Underline.Single; // or Underline.Double
 
@@ -40,9 +41,10 @@ class MalaJapExcelFileHandler {
     malas.asMap().forEach((index, mala) {
       sheetObject.insertRowIterables([
         TextCellValue(
-            DateTimeHandler.getString(mala.date, DateTimeHandler.dateFormat)),
+          DateTimeHandler.getString(mala.date, DateTimeHandler.dateFormat),
+        ),
         IntCellValue(mala.count),
-        IntCellValue(mala.japs)
+        IntCellValue(mala.japs),
       ], index + 1);
     });
 
@@ -55,8 +57,10 @@ class MalaJapExcelFileHandler {
     return excel;
   }
 
-  Future<void> saveExcel(final Future<void> Function() onSuccess,
-      final void Function(String) onFailure) async {
+  Future<void> saveExcel(
+    final Future<void> Function() onSuccess,
+    final void Function(String) onFailure,
+  ) async {
     final Excel excel = await _createExcel();
     if (kIsWeb) {
       excel.save(fileName: 'malas.xlsx');
@@ -80,17 +84,19 @@ class MalaJapExcelFileHandler {
   }
 
   Future<void> createAndSaveExcelOnDesktop(
-      final Future<void> Function() onSuccess,
-      final void Function(String) onFailure) async {
+    final Future<void> Function() onSuccess,
+    final void Function(String) onFailure,
+  ) async {
     final Excel excel = await _createExcel();
     List<int>? fileBytes = excel.save();
     if (fileBytes != null && fileBytes.isNotEmpty) {
       try {
         const fileName = 'malas.xlsx';
         final filePath = await FilePicker.platform.saveFile(
-            fileName: fileName,
-            type: FileType.custom,
-            allowedExtensions: ['xlsx']);
+          fileName: fileName,
+          type: FileType.custom,
+          allowedExtensions: ['xlsx'],
+        );
         /*
         final filePath = await FlutterFileSaver().writeFileAsBytes(
           fileName: fileName,
@@ -113,8 +119,9 @@ class MalaJapExcelFileHandler {
   }
 
   Future<void> createAndSaveExcelOnMobile(
-      final Future<void> Function() onSuccess,
-      final void Function(String) onFailure) async {
+    final Future<void> Function() onSuccess,
+    final void Function(String) onFailure,
+  ) async {
     final Excel excel = await _createExcel();
     // List<int>? fileBytes = excel.encode();
     List<int>? fileBytes = excel.save();
@@ -122,7 +129,9 @@ class MalaJapExcelFileHandler {
       try {
         const fileName = 'malas.xlsx';
         final params = SaveFileDialogParams(
-            data: Uint8List.fromList(fileBytes), fileName: fileName);
+          data: Uint8List.fromList(fileBytes),
+          fileName: fileName,
+        );
         final filePath = await FlutterFileDialog.saveFile(params: params);
         /*
         var file = await _createTempExcel(fileName, fileBytes);
@@ -171,7 +180,8 @@ class MalaJapExcelFileHandler {
           ? downloadDirectory
           : await getApplicationDocumentsDirectory();
     } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-      directory = await getDownloadsDirectory() ??
+      directory =
+          await getDownloadsDirectory() ??
           await getApplicationDocumentsDirectory();
     } else {
       directory = await getApplicationDocumentsDirectory();

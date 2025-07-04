@@ -118,11 +118,16 @@ class _DessertDataSource extends DataTableSource {
       },
       */
       cells: [
-        DataCell(Text(DateTimeHandler.getString(
-            dessert.date,
-            DateTimeHandler.isToday(dessert.date)
-                ? DateTimeHandler.dateTimeFormat
-                : DateTimeHandler.dateFormat))),
+        DataCell(
+          Text(
+            DateTimeHandler.getString(
+              dessert.date,
+              DateTimeHandler.isToday(dessert.date)
+                  ? DateTimeHandler.dateTimeFormat
+                  : DateTimeHandler.dateFormat,
+            ),
+          ),
+        ),
         DataCell(Text('${dessert.count}')),
         DataCell(Text('${dessert.japs}')),
       ],

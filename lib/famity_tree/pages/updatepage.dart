@@ -27,156 +27,163 @@ class _UpdatePageState extends State<UpdatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Update Members'),
-        ),
-        body: Container(
-          alignment: const Alignment(0, 0),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                colors: [
-                  Color(0xFF3366FF),
-                  Color(0xFF00CCFF),
-                ],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 0.0),
-                stops: [0.0, 1.0],
-                tileMode: TileMode.clamp),
+      appBar: AppBar(title: const Text('Update Members')),
+      body: Container(
+        alignment: const Alignment(0, 0),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+            begin: FractionalOffset(0.0, 0.0),
+            end: FractionalOffset(1.0, 0.0),
+            stops: [0.0, 1.0],
+            tileMode: TileMode.clamp,
           ),
-          child: ListView(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Card(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Choose family: ',
+        ),
+        child: ListView(
+          // mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Card(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Choose family: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  FutureBuilder<Iterable>(
+                    future: DBProvider.db.getFamilies(),
+                    builder: (context, ss) {
+                      if (ss.data == null) {
+                        return const Text(
+                          'No data!',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Flexible(
+                          child: DropdownButton(
+                            hint: Text(
+                              _selected1.isEmpty
+                                  ? "Select Family"
+                                  : _selected1.capitalizeFirstofEach,
+                            ),
+                            items: ss.data?.map<DropdownMenuItem<String>>((e) {
+                              String response = e['name'];
+                              return DropdownMenuItem(
+                                value: response,
+                                child: Text(response.capitalizeFirstofEach),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selected1 = value!;
+                              });
+                            },
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text(
+                      'Show Results',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    FutureBuilder<Iterable>(
-                        future: DBProvider.db.getFamilies(),
-                        builder: (context, ss) {
-                          if (ss.data == null) {
-                            return const Text(
-                              'No data!',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            );
-                          } else {
-                            return Flexible(
-                              child: DropdownButton(
-                                hint: Text(_selected1.isEmpty
-                                    ? "Select Family"
-                                    : _selected1.capitalizeFirstofEach),
-                                items:
-                                    ss.data?.map<DropdownMenuItem<String>>((e) {
-                                  String response = e['name'];
-                                  return DropdownMenuItem(
-                                    value: response,
-                                    child: Text(response.capitalizeFirstofEach),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selected1 = value!;
-                                  });
-                                },
-                              ),
-                            );
-                          }
-                        }),
-                    ElevatedButton(
-                        child: const Text(
-                          'Show Results',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            show = true;
-                          });
-                        }),
-                  ],
-                ),
+                    onPressed: () {
+                      setState(() {
+                        show = true;
+                      });
+                    },
+                  ),
+                ],
               ),
-              const Padding(padding: EdgeInsets.all(10)),
-              RefreshIndicator(
-                key: refreshKey,
-                onRefresh: () => getdata(),
-                child: show == true
-                    ? FutureBuilder<Iterable>(
-                        future: DBProvider.db.getMembers(_selected1),
-                        builder: (context, ss) {
-                          if (ss.connectionState == ConnectionState.waiting &&
-                              !ss.hasData) {
-                            return const Text(
-                              'No data!',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            );
-                          } else {
-                            var data = List.from(ss.data!)..removeAt(0);
-                            return ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: data.length,
-                                itemBuilder: (context, item) {
-                                  TreeMember treemember =
-                                      TreeMember.fromJson(data[item]);
-                                  return Card(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+            ),
+            const Padding(padding: EdgeInsets.all(10)),
+            RefreshIndicator(
+              key: refreshKey,
+              onRefresh: () => getdata(),
+              child: show == true
+                  ? FutureBuilder<Iterable>(
+                      future: DBProvider.db.getMembers(_selected1),
+                      builder: (context, ss) {
+                        if (ss.connectionState == ConnectionState.waiting &&
+                            !ss.hasData) {
+                          return const Text(
+                            'No data!',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          );
+                        } else {
+                          var data = List.from(ss.data!)..removeAt(0);
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: data.length,
+                            itemBuilder: (context, item) {
+                              TreeMember treemember = TreeMember.fromJson(
+                                data[item],
+                              );
+                              return Card(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.people),
+                                    Text(
+                                      treemember.name.capitalizeFirstofEach,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Row(
                                       children: [
-                                        const Icon(Icons.people),
-                                        Text(
-                                          treemember.name.capitalizeFirstofEach,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
+                                        ElevatedButton(
+                                          child: const Text(
+                                            "Update",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) => Update(
+                                                  table: _selected1,
+                                                  treeMember: treemember,
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         ),
-                                        Row(
-                                          children: [
-                                            ElevatedButton(
-                                              child: const Text(
-                                                "Update",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.green),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            Update(
-                                                              table: _selected1,
-                                                              treeMember:
-                                                                  treemember,
-                                                            )));
-                                              },
+                                        const Spacer(),
+                                        ElevatedButton(
+                                          child: const Text(
+                                            "Delete",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
                                             ),
-                                            const Spacer(),
-                                            ElevatedButton(
-                                              child: const Text(
-                                                "Delete",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.red),
-                                              ),
-                                              onPressed: () {
-                                                DBProvider.db.removeMember(
-                                                    treemember, _selected1);
-                                              },
-                                            ),
-                                          ],
+                                          ),
+                                          onPressed: () {
+                                            DBProvider.db.removeMember(
+                                              treemember,
+                                              _selected1,
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),
-                                  );
-                                });
-                          }
-                        })
-                    : Container(),
-              ),
-            ],
-          ),
-        ));
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        }
+                      },
+                    )
+                  : Container(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -217,10 +224,7 @@ class _UpdateState extends State<Update> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Update'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Update'), centerTitle: true),
       body: ListView(
         children: [
           Container(
@@ -229,14 +233,12 @@ class _UpdateState extends State<Update> {
             width: MediaQuery.of(context).size.width,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF3366FF),
-                    Color(0xFF00CCFF),
-                  ],
-                  begin: FractionalOffset(0.0, 0.0),
-                  end: FractionalOffset(1.0, 0.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
+                colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+                begin: FractionalOffset(0.0, 0.0),
+                end: FractionalOffset(1.0, 0.0),
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp,
+              ),
             ),
             child: Container(
               color: Colors.white,
@@ -265,7 +267,8 @@ class _UpdateState extends State<Update> {
                               },
                               inputFormatters: <TextInputFormatter>[
                                 FilteringTextInputFormatter.allow(
-                                    RegExp("[a-zA-Z\u00C0-\u017F ]")),
+                                  RegExp("[a-zA-Z\u00C0-\u017F ]"),
+                                ),
                                 FilteringTextInputFormatter.singleLineFormatter,
                               ],
                             )
@@ -287,7 +290,8 @@ class _UpdateState extends State<Update> {
                               },
                               inputFormatters: <TextInputFormatter>[
                                 FilteringTextInputFormatter.allow(
-                                    RegExp("[a-zA-Z\u00C0-\u017F ]")),
+                                  RegExp("[a-zA-Z\u00C0-\u017F ]"),
+                                ),
                                 FilteringTextInputFormatter.singleLineFormatter,
                               ],
                             )
@@ -309,7 +313,8 @@ class _UpdateState extends State<Update> {
                               },
                               inputFormatters: <TextInputFormatter>[
                                 FilteringTextInputFormatter.allow(
-                                    RegExp("[a-zA-Z\u00C0-\u017F ]")),
+                                  RegExp("[a-zA-Z\u00C0-\u017F ]"),
+                                ),
                                 FilteringTextInputFormatter.singleLineFormatter,
                               ],
                             )
@@ -322,77 +327,85 @@ class _UpdateState extends State<Update> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           FutureBuilder<Iterable>(
-                              future: DBProvider.db.getMembers(table),
-                              builder: (context, ss) {
-                                if (ss.data == null) {
-                                  return const Text(
-                                    'No data!',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  );
-                                } else {
-                                  return Flexible(
-                                    child: DropdownButton(
-                                      hint: Text(_child == 0
+                            future: DBProvider.db.getMembers(table),
+                            builder: (context, ss) {
+                              if (ss.data == null) {
+                                return const Text(
+                                  'No data!',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                );
+                              } else {
+                                return Flexible(
+                                  child: DropdownButton(
+                                    hint: Text(
+                                      _child == 0
                                           ? 'Selected Memeber'
                                           : ss.data!
-                                              .firstWhere((element) =>
-                                                  element['id'] ==
-                                                  _child)['name']
-                                              .toString()
-                                              .capitalizeFirstofEach),
-                                      items: ss.data!
-                                          .map<DropdownMenuItem<int>>((e) {
-                                        TreeMember treemember =
-                                            TreeMember.fromJson(e);
-                                        return DropdownMenuItem(
-                                          value: treemember.id,
-                                          child: Text(treemember
-                                              .name.capitalizeFirstofEach),
-                                        );
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _child = value!;
-                                        });
-                                      },
+                                                .firstWhere(
+                                                  (element) =>
+                                                      element['id'] == _child,
+                                                )['name']
+                                                .toString()
+                                                .capitalizeFirstofEach,
                                     ),
-                                  );
-                                }
-                              }),
+                                    items: ss.data!.map<DropdownMenuItem<int>>((
+                                      e,
+                                    ) {
+                                      TreeMember treemember =
+                                          TreeMember.fromJson(e);
+                                      return DropdownMenuItem(
+                                        value: treemember.id,
+                                        child: Text(
+                                          treemember.name.capitalizeFirstofEach,
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _child = value!;
+                                      });
+                                    },
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                         ],
                       ),
                       ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              if (widget.treeMember.name.split('\n').length ==
-                                  2) {
-                                var res =
-                                    "${_name1.text.trim()} * ${_name2.text.trim()}";
-                                treeMember.name = res.capitalizeFirstofEach;
-                                treeMember.c = _child;
-                                DBProvider.db.updateMember(table, treeMember);
-                              } else {
-                                treeMember.name =
-                                    _name1.text.capitalizeFirstofEach;
-                                treeMember.c = _child;
-                                DBProvider.db.updateMember(table, treeMember);
-                              }
-                              setState(() {
-                                msg = "Updated!";
-                              });
-                              Future.delayed(const Duration(seconds: 3), () {
-                                setState(() {
-                                  msg = "";
-                                });
-                              });
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            if (widget.treeMember.name.split('\n').length ==
+                                2) {
+                              var res =
+                                  "${_name1.text.trim()} * ${_name2.text.trim()}";
+                              treeMember.name = res.capitalizeFirstofEach;
+                              treeMember.c = _child;
+                              DBProvider.db.updateMember(table, treeMember);
+                            } else {
+                              treeMember.name =
+                                  _name1.text.capitalizeFirstofEach;
+                              treeMember.c = _child;
+                              DBProvider.db.updateMember(table, treeMember);
                             }
-                          },
-                          child: const Text('Update')),
+                            setState(() {
+                              msg = "Updated!";
+                            });
+                            Future.delayed(const Duration(seconds: 3), () {
+                              setState(() {
+                                msg = "";
+                              });
+                            });
+                          }
+                        },
+                        child: const Text('Update'),
+                      ),
                       Text(
                         msg,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, color: color),
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
                       ),
                     ],
                   ),
@@ -433,87 +446,88 @@ class _UpdateFamiliesState extends State<UpdateFamilies> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Update Families'),
-      ),
+      appBar: AppBar(title: const Text('Update Families')),
       body: Container(
         alignment: const Alignment(0, 0),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [
-                Color(0xFF3366FF),
-                Color(0xFF00CCFF),
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
+            colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+            begin: FractionalOffset(0.0, 0.0),
+            end: FractionalOffset(1.0, 0.0),
+            stops: [0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
         ),
         child: RefreshIndicator(
           key: refreshKey,
           onRefresh: () => getdata(),
           child: Container(
-              alignment: const Alignment(0, -1),
-              child: FutureBuilder<Iterable>(
-                future: DBProvider.db.getFamilies(),
-                builder: (context, ss) {
-                  if (ss.data == null) {
-                    return Container();
-                  } else {
-                    return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: ss.data!.length,
-                        itemBuilder: (context, item) {
-                          var data = ss.data!.toList()[item]['name'].toString();
-                          return Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+            alignment: const Alignment(0, -1),
+            child: FutureBuilder<Iterable>(
+              future: DBProvider.db.getFamilies(),
+              builder: (context, ss) {
+                if (ss.data == null) {
+                  return Container();
+                } else {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: ss.data!.length,
+                    itemBuilder: (context, item) {
+                      var data = ss.data!.toList()[item]['name'].toString();
+                      return Card(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.people),
+                            Text(
+                              data.capitalizeFirstofEach,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Row(
                               children: [
-                                const Icon(Icons.people),
-                                Text(
-                                  data.capitalizeFirstofEach,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                ElevatedButton(
+                                  child: const Text(
+                                    "Update",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NewDataFamily(table: data),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                Row(
-                                  children: [
-                                    ElevatedButton(
-                                      child: const Text(
-                                        "Update",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    NewDataFamily(
-                                                      table: data,
-                                                    )));
-                                      },
+                                const Spacer(),
+                                ElevatedButton(
+                                  child: const Text(
+                                    "Delete",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
                                     ),
-                                    const Spacer(),
-                                    ElevatedButton(
-                                      child: const Text(
-                                        "Delete",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red),
-                                      ),
-                                      onPressed: () {
-                                        DBProvider.db.deleteTable(data);
-                                      },
-                                    ),
-                                  ],
+                                  ),
+                                  onPressed: () {
+                                    DBProvider.db.deleteTable(data);
+                                  },
                                 ),
                               ],
                             ),
-                          );
-                        });
-                  }
-                },
-              )),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -546,10 +560,7 @@ class _NewDataFamilyState extends State<NewDataFamily> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Update'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Update'), centerTitle: true),
       body: ListView(
         children: [
           Container(
@@ -558,14 +569,12 @@ class _NewDataFamilyState extends State<NewDataFamily> {
             width: MediaQuery.of(context).size.width,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF3366FF),
-                    Color(0xFF00CCFF),
-                  ],
-                  begin: FractionalOffset(0.0, 0.0),
-                  end: FractionalOffset(1.0, 0.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
+                colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+                begin: FractionalOffset(0.0, 0.0),
+                end: FractionalOffset(1.0, 0.0),
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp,
+              ),
             ),
             child: Container(
               color: Colors.white,
@@ -593,28 +602,34 @@ class _NewDataFamilyState extends State<NewDataFamily> {
                         },
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(
-                              RegExp("[a-zA-Z\u00C0-\u017F ]")),
+                            RegExp("[a-zA-Z\u00C0-\u017F ]"),
+                          ),
                           FilteringTextInputFormatter.singleLineFormatter,
                         ],
                       ),
                       ElevatedButton(
-                          onPressed: () {
-                            DBProvider.db
-                                .renameTable(widget.table, _name1.text.trim());
+                        onPressed: () {
+                          DBProvider.db.renameTable(
+                            widget.table,
+                            _name1.text.trim(),
+                          );
+                          setState(() {
+                            msg = "Updated!";
+                          });
+                          Future.delayed(const Duration(seconds: 3), () {
                             setState(() {
-                              msg = "Updated!";
+                              msg = "";
                             });
-                            Future.delayed(const Duration(seconds: 3), () {
-                              setState(() {
-                                msg = "";
-                              });
-                            });
-                          },
-                          child: const Text('Update')),
+                          });
+                        },
+                        child: const Text('Update'),
+                      ),
                       Text(
                         msg,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, color: color),
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
                       ),
                     ],
                   ),

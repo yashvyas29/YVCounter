@@ -7,8 +7,9 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
   // final _RestorableDessertSelections _dessertSelections =
   //     _RestorableDessertSelections();
   final RestorableInt _rowIndex = RestorableInt(0);
-  final RestorableInt _rowsPerPage =
-      RestorableInt(PaginatedDataTable.defaultRowsPerPage);
+  final RestorableInt _rowsPerPage = RestorableInt(
+    PaginatedDataTable.defaultRowsPerPage,
+  );
   // int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   final RestorableBool _sortAscending = RestorableBool(false);
   final RestorableIntN _sortColumnIndex = RestorableIntN(0);
@@ -36,8 +37,10 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     _dessertsDataSource ??= _DessertDataSource(context, widget.malas);
     switch (_sortColumnIndex.value) {
       case 0:
-        _dessertsDataSource!
-            ._sort<DateTime>((d) => d.date, _sortAscending.value);
+        _dessertsDataSource!._sort<DateTime>(
+          (d) => d.date,
+          _sortAscending.value,
+        );
         break;
       case 1:
         _dessertsDataSource!._sort<num>((d) => d.count, _sortAscending.value);
@@ -85,7 +88,9 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
 
   Future<void> _handleSaveExcelSuccess() async {
     await showAlertDialog(
-        context, AppLocalizations.of(context).excelSaveSuccessful);
+      context,
+      AppLocalizations.of(context).excelSaveSuccessful,
+    );
   }
 
   void _handleSaveExcelFailure(String error) {
@@ -98,8 +103,9 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     final totalMalas = widget._getTotalMalas();
     final totalJaps = totalMalas * Mala.japsPerMala;
     var isRowCountLessDefaultRowsPerPage = tableItemsCount < _rowsPerPage.value;
-    final rowsPerPage =
-        isRowCountLessDefaultRowsPerPage ? tableItemsCount : _rowsPerPage.value;
+    final rowsPerPage = isRowCountLessDefaultRowsPerPage
+        ? tableItemsCount
+        : _rowsPerPage.value;
     final localizations = AppLocalizations.of(context);
 
     return Scaffold(
@@ -108,19 +114,18 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
         actions: [
           if (tableItemsCount > 0)
             IconButton(
-                onPressed: () async => await fileHandler.saveExcel(
-                      _handleSaveExcelSuccess,
-                      _handleSaveExcelFailure,
-                    ),
-                icon: const Icon(Icons.file_download)),
+              onPressed: () async => await fileHandler.saveExcel(
+                _handleSaveExcelSuccess,
+                _handleSaveExcelFailure,
+              ),
+              icon: const Icon(Icons.file_download),
+            ),
         ],
       ),
       body: Scrollbar(
         controller: scrollController,
         child: tableItemsCount == 0
-            ? Center(
-                child: Text(localizations.malaNotAvailable),
-              )
+            ? Center(child: Text(localizations.malaNotAvailable))
             : ListView(
                 controller: scrollController,
                 restorationId: 'data_table_list_view',
@@ -128,7 +133,8 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                 children: [
                   PaginatedDataTable(
                     header: Text(
-                        '${localizations.mala}: $totalMalas, ${localizations.jap}: $totalJaps'),
+                      '${localizations.mala}: $totalMalas, ${localizations.jap}: $totalJaps',
+                    ),
                     availableRowsPerPage: [
                       rowsPerPage,
                       rowsPerPage * 2,
@@ -157,7 +163,10 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                       DataColumn(
                         label: Text(localizations.date),
                         onSort: (columnIndex, ascending) => _sort<DateTime>(
-                            (d) => d.date, columnIndex, ascending),
+                          (d) => d.date,
+                          columnIndex,
+                          ascending,
+                        ),
                       ),
                       DataColumn(
                         label: Text(localizations.mala),

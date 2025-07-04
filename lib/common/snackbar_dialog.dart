@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
 
 void showSnackBar(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message), duration: const Duration(milliseconds: 2000)));
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      duration: const Duration(milliseconds: 2000),
+    ),
+  );
 }
 
 Future<void> showAlertDialog(BuildContext context, String massage) async {
@@ -14,11 +18,7 @@ Future<void> showAlertDialog(BuildContext context, String massage) async {
       return AlertDialog(
         title: const Text('Alert'),
         content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              Text(massage),
-            ],
-          ),
+          child: ListBody(children: <Widget>[Text(massage)]),
         ),
         actions: <Widget>[
           TextButton(
@@ -33,8 +33,11 @@ Future<void> showAlertDialog(BuildContext context, String massage) async {
   );
 }
 
-Future<void> showDeleteConfirmationDialog(BuildContext context, String massage,
-    void Function() confirmPressed) async {
+Future<void> showDeleteConfirmationDialog(
+  BuildContext context,
+  String massage,
+  void Function() confirmPressed,
+) async {
   final localizations = AppLocalizations.of(context);
   return showDialog<void>(
     context: context,
@@ -46,9 +49,7 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, String massage,
         actions: <Widget>[
           TextButton(
             onPressed: confirmPressed,
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: Text(localizations.delete),
           ),
           TextButton(
@@ -76,10 +77,7 @@ void showProgressIndicator(BuildContext context, String message) {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              Text(message),
-            ],
+            children: [const CircularProgressIndicator(), Text(message)],
           ),
         ),
       );

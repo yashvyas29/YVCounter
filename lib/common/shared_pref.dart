@@ -4,13 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yv_counter/data_model/mala.dart';
 
 class SharedPref {
-  read(String key) async {
+  Future<String> read(String key) async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString(key);
     return value == null ? "" : json.decode(value);
   }
 
-  save(String key, value) async {
+  Future<void> save(String key, value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, json.encode(value));
   }
@@ -23,19 +23,19 @@ class SharedPref {
         : list.map((value) => Mala.fromJson(json.decode(value))).toList();
   }
 
-  saveList(String key, List<Mala> malas) async {
+  Future<void> saveList(String key, List<Mala> malas) async {
     final list = malas.map((mala) => json.encode(mala.toJson())).toList();
     // debugPrint(list.join('\n'));
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList(key, list);
   }
 
-  remove(String key) async {
+  Future<void> remove(String key) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(key);
   }
 
-  clear() async {
+  Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }

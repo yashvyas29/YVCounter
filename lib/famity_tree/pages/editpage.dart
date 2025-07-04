@@ -13,21 +13,17 @@ class _EditPageState extends State<EditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit'),
-      ),
+      appBar: AppBar(title: const Text('Edit')),
       body: Container(
         alignment: const Alignment(0, 0),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [
-                Color(0xFF3366FF),
-                Color(0xFF00CCFF),
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
+            colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+            begin: FractionalOffset(0.0, 0.0),
+            end: FractionalOffset(1.0, 0.0),
+            stops: [0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -37,8 +33,9 @@ class _EditPageState extends State<EditPage> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const UpdatePage()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const UpdatePage()),
+                  );
                 },
                 child: const Text(
                   'Members',
@@ -47,8 +44,11 @@ class _EditPageState extends State<EditPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const UpdateFamilies()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const UpdateFamilies(),
+                    ),
+                  );
                 },
                 child: const Text(
                   'Families',

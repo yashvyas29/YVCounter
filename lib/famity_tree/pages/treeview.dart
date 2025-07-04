@@ -19,20 +19,16 @@ class _LoadTreeState extends State<LoadTree> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Tree"),
-      ),
+      appBar: AppBar(title: const Text("Tree")),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [
-                Color(0xFF3366FF),
-                Color(0xFF00CCFF),
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
+            colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+            begin: FractionalOffset(0.0, 0.0),
+            end: FractionalOffset(1.0, 0.0),
+            stops: [0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
         ),
         alignment: const Alignment(0, 0),
         child: Column(
@@ -47,50 +43,55 @@ class _LoadTreeState extends State<LoadTree> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   FutureBuilder(
-                      future: DBProvider.db.getFamilies(),
-                      builder: (context, ss) {
-                        if (ss.data == null) {
-                          return const Text(
-                            "No Data!",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          );
-                        } else {
-                          // debugPrint(ss.data.toString());
-                          return Flexible(
-                            child: DropdownButton(
-                              hint: Text(_selected1.isEmpty
+                    future: DBProvider.db.getFamilies(),
+                    builder: (context, ss) {
+                      if (ss.data == null) {
+                        return const Text(
+                          "No Data!",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        // debugPrint(ss.data.toString());
+                        return Flexible(
+                          child: DropdownButton(
+                            hint: Text(
+                              _selected1.isEmpty
                                   ? "Select Family"
-                                  : _selected1.capitalizeFirstofEach),
-                              items:
-                                  ss.data!.map<DropdownMenuItem<String>>((e) {
-                                String response = e['name'];
-                                return DropdownMenuItem(
-                                  value: response,
-                                  child: Text(response.capitalizeFirstofEach),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selected1 = value!;
-                                });
-                              },
+                                  : _selected1.capitalizeFirstofEach,
                             ),
-                          );
-                        }
-                      }),
+                            items: ss.data!.map<DropdownMenuItem<String>>((e) {
+                              String response = e['name'];
+                              return DropdownMenuItem(
+                                value: response,
+                                child: Text(response.capitalizeFirstofEach),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selected1 = value!;
+                              });
+                            },
+                          ),
+                        );
+                      }
+                    },
+                  ),
                   ElevatedButton(
-                      child: const Text(
-                        'Load Tree',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => TreeViewPage(
-                                    familyName: _selected1,
-                                  )));
-                        });
-                      }),
+                    child: const Text(
+                      'Load Tree',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                TreeViewPage(familyName: _selected1),
+                          ),
+                        );
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -132,20 +133,16 @@ class _GraphViewPageState extends State<TreeViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Tree"),
-      ),
+      appBar: AppBar(title: const Text("Tree")),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [
-                Color(0xFF3366FF),
-                Color(0xFF00CCFF),
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
+            colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+            begin: FractionalOffset(0.0, 0.0),
+            end: FractionalOffset(1.0, 0.0),
+            stops: [0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
         ),
         child: FutureBuilder(
           future: DBProvider.db.getMembers(widget.familyName),

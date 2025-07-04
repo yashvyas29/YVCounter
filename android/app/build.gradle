@@ -26,14 +26,14 @@ if (flutterVersionName == null) {
 android {
     namespace = "com.yash.YVCounter"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "27.0.12077973" // flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
 
         kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_21.toString()
+            jvmTarget = JavaVersion.VERSION_24.toString()
         }
     }
 

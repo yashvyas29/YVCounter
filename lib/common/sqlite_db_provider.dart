@@ -18,10 +18,7 @@ class DBProvider {
   }
 
   Future<Database> get database async {
-    _database ??= await openDatabase(
-      await getDatabasePath(),
-      version: 1,
-    );
+    _database ??= await openDatabase(await getDatabasePath(), version: 1);
     return _database!;
   }
 
@@ -70,10 +67,13 @@ class DBProvider {
    name TEXT,
    c INTEGER);
     ''')
-      ..rawInsert('''
+      ..rawInsert(
+        '''
      REPLACE INTO '$familyName' (id, name, c)
       VALUES (?, ?, ?);
-     ''', [1, familyName, null]);
+     ''',
+        [1, familyName, null],
+      );
   }
 
   Future<List<Map>> cleanTable(String table) async {
@@ -110,10 +110,13 @@ class DBProvider {
   Future<int> insertMember(TreeMember treeMember, String table) async {
     final db = await database;
 
-    var res = await db.rawInsert('''
+    var res = await db.rawInsert(
+      '''
     INSERT INTO '$table' (id, name, c)
     VALUES (?, ?, ?);
-    ''', [treeMember.id, treeMember.name, treeMember.c]);
+    ''',
+      [treeMember.id, treeMember.name, treeMember.c],
+    );
 
     //print(res);
     return res;
@@ -121,18 +124,24 @@ class DBProvider {
 
   Future<void> updateMember(String table, TreeMember treeMember) async {
     final db = await database;
-    await db.rawInsert('''
+    await db.rawInsert(
+      '''
      REPLACE INTO '$table' (id, name, c)
       VALUES (?, ?, ?);
-     ''', [treeMember.id, treeMember.name, treeMember.c]);
+     ''',
+      [treeMember.id, treeMember.name, treeMember.c],
+    );
   }
 
   Future<int> removeMember(TreeMember treeMember, String table) async {
     final db = await database;
 
-    var res = await db.rawDelete('''
+    var res = await db.rawDelete(
+      '''
      DELETE FROM '$table' WHERE id = ?;
-     ''', [treeMember.id]);
+     ''',
+      [treeMember.id],
+    );
 
     //print(res);
     return res;

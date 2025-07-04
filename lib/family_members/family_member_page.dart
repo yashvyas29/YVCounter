@@ -15,11 +15,12 @@ class FamilyMemberPage extends StatefulWidget {
   final String name;
   final String familyFileName;
 
-  const FamilyMemberPage(
-      {super.key,
-      required this.id,
-      required this.name,
-      required this.familyFileName});
+  const FamilyMemberPage({
+    super.key,
+    required this.id,
+    required this.name,
+    required this.familyFileName,
+  });
 
   @override
   FamilyMemberPageState createState() => FamilyMemberPageState();
@@ -89,21 +90,15 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
           toolbarWidgetColor: toolbarWidgetColor,
           initAspectRatio: ic.CropAspectRatioPreset.square,
           lockAspectRatio: true,
-          aspectRatioPresets: [
-            ic.CropAspectRatioPreset.square,
-          ],
+          aspectRatioPresets: [ic.CropAspectRatioPreset.square],
         ),
         ic.IOSUiSettings(
           aspectRatioPickerButtonHidden: true,
           // title: 'Cropper',
           cropStyle: ic.CropStyle.circle,
-          aspectRatioPresets: [
-            ic.CropAspectRatioPreset.square,
-          ],
+          aspectRatioPresets: [ic.CropAspectRatioPreset.square],
         ),
-        ic.WebUiSettings(
-          context: context,
-        ),
+        ic.WebUiSettings(context: context),
       ],
     );
     String filePath;
@@ -211,8 +206,8 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
       return CustomPaint(painter: MyPainter(rect));
     },
     */
-
       progressIndicator: const CircularProgressIndicator(),
+
       // radius: 20,
 
       /*
@@ -232,7 +227,6 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
       cornerDotBuilder: (size, edgeAlignment) =>
           const DotControl(color: Colors.blue),
       */
-
       clipBehavior: Clip.none,
       interactive: true,
       fixCropRect: true,
@@ -289,11 +283,14 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
                             ),
                             IconButton(
                               onPressed: () {
-                                _deleteImage(localizations.deleteConfirmation(
-                                    name: localizations.image));
+                                _deleteImage(
+                                  localizations.deleteConfirmation(
+                                    name: localizations.image,
+                                  ),
+                                );
                               },
                               icon: Icon(Icons.delete),
-                            )
+                            ),
                           ],
                         ),
                       ],
@@ -301,8 +298,10 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
                   else
                     IconButton(
                       onPressed: () => _pickImage(),
-                      icon:
-                          Icon(Icons.upload, size: _getMinFromWidthAndHeight()),
+                      icon: Icon(
+                        Icons.upload,
+                        size: _getMinFromWidthAndHeight(),
+                      ),
                     ),
                   SizedBox(height: 10),
                   Padding(
@@ -310,9 +309,7 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '${localizations.memberName}: ${names.first}',
-                        ),
+                        Text('${localizations.memberName}: ${names.first}'),
                         if (_isMarried())
                           Column(
                             children: [

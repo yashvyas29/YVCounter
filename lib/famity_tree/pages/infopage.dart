@@ -17,21 +17,17 @@ class _InfoPageState extends State<InfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Info'),
-      ),
+      appBar: AppBar(title: const Text('Info')),
       body: Container(
         alignment: const Alignment(0, 0),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [
-                Color(0xFF3366FF),
-                Color(0xFF00CCFF),
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
+            colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+            begin: FractionalOffset(0.0, 0.0),
+            end: FractionalOffset(1.0, 0.0),
+            stops: [0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
         ),
         child: Column(
           children: [
@@ -41,14 +37,15 @@ class _InfoPageState extends State<InfoPage> {
                     ? Expanded(
                         child: Card(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "Husband: ${widget.txt1.split("\n")[0].capitalizeFirstofEach}",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "Husband: ${widget.txt1.split("\n")[0].capitalizeFirstofEach}",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       )
                     : Expanded(
@@ -94,8 +91,11 @@ class MyEditableText extends StatefulWidget {
   final String text;
   final TextStyle textStyle;
 
-  const MyEditableText(
-      {super.key, required this.text, required this.textStyle});
+  const MyEditableText({
+    super.key,
+    required this.text,
+    required this.textStyle,
+  });
 
   @override
   State<MyEditableText> createState() => _MyEditableTextState();

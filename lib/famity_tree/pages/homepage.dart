@@ -22,21 +22,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(widget.title), centerTitle: true),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [
-                Color(0xFF3366FF),
-                Color(0xFF00CCFF),
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
+            colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+            begin: FractionalOffset(0.0, 0.0),
+            end: FractionalOffset(1.0, 0.0),
+            stops: [0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -50,8 +45,9 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const LoadTree()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const LoadTree()),
+                  );
                 },
               ),
               ElevatedButton(
@@ -60,8 +56,9 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const CreatePage()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const CreatePage()),
+                  );
                 },
               ),
               ElevatedButton(
@@ -71,7 +68,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onPressed: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const AddPage()));
+                    MaterialPageRoute(builder: (context) => const AddPage()),
+                  );
                 },
               ),
               ElevatedButton(
@@ -80,8 +78,9 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const EditPage()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const EditPage()),
+                  );
                 },
               ),
             ],

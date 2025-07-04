@@ -16,15 +16,15 @@ class Mala implements Comparable<Mala> {
   Mala(this.date, this.count, this.japs);
 
   Mala.fromJson(Map<String, dynamic> json)
-      : date = DateTime.parse(json['date']),
-        count = json['count'],
-        japs = json['japs'];
+    : date = DateTime.parse(json['date']),
+      count = json['count'],
+      japs = json['japs'];
 
   Map<String, dynamic> toJson() => {
-        'date': date.toIso8601String(),
-        'count': count,
-        'japs': japs,
-      };
+    'date': date.toIso8601String(),
+    'count': count,
+    'japs': japs,
+  };
 
   @override
   int compareTo(Mala other) => other.date.compareTo(date);
