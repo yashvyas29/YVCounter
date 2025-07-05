@@ -12,10 +12,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _googleDrive.signInSilently().then((value) {
-      _googleDrive.getUser().then((user) {
-        setState(() {
-          _user = user;
+    _googleDrive.initializeGoogleSignIn().then((value) {
+      _googleDrive.signInSilently().then((value) {
+        _googleDrive.getUser().then((user) {
+          setState(() {
+            _user = user;
+          });
         });
       });
     });

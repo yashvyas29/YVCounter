@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:yv_counter/data_model/user.dart';
+import 'package:googleapis/drive/v3.dart' as ga;
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:file/memory.dart';
-import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/drive/v3.dart' as ga;
-import 'package:yv_counter/data_model/user.dart';
 
 class GoogleDrive {
   static const _scopes = [ga.DriveApi.driveAppdataScope];
@@ -14,37 +15,48 @@ class GoogleDrive {
   static const malasFileName = "malas";
   static String fileName = malasFileName;
 
-  final _googleSignIn = GoogleSignIn.standard(scopes: _scopes);
+  final _googleSignIn = GoogleSignIn.instance; // standard(scopes: _scopes);
+  late GoogleSignInAccount? _account;
+
+  Future<void> initializeGoogleSignIn() async {
+    try {
+      await _googleSignIn.initialize();
+    } catch (error) {
+      debugPrint('initialize error: $error');
+      Future.error(error);
+    }
+  }
 
   Future<void> signIn() async {
     try {
       debugPrint("signIn");
-      var account = _googleSignIn.currentUser;
-      account ??=
-          await _googleSignIn.signInSilently() ?? await _googleSignIn.signIn();
+      await _googleSignIn.initialize();
+      _account = await _googleSignIn.attemptLightweightAuthentication() ?? await _googleSignIn.authenticate(scopeHint: _scopes);
     } catch (error) {
       debugPrint("signIn error: $error");
+      Future.error(error);
     }
   }
 
   Future<void> signInSilently() async {
     try {
       debugPrint("signInSilently");
-      var account = _googleSignIn.currentUser;
-      account ??= await _googleSignIn.signInSilently();
+      _account ??= await _googleSignIn.attemptLightweightAuthentication();
     } catch (error) {
-      debugPrint("signIn error: $error");
+      debugPrint("signInSilently error: $error");
+      Future.error(error);
     }
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.disconnect();
+    // await _googleSignIn.disconnect();
+    await _googleSignIn.signOut();
   }
 
   Future<User?> getUser() async {
     debugPrint("getUser");
-    final user = _googleSignIn.currentUser;
-    if (user != null) {
+    if (_account != null) {
+      final GoogleSignInAccount user = _account!;
       await _printSignInMetaData(user);
       return User(user.displayName, user.email, user.id);
     } else {
@@ -55,8 +67,12 @@ class GoogleDrive {
   // Get Drive Api
   Future<ga.DriveApi?> _getDriveApi() async {
     debugPrint("_getDriveApi");
-    await signIn();
-    final authClient = await _googleSignIn.authenticatedClient();
+    if (_account == null) {
+      debugPrint("User not signed in.");
+      await signIn();
+    }
+    final authorization = await _account?.authorizationClient.authorizeScopes(_scopes);
+    final authClient = authorization?.authClient(scopes: _scopes);
     if (authClient != null) {
       return ga.DriveApi(authClient);
     } else {
@@ -264,10 +280,10 @@ class GoogleDrive {
   }
 
   Future<void> _printSignInMetaData(GoogleSignInAccount account) async {
-    debugPrint("isSignedIn: ${await _googleSignIn.isSignedIn()}");
+    debugPrint("supportsAuthenticate: ${_googleSignIn.supportsAuthenticate()}");
     debugPrint("User: $account");
-    final auth = await account.authentication;
-    debugPrint("accessToken: ${auth.accessToken}");
+    final auth = account.authentication;
+    debugPrint("idToken: ${auth.idToken}");
   }
 
   /*
