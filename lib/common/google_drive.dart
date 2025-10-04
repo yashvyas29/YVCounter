@@ -16,7 +16,7 @@ class GoogleDrive {
   static String fileName = malasFileName;
 
   final _googleSignIn = GoogleSignIn.instance; // standard(scopes: _scopes);
-  late GoogleSignInAccount? _account;
+  GoogleSignInAccount? _account;
 
   Future<void> initializeGoogleSignIn() async {
     try {
@@ -31,7 +31,17 @@ class GoogleDrive {
     try {
       debugPrint("signIn");
       await _googleSignIn.initialize();
-      _account = await _googleSignIn.attemptLightweightAuthentication() ?? await _googleSignIn.authenticate(scopeHint: _scopes);
+      if (_googleSignIn.supportsAuthenticate()) {
+        _account =
+            await _googleSignIn.attemptLightweightAuthentication() ??
+            await _googleSignIn.authenticate(scopeHint: _scopes);
+      } else {
+        /*
+        // For web, you can use the renderButton method to display a sign-in button.
+        if (kIsWeb)
+          web.renderButton()
+         */
+      }
     } catch (error) {
       debugPrint("signIn error: $error");
       Future.error(error);
@@ -49,8 +59,10 @@ class GoogleDrive {
   }
 
   Future<void> signOut() async {
+    debugPrint("signOut");
     // await _googleSignIn.disconnect();
     await _googleSignIn.signOut();
+    _account = null;
   }
 
   Future<User?> getUser() async {
@@ -71,7 +83,9 @@ class GoogleDrive {
       debugPrint("User not signed in.");
       await signIn();
     }
-    final authorization = await _account?.authorizationClient.authorizeScopes(_scopes);
+    final authorization = await _account?.authorizationClient.authorizeScopes(
+      _scopes,
+    );
     final authClient = authorization?.authClient(scopes: _scopes);
     if (authClient != null) {
       return ga.DriveApi(authClient);

@@ -374,38 +374,38 @@ class _MyHomePageState extends State<MyHomePage> {
               language = localeModel.locale.languageCode;
               final changeToLanguage = language == 'en' ? 'hi' : 'en';
               /*
-            PopupMenuButton<LanguageMenu>(
-              tooltip: localizations.menu,
-              icon: const Icon(Icons.language),
-              initialValue: localeModel.locale?.languageCode == 'hi' ? LanguageMenu.hindi : LanguageMenu.english,
-              onSelected: (menu) async {
-                switch (menu) {
-                  case LanguageMenu.english:
-                    localeModel.set(const Locale('en'));
-                    break;
-                  case LanguageMenu.hindi:
-                    localeModel.set(const Locale('hi'));
-                    break;
-                }
-              },
-              itemBuilder: (context) {
-                return [
-                  const PopupMenuItem(
-                    value: LanguageMenu.english,
-                    child: Text(
-                      'English',
+              PopupMenuButton<LanguageMenu>(
+                tooltip: localizations.menu,
+                icon: const Icon(Icons.language),
+                initialValue: language == 'hi' ? LanguageMenu.hindi : LanguageMenu.english,
+                onSelected: (menu) async {
+                  switch (menu) {
+                    case LanguageMenu.english:
+                      localeModel.set(const Locale('en'));
+                      break;
+                    case LanguageMenu.hindi:
+                      localeModel.set(const Locale('hi'));
+                      break;
+                  }
+                },
+                itemBuilder: (context) {
+                  return [
+                    const PopupMenuItem(
+                      value: LanguageMenu.english,
+                      child: Text(
+                        'English',
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: LanguageMenu.hindi,
-                    child: Text(
-                      'हिन्दी',
+                    const PopupMenuItem(
+                      value: LanguageMenu.hindi,
+                      child: Text(
+                        'हिन्दी',
+                      ),
                     ),
-                  ),
-                ];
-              },
-            ),
-            */
+                  ];
+                },
+              ),
+              */
               return PopupMenuButton<Menu>(
                 tooltip: localizations.menu,
                 onSelected: (menu) async {

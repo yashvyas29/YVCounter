@@ -1,1 +1,4 @@
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+-dontwarn okhttp3.**
 -dontwarn com.google.j2objc.annotations.ReflectionSupport

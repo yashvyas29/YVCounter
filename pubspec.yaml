@@ -20,8 +20,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+6
 
 environment:
-  sdk: ^3.8.1
-  flutter: 3.32.5
+  sdk: ^3.9.2
+  flutter: 3.35.5
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -35,43 +35,43 @@ dependencies:
   excel: ^4.0.6
   extension_google_sign_in_as_googleapis_auth: ^3.0.0 # ^2.0.13
   file: ^7.0.1
-  file_picker: ^10.2.0
+  file_picker: ^10.3.3
+  file_saver: ^0.3.1
 
   flutter:
     sdk: flutter
 
   flutter_beep:
     git:
-      url: https://github.com/trietho/flutter_beep
-      ref: master
+      url: https://github.com/yashvyas29/flutter_beep
+      ref: feature/flutter-gradle-dependencies-upgrade
 
-  flutter_file_dialog: ^3.0.2
   flutter_image_compress: ^2.4.0
 
   flutter_localizations:
     sdk: flutter
 
   # https://github.com/flutter/packages/blob/main/packages/google_sign_in/google_sign_in/MIGRATION.md
-  google_sign_in: ^7.1.0 # ^6.3.0
-  googleapis: ^14.0.0
+  google_sign_in: ^7.2.0 # ^6.3.0
+  googleapis: ^15.0.0
   googleapis_auth: ^2.0.0
 
-  graphview: ^1.2.0
-  http: ^1.4.0
-  image_cropper: ^9.1.0
-  image_picker: ^1.1.2
+  graphview: ^1.5.0
+  http: ^1.5.0
+  image_cropper: ^11.0.0
+  image_picker: ^1.2.0
   intl: ^0.20.2
   path: ^1.9.0 # 1.9.1
   path_provider: ^2.1.5
-  provider: ^6.1.5
+  provider: ^6.1.5+1
   shared_preferences: ^2.5.3
   sqflite: ^2.4.2
+  vector_math: ^2.2.0
   widget_zoom: ^0.0.4
   zoom_pinch_overlay: ^1.4.3
 
-  # cr_file_saver: ^0.0.2+1
   # drift: ^2.11.1
-  # flutter_file_saver: ^0.6.2
+  # flutter_file_saver: ^0.9.0
   # flutter_secure_storage: ^9.0.0
   # isar: ^3.1.0+1
   # isar_flutter_libs: ^3.1.0+1

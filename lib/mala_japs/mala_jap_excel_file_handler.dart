@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/common/date_time_handler.dart';
@@ -127,24 +127,13 @@ class MalaJapExcelFileHandler {
     List<int>? fileBytes = excel.save();
     if (fileBytes != null && fileBytes.isNotEmpty) {
       try {
-        const fileName = 'malas.xlsx';
-        final params = SaveFileDialogParams(
-          data: Uint8List.fromList(fileBytes),
-          fileName: fileName,
+        await FileSaver.instance.saveFile(
+          name: "malas",
+          bytes: Uint8List.fromList(fileBytes),
+          fileExtension: "xlsx",
+          mimeType: MimeType.microsoftExcel,
         );
-        final filePath = await FlutterFileDialog.saveFile(params: params);
-        /*
-        var file = await _createTempExcel(fileName, fileBytes);
-        final params = SaveFileDialogParams(
-            sourceFilePath: file.path, destinationFileName: fileName);
-        final filePath = await CRFileSaver.saveFileWithDialog(params);
-        file.delete();
-        */
-        if (filePath == null) {
-          onFailure.call("Cancelled");
-        } else {
-          await onSuccess.call();
-        }
+        await onSuccess.call();
       } catch (error) {
         debugPrint(error.toString());
         onFailure.call(error.toString());
@@ -153,16 +142,6 @@ class MalaJapExcelFileHandler {
       onFailure.call("");
     }
   }
-
-  /*
-  /// Create example file in temporary directory to work with
-  Future<File> createTempExcel(String fileName, List<int> fileBytes) async {
-    final folder = await getTemporaryDirectory();
-    final filePath = '${folder.path}/$fileName';
-    final file = File(filePath);
-    return await file.writeAsBytes(fileBytes);
-  }
-  */
 
   Future<String> _getExcelFilePath() async {
     Directory directory;

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
@@ -549,7 +550,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _transformationController.value = Matrix4.identity()
-        ..translate(position.dx, position.dy);
+        ..translateByVector3(Vector3(position.dx, position.dy, 0));
     });
   }
 

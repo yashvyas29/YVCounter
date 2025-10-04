@@ -4,5 +4,5 @@ use-escaping: true
 relax-syntax: true
 use-named-parameters: true
 # untranslated-messages-file: untranslatedMessages.txt
-synthetic-package: false
+# synthetic-package: false
 arb-dir: lib/l10n
