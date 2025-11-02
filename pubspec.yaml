@@ -21,7 +21,7 @@ version: 1.0.0+6
 
 environment:
   sdk: ^3.9.2
-  flutter: 3.35.5
+  flutter: 3.35.7
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -56,7 +56,7 @@ dependencies:
   googleapis: ^15.0.0
   googleapis_auth: ^2.0.0
 
-  graphview: ^1.5.0
+  graphview: ^1.5.1
   http: ^1.5.0
   image_cropper: ^11.0.0
   image_picker: ^1.2.0

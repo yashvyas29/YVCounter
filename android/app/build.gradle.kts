@@ -29,7 +29,7 @@ val detStorePassword = keyProperties.getProperty("storePassword")
 require(detStorePassword != null) { "storePassword not found in key.properties file." }
 
 android {
-    namespace = "com.yash.yv_counter"
+    namespace = "com.yash.YVCounter"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973" // flutter.ndkVersion
 
@@ -40,7 +40,7 @@ android {
 
     defaultConfig {
         // Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.yash.yv_counter"
+        applicationId = "com.yash.YVCounter"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
