@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:vector_math/vector_math_64.dart' hide Colors;
+// import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:graphview/GraphView.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
@@ -43,7 +43,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   final Map<int, dynamic> _images = {};
   late ImageFileHandler imageFileHandler;
 
-  static const spacing = 20.0;
+  static const spacing = 30.0;
   static const boxSide = 320.0;
   static const boxCornerRadius = 4.0;
   static const borderWidth = 2.0;
@@ -51,9 +51,10 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
   final _graph = Graph()..isTree = true;
   final BuchheimWalkerConfiguration _builder = BuchheimWalkerConfiguration();
-  late final _CallbackBuchheimWalkerAlgorithm _algorithm;
-  final TransformationController _transformationController =
-      TransformationController();
+  // late final _CallbackBuchheimWalkerAlgorithm _algorithm;
+  late final Algorithm _algorithm = BuchheimWalkerAlgorithm(_builder, null);
+  final GraphViewController _controller = GraphViewController();
+  // final TransformationController _transformationController = TransformationController();
 
   @override
   void initState() {
@@ -65,13 +66,16 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     _builder
       ..siblingSeparation = (spacing.toInt())
       ..levelSeparation = (spacing.toInt())
-      ..subtreeSeparation = (spacing.toInt());
+      ..subtreeSeparation = (spacing.toInt())
+      ..useCurvedConnections = false;
 
+    /*
     _algorithm = _CallbackBuchheimWalkerAlgorithm(
       _builder,
       TreeEdgeRenderer(_builder),
       onFirstCalculated: () => _jumpToRootNode(),
     );
+    */
   }
 
   @override
@@ -95,9 +99,13 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 
   void _reset() {
+    // _controller.jumpToNode(ValueKey(_rootNodeId()));
+    _controller.zoomToFit();
+    /*
     if (_transformationController.value != Matrix4.identity()) {
       _jumpToRootNode();
     }
+    */
     /*
     widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
     _graph = Graph()..isTree = true;
@@ -233,10 +241,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     },
                   ),
             SizedBox(width: 8),
-            Expanded(
-              child: readOnly
-                  ? Text(value, style: textStyle)
-                  : TextField(
+            readOnly
+                ? Expanded(child: Text(value, style: textStyle))
+                : SizedBox(
+                    width: boxSide - imageSide - 88,
+                    height: imageSide + 4,
+                    child: TextField(
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
                       controller: textController,
@@ -245,7 +255,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       readOnly: readOnly,
                       autofocus: !readOnly,
                     ),
-            ),
+                  ),
             SizedBox(width: 4),
             Column(
               children: [
@@ -468,6 +478,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         ? FutureBuilder(
             future: widget.readJsonData(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
+              debugPrint(snapshot.connectionState.toString());
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator(
@@ -498,15 +509,18 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     final edges = _data[FamilyJsonKey.edges];
     _updateNode(edges);
 
+    /*
     final contextSize = MediaQuery.sizeOf(context);
     final horizontalInsets = contextSize.width - boxSide - spacing;
-    final topToExclude = Platform.isAndroid
+    final topToExclude = !kIsWeb && Platform.isAndroid
         ? MediaQuery.viewPaddingOf(context).top + kToolbarHeight
         : 0;
-    final verticalInsets =
-        contextSize.height - boxSide - spacing - topToExclude;
+    final verticalInsets = contextSize.height - boxSide - spacing - topToExclude;
+    */
 
-    return InteractiveViewer(
+    return
+    /*
+    InteractiveViewer(
       constrained: false,
       boundaryMargin: EdgeInsets.symmetric(
         horizontal: horizontalInsets,
@@ -515,25 +529,37 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       minScale: 0.05,
       maxScale: 1,
       transformationController: _transformationController,
-      child: GraphView(
-        graph: _graph,
-        algorithm: _algorithm,
-        paint: Paint()
-          ..color = Colors.green
-          ..strokeWidth = 1
-          ..style = PaintingStyle.stroke,
-        builder: (Node node) {
-          return _rectangleWidget(node);
-        },
-      ),
+      child: 
+      */
+    GraphView.builder(
+      graph: _graph,
+      algorithm: _algorithm,
+      paint: Paint()
+        ..color = Colors.green
+        ..strokeWidth = 1
+        ..style = PaintingStyle.stroke,
+      builder: (Node node) {
+        return _rectangleWidget(node);
+      },
+      controller: _controller,
+      // animated: true,
+      initialNode: ValueKey(_rootNodeId()),
+      // autoZoomToFit: true,
+      // centerGraph: true,
     );
+    // );
   }
 
-  void _jumpToRootNode() {
-    final currentRoot = _data[FamilyJsonKey.nodes].firstWhere(
+  int _rootNodeId() {
+    final rootNode = _data[FamilyJsonKey.nodes].firstWhere(
       (node) => node['isRoot'] == true,
     );
-    _jumpToNode(currentRoot[FamilyJsonKey.id]);
+    return rootNode[FamilyJsonKey.id];
+  }
+
+  /*
+  void _jumpToRootNode() {
+    _jumpToNode(_rootNodeId());
   }
 
   void _jumpToNode(int nodeId) {
@@ -553,13 +579,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         ..translateByVector3(Vector3(position.dx, position.dy, 0));
     });
   }
+  */
 
   void _updateNode(List edges) {
-    /*
     debugPrint("updateNode");
     debugPrint("Edges count: ${edges.length.toString()}");
-    debugPrint("Edges value: ${edges.toString()}");
-    */
+    // debugPrint("Edges value: ${edges.toString()}");
 
     if (edges.isEmpty) {
       final nodes = _data[FamilyJsonKey.nodes];
@@ -657,6 +682,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 }
 
+/*
 class _CallbackBuchheimWalkerAlgorithm extends BuchheimWalkerAlgorithm {
   bool _wasCalculated = false;
   void Function() onFirstCalculated;
@@ -677,3 +703,4 @@ class _CallbackBuchheimWalkerAlgorithm extends BuchheimWalkerAlgorithm {
     return size;
   }
 }
+*/

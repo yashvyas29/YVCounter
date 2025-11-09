@@ -89,14 +89,21 @@ class JsonFileHandler {
 
   String getFamilyFileName(String name) {
     final trimedName = name.trim();
-    if (trimedName == 'व्यास परिवार') {
-      return 'vyas_family_hi';
-    } else if (trimedName == 'कड़वावत परिवार') {
-      return 'kadvawat_family_hi';
-    } else if (trimedName == 'धर्मावत परिवार') {
-      return 'dharmawat_family_hi';
-    } else {
-      return trimedName.toLowerCase().replaceAll(RegExp(' '), '_');
+    switch (trimedName) {
+      case 'आध्यात्मिक परिवार':
+        return "spritual_family_hi";
+      case 'सूर्य परिवार':
+        return "sury_family_hi";
+      case 'चंद्र परिवार':
+        return "chandr_family_hi";
+      case 'व्यास परिवार':
+        return 'vyas_family_hi';
+      case 'कड़वावत परिवार':
+        return 'kadvawat_family_hi';
+      case 'धर्मावत परिवार':
+        return 'dharmawat_family_hi';
+      default:
+        return trimedName.toLowerCase().replaceAll(RegExp(' '), '_');
     }
   }
 

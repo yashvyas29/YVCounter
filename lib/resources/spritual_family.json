@@ -1,0 +1,104 @@
+{
+  "nodes": [
+    {"id": 1, "label": "Param Brahma / The Absolute Reality", "isRoot": true},
+    {"id": 2, "label": "Ishwara / Purusha", "isRootChild": true},
+    {"id": 3, "label": "Maya / Prakriti", "isRootChild": true},
+    {"id": 4, "label": "Brahma"}, {"id": 5, "label": "Vishnu"}, {"id": 6, "label": "Shiva"},
+
+    {"id": 7, "label": "Mahatattva (Intellect)"}, {"id": 8, "label": "Ahankara (Ego)"}, {"id": 9, "label": "Manas (Mind)"},
+    {"id": 10, "label": "Panch Tatva (Five Elements)"}, {"id": 11, "label": "Akasha"}, {"id": 12, "label": "Vayu"}, 
+    {"id": 13, "label": "Agni"}, {"id": 14, "label": "Jala"}, {"id": 15, "label": "Prithvi"},
+
+    {"id": 16, "label": "Mahakali / Durga"}, {"id": 17, "label": "Mahalakshmi"}, {"id": 18, "label": "Mahasaraswati"},
+    {"id": 19, "label": "Gayatri / Savitri"}, {"id": 20, "label": "Radha"},
+
+    {"id": 21, "label": "Manas Putras"}, {"id": 22, "label": "Daksha Prajapati"},
+    {"id": 23, "label": "Kamadeva (Manmatha)"}, {"id": 24, "label": "Sandhya / Sangya"}, 
+    {"id": 25, "label": "Ekadasha Rudras"}, {"id": 26, "label": "Manu and Shatarupa"},
+
+    {"id": 27, "label": "Marichi"}, {"id": 28, "label": "Atri"}, {"id": 29, "label": "Angiras"}, {"id": 30, "label": "Pulastya"},
+    {"id": 31, "label": "Pulaha"}, {"id": 32, "label": "Kratu"}, {"id": 33, "label": "Vashishtha"}, {"id": 34, "label": "Narada"},
+
+    {"id": 35, "label": "Manyu"}, {"id": 36, "label": "Manu"}, {"id": 37, "label": "Mahinasa"}, {"id": 38, "label": "Mahan"}, 
+    {"id": 39, "label": "Shiva (Rudra)"}, {"id": 40, "label": "Rutadhvaja"}, {"id": 41, "label": "Ugraretasa"}, {"id": 42, "label": "Bhava"}, 
+    {"id": 43, "label": "Kama"}, {"id": 44, "label": "Vamadeva"}, {"id": 45, "label": "Dhritavrata"},
+
+    {"id": 46, "label": "24 Avatars"},
+    {"id": 47, "label": "Sanakadi Munis"}, {"id": 48, "label": "Varaha"}, {"id": 49, "label": "Narada"}, 
+    {"id": 50, "label": "Nara-Narayana"}, {"id": 51, "label": "Kapila"}, {"id": 52, "label": "Dattatreya"}, 
+    {"id": 53, "label": "Yajna"}, {"id": 54, "label": "Rishabha"}, {"id": 55, "label": "Prithu"}, 
+    {"id": 56, "label": "Dhanvantari"}, {"id": 57, "label": "Mohini"}, {"id": 58, "label": "Vedavyasa"}, 
+    {"id": 59, "label": "Balarama"}, {"id": 60, "label": "Hayagriva"}, {"id": 61, "label": "Hansa"},
+
+    {"id": 62, "label": "Dashavatar"}, 
+    {"id": 63, "label": "Matsya"}, {"id": 64, "label": "Kurma"}, {"id": 65, "label": "Narasimha"}, 
+    {"id": 66, "label": "Vamana"}, {"id": 67, "label": "Parashurama"}, {"id": 68, "label": "Rama"}, 
+    {"id": 69, "label": "Krishna"}, {"id": 70, "label": "Buddha"}, {"id": 71, "label": "Kalki"}, 
+
+    {"id": 72, "label": "Sanaka"}, {"id": 73, "label": "Sanandana"}, {"id": 74, "label": "Sanatana"}, {"id": 75, "label": "Sanatkumara"},
+
+    {"id": 76, "label": "Kaushiki"}, {"id": 77, "label": "Chandika"}, {"id": 78, "label": "Chamunda"},
+    {"id": 79, "label": "Navadurga"}, {"id": 80, "label": "Das Mahavidya"},
+
+    {"id": 81, "label": "Shailaputri"}, {"id": 82, "label": "Brahmacharini"}, {"id": 83, "label": "Chandraghanta"}, 
+    {"id": 84, "label": "Kushmanda"}, {"id": 85, "label": "Skandamata"}, {"id": 86, "label": "Katyayani"}, 
+    {"id": 87, "label": "Kalaratri"}, {"id": 88, "label": "Mahagauri"}, {"id": 89, "label": "Siddhidatri"},
+
+    {"id": 90, "label": "Kali"}, {"id": 91, "label": "Tara"}, {"id": 92, "label": "Tripura Sundari"}, 
+    {"id": 93, "label": "Bhuvaneshwari"}, {"id": 94, "label": "Chhinnamasta"}, {"id": 95, "label": "Tripura Bhairavi"}, 
+    {"id": 96, "label": "Dhumavati"}, {"id": 97, "label": "Bagalamukhi"}, {"id": 98, "label": "Matangi"}, 
+    {"id": 99, "label": "Kamala"}, 
+
+    {"id": 100, "label": "Major Avatars of Shiva"}, {"id": 101, "label": "12 Jyotirlingas"},
+    {"id": 102, "label": "Virabhadra"}, {"id": 103, "label": "Kala Bhairava"}, {"id": 104, "label": "Hanuman"}, {"id": 105, "label": "Sharabha"},
+
+    {"id": 106, "label": "Somanath"}, {"id": 107, "label": "Mallikarjuna"}, {"id": 108, "label": "Mahakaleshwar"}, 
+    {"id": 109, "label": "Omkareshwar"}, {"id": 110, "label": "Kedarnath"}, {"id": 111, "label": "Bhimashankar"}, 
+    {"id": 112, "label": "Kashi Vishwanath"}, {"id": 113, "label": "Trimbakeshwar"}, {"id": 114, "label": "Vaidyanath"}, 
+    {"id": 115, "label": "Nageshwar"}, {"id": 116, "label": "Rameswaram"}, {"id": 117, "label": "Grishneshwar"},
+
+    {"id": 118, "label": "Kartikeya"}, {"id": 119, "label": "Ganesha"}, {"id": 120, "label": "Ashoka Sundari"},
+    {"id": 121, "label": "Jvala"}, {"id": 122, "label": "Jyoti"}, {"id": 123, "label": "Mansa"}, {"id": 124, "label": "Andhak"},
+    {"id": 125, "label": "Labh"}, {"id": 126, "label": "Shubh"}, {"id": 127, "label": "Santoshi"},
+    {"id": 128, "label": "Aamod"}, {"id": 129, "label": "Pramod"},
+    {"id": 130, "label": "Bhramri"}, {"id": 131, "label": "Shakambri"},
+    {"id": 132, "label": "Vindhyvasini"}, {"id": 133, "label": "Veshno"}
+  ],
+  "edges": [
+    {"from": 1, "to": 2}, {"from": 1, "to": 3}, 
+    {"from": 2, "to": 4}, {"from": 2, "to": 5}, {"from": 2, "to": 6}, 
+    {"from": 3, "to": 16}, {"from": 3, "to": 17}, {"from": 3, "to": 18}, 
+
+    {"from": 3, "to": 7}, {"from": 7, "to": 8}, {"from": 8, "to": 9}, {"from": 8, "to": 10}, 
+    {"from": 10, "to": 11}, {"from": 10, "to": 12}, {"from": 10, "to": 13}, {"from": 10, "to": 14}, {"from": 10, "to": 15}, 
+
+    {"from": 4, "to": 21}, {"from": 4, "to": 22}, {"from": 4, "to": 23}, {"from": 4, "to": 24},
+    {"from": 4, "to": 25}, {"from": 4, "to": 26}, 
+
+    {"from": 21, "to": 27}, {"from": 21, "to": 28}, {"from": 21, "to": 29}, {"from": 21, "to": 30}, 
+    {"from": 21, "to": 31}, {"from": 21, "to": 32}, {"from": 21, "to": 33}, {"from": 21, "to": 34},
+    {"from": 25, "to": 35}, {"from": 25, "to": 36}, {"from": 25, "to": 37}, {"from": 25, "to": 38}, {"from": 25, "to": 39}, {"from": 25, "to": 40}, {"from": 25, "to": 41}, {"from": 25, "to": 42}, {"from": 25, "to": 43}, {"from": 25, "to": 44}, {"from": 25, "to": 45},
+
+    {"from": 5, "to": 47}, {"from": 5, "to": 49}, {"from": 5, "to": 50}, {"from": 5, "to": 51}, {"from": 5, "to": 52}, {"from": 5, "to": 53}, {"from": 5, "to": 54}, {"from": 5, "to": 55}, {"from": 5, "to": 56}, {"from": 5, "to": 57}, {"from": 5, "to": 58}, {"from": 5, "to": 59}, {"from": 5, "to": 60}, {"from": 5, "to": 61},
+    {"from": 5, "to": 62},
+    {"from": 62, "to": 63}, {"from": 62, "to": 64}, {"from": 62, "to": 48}, {"from": 62, "to": 65}, {"from": 62, "to": 66}, {"from": 62, "to": 67}, {"from": 62, "to": 68}, {"from": 62, "to": 69}, {"from": 62, "to": 70}, {"from": 62, "to": 71},
+
+    {"from": 47, "to": 72}, {"from": 47, "to": 73}, {"from": 47, "to": 74}, {"from": 47, "to": 75}, 
+
+    {"from": 16, "to": 76}, {"from": 16, "to": 77}, {"from": 16, "to": 130}, {"from": 16, "to": 131},
+    {"from": 77, "to": 78}, 
+    {"from": 16, "to": 79}, {"from": 16, "to": 80}, 
+    {"from": 79, "to": 81}, {"from": 79, "to": 82}, {"from": 79, "to": 83}, {"from": 79, "to": 84}, {"from": 79, "to": 85}, {"from": 79, "to": 86}, {"from": 79, "to": 87}, {"from": 79, "to": 88}, {"from": 79, "to": 89},
+    {"from": 80, "to": 90}, {"from": 80, "to": 91}, {"from": 80, "to": 92}, {"from": 80, "to": 93}, {"from": 80, "to": 94}, {"from": 80, "to": 95}, {"from": 80, "to": 96}, {"from": 80, "to": 97}, {"from": 80, "to": 98}, {"from": 80, "to": 99},
+
+    {"from": 6, "to": 100}, {"from": 6, "to": 101},
+    {"from": 100, "to": 102}, {"from": 100, "to": 103}, {"from": 100, "to": 104}, {"from": 100, "to": 105},
+    {"from": 101, "to": 106}, {"from": 101, "to": 107}, {"from": 101, "to": 108}, {"from": 101, "to": 109}, {"from": 101, "to": 110}, {"from": 101, "to": 111}, {"from": 101, "to": 112}, {"from": 101, "to": 113}, {"from": 101, "to": 114}, {"from": 101, "to": 115}, {"from": 101, "to": 116}, {"from": 101, "to": 117},
+    
+    {"from": 6, "to": 118}, {"from": 6, "to": 122}, {"from": 6, "to": 123}, {"from": 6, "to": 124},
+    {"from": 16, "to": 119},
+    {"from": 119, "to": 125}, {"from": 119, "to": 126}, {"from": 119, "to": 127},
+    {"from": 125, "to": 128}, {"from": 126, "to": 129},
+    {"from": 16, "to": 120}, {"from": 16, "to": 121}, {"from": 16, "to": 132}, {"from": 16, "to": 133}
+  ]
+}

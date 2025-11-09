@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
@@ -32,8 +33,19 @@ class _FamilyListPageState extends State<FamilyListPage> {
   late List<String> families;
   late String newFamilyName;
 
+  List<Map<String, String>> _getStaticFamilies() {
+    final localizations = AppLocalizations.of(context);
+    return [
+      {"name": localizations.vyasFamily},
+      {"name": localizations.kadvawatFamily},
+      {"name": localizations.dharmawatFamily},
+    ];
+  }
+
   Future<List<String>> _getFamilies() async {
-    final families = await DBProvider.db.getFamilies();
+    final families = kIsWeb
+        ? _getStaticFamilies()
+        : await DBProvider.db.getFamilies();
     // debugPrint(families.toString());
     setState(() {
       _families.addAll(families.map((e) => e['name'].toString()));
@@ -154,21 +166,26 @@ class _FamilyListPageState extends State<FamilyListPage> {
           /*
           if (_families.isEmpty)
             IconButton(
-                onPressed: () async {
-                  debugPrint("Restore family pressed.");
-                  for (final family in widget.families) {
-                    await _addFamily(family);
-                  }
-                },
-                icon: const Icon(Icons.restore)),
-          */
-          IconButton(
-            onPressed: () async {
-              debugPrint("Add family pressed.");
-              await _addFamily(newFamilyName);
-            },
-            icon: const Icon(Icons.add_circle),
-          ),
+              onPressed: () async {
+                debugPrint("Restore family pressed.");
+                final staticFamilies = _getStaticFamilies().map(
+                  (e) => e['name'].toString(),
+                );
+                for (final family in staticFamilies) {
+                  await _addFamily(family);
+                }
+              },
+              icon: const Icon(Icons.restore),
+            ),
+            */
+          if (!kIsWeb)
+            IconButton(
+              onPressed: () async {
+                debugPrint("Add family pressed.");
+                await _addFamily(newFamilyName);
+              },
+              icon: const Icon(Icons.add_circle),
+            ),
         ],
       ),
       body: _futureBuilder(),
