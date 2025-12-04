@@ -20,8 +20,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+6
 
 environment:
-  sdk: ^3.9.2
-  flutter: 3.35.7
+  sdk: ^3.10.1
+  flutter: 3.38.3
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -35,7 +35,7 @@ dependencies:
   excel: ^4.0.6
   extension_google_sign_in_as_googleapis_auth: ^3.0.0 # ^2.0.13
   file: ^7.0.1
-  file_picker: ^10.3.3
+  file_picker: ^10.3.7 # ^10.3.3
   file_saver: ^0.3.1
 
   flutter:
@@ -57,9 +57,9 @@ dependencies:
   googleapis_auth: ^2.0.0
 
   graphview: ^1.5.1
-  http: ^1.5.0
+  http: ^1.6.0
   image_cropper: ^11.0.0
-  image_picker: ^1.2.0
+  image_picker: ^1.2.1
   intl: ^0.20.2
   path: ^1.9.0 # 1.9.1
   path_provider: ^2.1.5

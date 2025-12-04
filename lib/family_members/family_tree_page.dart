@@ -87,6 +87,13 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         actions: [
           IconButton(
             onPressed: () {
+              debugPrint("Jump to root node pressed.");
+              _controller.animateToNode(ValueKey(_rootNodeId()));
+            },
+            icon: const Icon(Icons.swipe_up_alt),
+          ),
+          IconButton(
+            onPressed: () {
               debugPrint("Reset to family pressed.");
               _reset();
             },
@@ -99,7 +106,6 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 
   void _reset() {
-    // _controller.jumpToNode(ValueKey(_rootNodeId()));
     _controller.zoomToFit();
     /*
     if (_transformationController.value != Matrix4.identity()) {
@@ -189,6 +195,82 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     textController.text = value;
     final image = _images[id];
 
+    final predecessors = _graph.predecessorsOf(node);
+    final List<Node> parentSuccessors;
+    final successors = _graph.successorsOf(node);
+
+    final Node? parentNode;
+    final Node? firstChildNode;
+    final ValueKey? prevNodeKey;
+    final ValueKey? nextNodeKey;
+
+    if (predecessors.isNotEmpty) {
+      parentNode = predecessors.last;
+    } else {
+      parentNode = null;
+    }
+
+    if (successors.isNotEmpty) {
+      firstChildNode = successors.first;
+    } else {
+      firstChildNode = null;
+    }
+
+    if (parentNode != null) {
+      parentSuccessors = _graph.successorsOf(parentNode);
+      if (parentSuccessors.length > 1) {
+        // Multiple siblings
+        final parentSuccessorIndex = parentSuccessors.indexOf(node);
+        if (parentSuccessorIndex != -1 &&
+            parentSuccessorIndex < parentSuccessors.length - 1) {
+          // Next sibling
+          nextNodeKey = parentSuccessors[parentSuccessorIndex + 1].key;
+        } else if (successors.isNotEmpty) {
+          // Removing next arrow when no next sibling, so first child down arrow can be shown
+          nextNodeKey = null;
+        } else {
+          // No next sibling or child in case of multiple siblings
+          nextNodeKey = null;
+        }
+        if (parentSuccessorIndex > 0) {
+          // Previous sibling
+          prevNodeKey = parentSuccessors[parentSuccessorIndex - 1].key;
+        } else {
+          // Removing previous arrow for first child from the multiple ones when parent exist
+          prevNodeKey = null;
+        }
+      } else {
+        // Rmoving previous and next arrow for siblings, alone child when parent exist
+        prevNodeKey = null;
+        nextNodeKey = null;
+        /*
+        if (parentSuccessors.length == 1 && successors.isNotEmpty) {
+          // No siblings but have children
+          // Showing down arrow in this case
+          nextNodeKey = successors.first.key;
+        } else {
+          // Removing next arrow when there are no children or siblings when parent exist
+          nextNodeKey = null;
+        }
+        */
+      }
+    } else {
+      // No parent
+      parentSuccessors = [];
+      prevNodeKey = null;
+      nextNodeKey = null;
+      /*
+      if (successors.isNotEmpty) {
+        // No parent but have children
+        // Showing down arrow in this case
+        nextNodeKey = successors.first.key;
+      } else {
+        // No parent and children
+        nextNodeKey = null;
+      }
+      */
+    }
+
     return InkWell(
       onTap: () {
         // debugPrint('Node $value clicked at ${node.toString()}.');
@@ -222,41 +304,98 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
               ? CrossAxisAlignment.start
               : CrossAxisAlignment.center,
           children: [
-            image != null
-                ? _imageWidget(image)
-                : FutureBuilder(
-                    future: imageFileHandler.loadThumbnail(id),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        final image = snapshot.data!;
-                        _images[id] = image;
-                        return _imageWidget(image);
-                      } else {
-                        return _borderedWidget(
-                          Icon(Icons.person, size: imageSide),
-                          boxCornerRadius,
-                        );
-                      }
-                    },
-                  ),
-            SizedBox(width: 8),
-            readOnly
-                ? Expanded(child: Text(value, style: textStyle))
-                : SizedBox(
-                    width: boxSide - imageSide - 88,
-                    height: imageSide + 4,
-                    child: TextField(
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      controller: textController,
-                      decoration: inputDecoration,
-                      style: textStyle,
-                      readOnly: readOnly,
-                      autofocus: !readOnly,
-                    ),
-                  ),
-            SizedBox(width: 4),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    image != null
+                        ? _imageWidget(image)
+                        : FutureBuilder(
+                            future: imageFileHandler.loadThumbnail(id),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.done &&
+                                      snapshot.hasData) {
+                                    final image = snapshot.data!;
+                                    _images[id] = image;
+                                    return _imageWidget(image);
+                                  } else {
+                                    return _borderedWidget(
+                                      Icon(Icons.person, size: imageSide),
+                                      boxCornerRadius,
+                                    );
+                                  }
+                                },
+                          ),
+                    SizedBox(width: 8),
+                    readOnly
+                        ? SizedBox(
+                            width: boxSide - imageSide - 88,
+                            child: Text(value, style: textStyle),
+                          )
+                        : SizedBox(
+                            width: boxSide - imageSide - 88,
+                            height: imageSide + 4,
+                            child: TextField(
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
+                              controller: textController,
+                              decoration: inputDecoration,
+                              style: textStyle,
+                              readOnly: readOnly,
+                              autofocus: !readOnly,
+                            ),
+                          ),
+                    SizedBox(width: 4),
+                  ],
+                ),
+                Row(
+                  children: [
+                    if (prevNodeKey != null)
+                      IconButton(
+                        onPressed: () {
+                          debugPrint(
+                            "Previous node key $prevNodeKey for $value pressed.",
+                          );
+                          _controller.animateToNode(prevNodeKey!);
+                        },
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                    if (parentNode != null)
+                      IconButton(
+                        onPressed: () {
+                          debugPrint(
+                            "Parent node key ${parentNode!.key} for $value pressed.",
+                          );
+                          _controller.animateToNode(parentNode.key!);
+                        },
+                        icon: const Icon(Icons.arrow_upward),
+                      ),
+                    if (successors.isNotEmpty)
+                      IconButton(
+                        onPressed: () {
+                          debugPrint(
+                            "Parent node key ${firstChildNode!.key} for $value pressed.",
+                          );
+                          _controller.animateToNode(firstChildNode.key!);
+                        },
+                        icon: const Icon(Icons.arrow_downward),
+                      ),
+                    if (nextNodeKey != null)
+                      IconButton(
+                        onPressed: () {
+                          debugPrint(
+                            "Next node key $nextNodeKey for $value pressed.",
+                          );
+                          _controller.animateToNode(nextNodeKey!);
+                        },
+                        icon: const Icon(Icons.arrow_forward),
+                      ),
+                  ],
+                ),
+              ],
+            ),
             Column(
               children: [
                 if (!isRoot && ((!isRootChild && nodes.length > 2) || readOnly))
@@ -551,10 +690,15 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 
   int _rootNodeId() {
-    final rootNode = _data[FamilyJsonKey.nodes].firstWhere(
-      (node) => node['isRoot'] == true,
-    );
-    return rootNode[FamilyJsonKey.id];
+    try {
+      final rootNode = _data[FamilyJsonKey.nodes].firstWhere(
+        (node) => node['isRoot'] == true,
+      );
+      return rootNode[FamilyJsonKey.id];
+    } catch (error) {
+      debugPrint('No manual root found.\n$error');
+      return 1;
+    }
   }
 
   /*

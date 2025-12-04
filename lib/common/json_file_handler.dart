@@ -103,7 +103,7 @@ class JsonFileHandler {
       case 'धर्मावत परिवार':
         return 'dharmawat_family_hi';
       default:
-        return trimedName.toLowerCase().replaceAll(RegExp(' '), '_');
+        return trimedName.toLowerCase().replaceAll(' ', '_');
     }
   }
 
