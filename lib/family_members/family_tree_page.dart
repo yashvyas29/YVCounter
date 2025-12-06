@@ -530,6 +530,14 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     },
                     icon: const Icon(Icons.cancel),
                   ),
+                  if (successors.isNotEmpty)
+                  IconButton(
+                    onPressed: () {
+                      debugPrint("Expand Collapse for $value pressed.");
+                      _controller.toggleNodeExpanded(_graph, node, animate: true);
+                    },
+                    icon: Icon(_controller.isNodeCollapsed(node) ? Icons.arrow_drop_down : Icons.arrow_drop_up),
+                  ),
               ],
             ),
           ],
