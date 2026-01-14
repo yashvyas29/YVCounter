@@ -1,23 +1,24 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:graphview/GraphView.dart';
+import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/family_members/family_member_page.dart';
-import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
+import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class FamilyTreePage extends StatefulWidget {
-  const FamilyTreePage({super.key, required this.title});
+  final String title;
 
+  final _jsonFileHandler = const JsonFileHandler();
+
+  const FamilyTreePage({super.key, required this.title});
   @override
   State<FamilyTreePage> createState() => _FamilyTreePageState();
-
-  final String title;
-  final _jsonFileHandler = const JsonFileHandler();
 
   String getFileName() {
     return _jsonFileHandler.getFamilyFileName(title);
@@ -38,23 +39,82 @@ class FamilyTreePage extends StatefulWidget {
   }
 }
 
+class _CallbackBuchheimWalkerAlgorithm extends BuchheimWalkerAlgorithm {
+  bool _wasCalculated = false;
+  void Function() onFirstCalculated;
+
+  _CallbackBuchheimWalkerAlgorithm(
+    super.configuration,
+    super.renderer, {
+    required this.onFirstCalculated,
+  });
+
+  @override
+  Size run(Graph? graph, double shiftX, double shiftY) {
+    final size = super.run(graph, shiftX, shiftY);
+    if (!_wasCalculated) {
+      onFirstCalculated();
+      _wasCalculated = true;
+    }
+    return size;
+  }
+}
+
 class _FamilyTreePageState extends State<FamilyTreePage> {
+  static const spacing = 30.0;
+  static const boxSide = 320.0;
+  static const boxCornerRadius = 4.0;
+
+  static const borderWidth = 2.0;
+  static const imageSide = 100.0;
   Map<String, dynamic> _data = {};
   final Map<int, dynamic> _images = {};
   late ImageFileHandler imageFileHandler;
 
-  static const spacing = 30.0;
-  static const boxSide = 320.0;
-  static const boxCornerRadius = 4.0;
-  static const borderWidth = 2.0;
-  static const imageSide = 100.0;
-
   final _graph = Graph()..isTree = true;
   final BuchheimWalkerConfiguration _builder = BuchheimWalkerConfiguration();
-  // late final _CallbackBuchheimWalkerAlgorithm _algorithm;
-  late final Algorithm _algorithm = BuchheimWalkerAlgorithm(_builder, null);
-  final GraphViewController _controller = GraphViewController();
-  // final TransformationController _transformationController = TransformationController();
+  late final _CallbackBuchheimWalkerAlgorithm _algorithm;
+  // late final Algorithm _algorithm = BuchheimWalkerAlgorithm(_builder, null);
+  // final GraphViewController _controller = GraphViewController();
+  final TransformationController _transformationController =
+      TransformationController();
+  final GlobalKey _viewerKey = GlobalKey();
+  final GlobalKey _contentKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          IconButton(
+            onPressed: () {
+              debugPrint("Jump to root node pressed.");
+              _jumpToRootNode();
+            },
+            icon: const Icon(Icons.restore),
+          ),
+          /*
+          IconButton(
+            onPressed: () {
+              debugPrint("Reset to family pressed.");
+              _reset();
+            },
+            icon: const Icon(Icons.restore),
+          ),
+          */
+        ],
+      ),
+      body: _futureBuilder(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -69,56 +129,11 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       ..subtreeSeparation = (spacing.toInt())
       ..useCurvedConnections = false;
 
-    /*
     _algorithm = _CallbackBuchheimWalkerAlgorithm(
       _builder,
       TreeEdgeRenderer(_builder),
       onFirstCalculated: () => _jumpToRootNode(),
     );
-    */
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            onPressed: () {
-              debugPrint("Jump to root node pressed.");
-              _controller.animateToNode(ValueKey(_rootNodeId()));
-            },
-            icon: const Icon(Icons.swipe_up_alt),
-          ),
-          IconButton(
-            onPressed: () {
-              debugPrint("Reset to family pressed.");
-              _reset();
-            },
-            icon: const Icon(Icons.restore),
-          ),
-        ],
-      ),
-      body: _futureBuilder(),
-    );
-  }
-
-  void _reset() {
-    _controller.zoomToFit();
-    /*
-    if (_transformationController.value != Matrix4.identity()) {
-      _jumpToRootNode();
-    }
-    */
-    /*
-    widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
-    _graph = Graph()..isTree = true;
-    setState(() {
-      _data.clear();
-    });
-    */
   }
 
   Widget _borderedWidget(Widget widget, double radius) {
@@ -140,6 +155,95 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
   }
 
+  Widget _futureBuilder() {
+    return _data.isEmpty
+        ? FutureBuilder(
+            future: widget.readJsonData(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              debugPrint(snapshot.connectionState.toString());
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.red,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                );
+              } else if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
+                final data = snapshot.data!;
+                if (data.isEmpty) {
+                  _data = {FamilyJsonKey.nodes: [], FamilyJsonKey.edges: []};
+                } else {
+                  _data = data;
+                }
+                return _interactiveViewer();
+              } else {
+                return Center(
+                  child: Text(AppLocalizations.of(context).commonError),
+                );
+              }
+            },
+          )
+        : _interactiveViewer();
+  }
+
+  int _getNewNodeId() {
+    return _data[FamilyJsonKey.nodes].fold(0, (previousValue, element) {
+          final currentValue = element[FamilyJsonKey.id] ?? 0;
+          return previousValue > currentValue ? previousValue : currentValue;
+        }) +
+        1;
+  }
+
+  Map<String, dynamic> _getNewNodeMap(int id, {bool isRoot = false}) {
+    final newNodeValue = {"id": id, "label": ""};
+    newNodeValue[FamilyJsonKey.readOnly] = false;
+    if (isRoot) {
+      newNodeValue['isRoot'] = isRoot;
+    }
+    // debugPrint(newNodeValue.toString());
+    return newNodeValue;
+  }
+
+  Widget _graphView() {
+    final edges = _data[FamilyJsonKey.edges];
+    _updateNode(edges);
+
+    /*
+    return GraphView.builder(
+      graph: _graph,
+      algorithm: _algorithm,
+      paint: Paint()
+        ..color = Colors.green
+        ..strokeWidth = 1
+        ..style = PaintingStyle.stroke,
+      builder: (Node node) {
+        return _rectangleWidget(node);
+      },
+      controller: _controller,
+      // animated: true,
+      initialNode: ValueKey(_rootNodeId()),
+      // autoZoomToFit: true,
+      // centerGraph: true,
+    );
+    */
+
+    return GraphView(
+      key: _contentKey,
+      graph: _graph,
+      algorithm: _algorithm,
+      paint: Paint()
+        ..color = Colors.green
+        ..strokeWidth = 1
+        ..style = PaintingStyle.stroke,
+      builder: (Node node) {
+        return _rectangleWidget(node);
+      },
+      // animated: true,
+      centerGraph: true,
+    );
+  }
+
   Widget _imageWidget(File image) {
     return _borderedWidget(
       _clipRectWidget(
@@ -155,6 +259,58 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       ),
       boxCornerRadius,
     );
+  }
+
+  Widget _interactiveViewer() {
+    final contextSize = MediaQuery.sizeOf(context);
+    final horizontalInsets = contextSize.width - boxSide - spacing;
+    final topToExclude = !kIsWeb && Platform.isAndroid
+        ? MediaQuery.viewPaddingOf(context).top + kToolbarHeight
+        : 0;
+    final verticalInsets =
+        contextSize.height - boxSide + 2 * spacing + topToExclude;
+
+    return InteractiveViewer(
+      key: _viewerKey,
+      constrained: false,
+      boundaryMargin: EdgeInsets.symmetric(
+        horizontal: horizontalInsets,
+        vertical: verticalInsets,
+      ),
+      minScale: 0.05,
+      maxScale: 1,
+      transformationController: _transformationController,
+      child: _graphView(),
+    );
+  }
+
+  void _jumpToNode(ValueKey nodeKey) {
+    debugPrint("Jump to node id: ${nodeKey.value}.");
+    // _controller.animateToNode(nodeKey);
+    try {
+      final startNode = _graph.nodes.firstWhere(
+        (node) => node.key!.value == nodeKey.value,
+      );
+      final position = Offset(
+        -(startNode.x -
+            MediaQuery.sizeOf(context).width / 2 +
+            startNode.width / 2),
+        -(startNode.y - spacing),
+      );
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _transformationController.value = Matrix4.identity()
+          ..translateByVector3(Vector3(position.dx, position.dy, 0));
+      });
+    } catch (error) {
+      debugPrint("Node not found.\n$error");
+      // zoomToFit();
+    }
+  }
+
+  void _jumpToRootNode() {
+    final rootKey = ValueKey(_rootNodeId());
+    // _controller.animateToNode(rootKey);
+    _jumpToNode(rootKey);
   }
 
   Widget _rectangleWidget(Node node) {
@@ -358,7 +514,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           debugPrint(
                             "Previous node key $prevNodeKey for $value pressed.",
                           );
-                          _controller.animateToNode(prevNodeKey!);
+                          _jumpToNode(prevNodeKey!);
                         },
                         icon: const Icon(Icons.arrow_back),
                       ),
@@ -368,7 +524,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           debugPrint(
                             "Parent node key ${parentNode!.key} for $value pressed.",
                           );
-                          _controller.animateToNode(parentNode.key!);
+                          _jumpToNode(parentNode.key!);
                         },
                         icon: const Icon(Icons.arrow_upward),
                       ),
@@ -378,7 +534,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           debugPrint(
                             "Parent node key ${firstChildNode!.key} for $value pressed.",
                           );
-                          _controller.animateToNode(firstChildNode.key!);
+                          _jumpToNode(firstChildNode.key!);
                         },
                         icon: const Icon(Icons.arrow_downward),
                       ),
@@ -388,7 +544,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           debugPrint(
                             "Next node key $nextNodeKey for $value pressed.",
                           );
-                          _controller.animateToNode(nextNodeKey!);
+                          _jumpToNode(nextNodeKey!);
                         },
                         icon: const Icon(Icons.arrow_forward),
                       ),
@@ -530,6 +686,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     },
                     icon: const Icon(Icons.cancel),
                   ),
+                /*
                   if (successors.isNotEmpty)
                   IconButton(
                     onPressed: () {
@@ -538,30 +695,13 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     },
                     icon: Icon(_controller.isNodeCollapsed(node) ? Icons.arrow_drop_down : Icons.arrow_drop_up),
                   ),
+                  */
               ],
             ),
           ],
         ),
       ),
     );
-  }
-
-  int _getNewNodeId() {
-    return _data[FamilyJsonKey.nodes].fold(0, (previousValue, element) {
-          final currentValue = element[FamilyJsonKey.id] ?? 0;
-          return previousValue > currentValue ? previousValue : currentValue;
-        }) +
-        1;
-  }
-
-  Map<String, dynamic> _getNewNodeMap(int id, {bool isRoot = false}) {
-    final newNodeValue = {"id": id, "label": ""};
-    newNodeValue[FamilyJsonKey.readOnly] = false;
-    if (isRoot) {
-      newNodeValue['isRoot'] = isRoot;
-    }
-    // debugPrint(newNodeValue.toString());
-    return newNodeValue;
   }
 
   void _removeNodeFromData(Node node) {
@@ -580,121 +720,21 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     _graph.removeNode(node);
   }
 
-  /*
-  void setupTransformationController() {
-    // const zoomFactor = 1.0;
-    final double xTranslate;
-    final double yTranslate;
-    if (kIsWeb ||
-        Platform.isMacOS ||
-        Platform.isLinux ||
-        Platform.isWindows ||
-        Platform.isFuchsia) {
-      xTranslate = 4900.0;
-      yTranslate = 1050.0;
-    } else {
-      xTranslate = 5380.0;
-      yTranslate = 1100.0;
+  void _reset() {
+    // _controller.zoomToFit();
+    _zoomToFit();
+    /*
+    if (_transformationController.value != Matrix4.identity()) {
+      _transformationController.value = Matrix4.identity();
     }
-    debugPrint("x: $xTranslate, y: $yTranslate");
-    /*
-    transformationController.value.setEntry(0, 0, zoomFactor);
-    transformationController.value.setEntry(1, 1, zoomFactor);
-    transformationController.value.setEntry(2, 2, zoomFactor);
     */
-    _transformationController.value.setEntry(0, 3, -xTranslate);
-    _transformationController.value.setEntry(1, 3, -yTranslate);
     /*
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (MediaQuery.of(context).orientation == Orientation.landscape &&
-          !kIsWeb &&
-          (Platform.isAndroid || Platform.isIOS)) {
-        const xTranslate = 5150.0;
-        const yTranslate = 855.0;
-        transformationController.value.setEntry(0, 3, -xTranslate);
-        transformationController.value.setEntry(1, 3, -yTranslate);
-        debugPrint("x: $xTranslate, y: $yTranslate");
-      }
+    widget._jsonFileHandler.deleteLocalFile(widget.getFileName());
+    _graph = Graph()..isTree = true;
+    setState(() {
+      _data.clear();
     });
     */
-  }
-  */
-
-  Widget _futureBuilder() {
-    return _data.isEmpty
-        ? FutureBuilder(
-            future: widget.readJsonData(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              debugPrint(snapshot.connectionState.toString());
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.red,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                  ),
-                );
-              } else if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                final data = snapshot.data!;
-                if (data.isEmpty) {
-                  _data = {FamilyJsonKey.nodes: [], FamilyJsonKey.edges: []};
-                } else {
-                  _data = data;
-                }
-                return _graphView();
-              } else {
-                return Center(
-                  child: Text(AppLocalizations.of(context).commonError),
-                );
-              }
-            },
-          )
-        : _graphView();
-  }
-
-  Widget _graphView() {
-    final edges = _data[FamilyJsonKey.edges];
-    _updateNode(edges);
-
-    /*
-    final contextSize = MediaQuery.sizeOf(context);
-    final horizontalInsets = contextSize.width - boxSide - spacing;
-    final topToExclude = !kIsWeb && Platform.isAndroid
-        ? MediaQuery.viewPaddingOf(context).top + kToolbarHeight
-        : 0;
-    final verticalInsets = contextSize.height - boxSide - spacing - topToExclude;
-    */
-
-    return
-    /*
-    InteractiveViewer(
-      constrained: false,
-      boundaryMargin: EdgeInsets.symmetric(
-        horizontal: horizontalInsets,
-        vertical: verticalInsets,
-      ),
-      minScale: 0.05,
-      maxScale: 1,
-      transformationController: _transformationController,
-      child: 
-      */
-    GraphView.builder(
-      graph: _graph,
-      algorithm: _algorithm,
-      paint: Paint()
-        ..color = Colors.green
-        ..strokeWidth = 1
-        ..style = PaintingStyle.stroke,
-      builder: (Node node) {
-        return _rectangleWidget(node);
-      },
-      controller: _controller,
-      // animated: true,
-      initialNode: ValueKey(_rootNodeId()),
-      // autoZoomToFit: true,
-      // centerGraph: true,
-    );
-    // );
   }
 
   int _rootNodeId() {
@@ -708,30 +748,6 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       return 1;
     }
   }
-
-  /*
-  void _jumpToRootNode() {
-    _jumpToNode(_rootNodeId());
-  }
-
-  void _jumpToNode(int nodeId) {
-    final startNode = _graph.nodes.firstWhere(
-      (node) => node.key!.value == nodeId,
-    );
-
-    // Positions are custom for our page. You might need something different.
-    final position = Offset(
-      -(startNode.x -
-          MediaQuery.sizeOf(context).width / 2 +
-          startNode.width / 2),
-      -(startNode.y - spacing),
-    );
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _transformationController.value = Matrix4.identity()
-        ..translateByVector3(Vector3(position.dx, position.dy, 0));
-    });
-  }
-  */
 
   void _updateNode(List edges) {
     debugPrint("updateNode");
@@ -832,27 +848,55 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       */
     }
   }
-}
 
-/*
-class _CallbackBuchheimWalkerAlgorithm extends BuchheimWalkerAlgorithm {
-  bool _wasCalculated = false;
-  void Function() onFirstCalculated;
+  void _zoomToFit() {
+    /*
+    // Ensure the widgets are rendered and their render objects are accessible
+    final RenderBox? viewerBox =
+        _viewerKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? contentBox =
+        _contentKey.currentContext?.findRenderObject() as RenderBox?;
 
-  _CallbackBuchheimWalkerAlgorithm(
-    super.configuration,
-    super.renderer, {
-    required this.onFirstCalculated,
-  });
-
-  @override
-  Size run(Graph? graph, double shiftX, double shiftY) {
-    final size = super.run(graph, shiftX, shiftY);
-    if (!_wasCalculated) {
-      onFirstCalculated();
-      _wasCalculated = true;
+    if (viewerBox == null || contentBox == null) {
+      debugPrint("Render box not found.");
+      return;
     }
-    return size;
+
+    final Size viewerSize = viewerBox.size;
+    final Size contentSize = contentBox.size;
+
+    if (viewerSize.isEmpty || contentSize.isEmpty) {
+      debugPrint("Render box size not found.");
+      return;
+    }
+
+    // 1. Calculate the scale factor to fit the content within the viewer bounds
+    // We calculate scale based on both width and height and take the minimum
+    // to ensure the entire content is visible without cropping.
+    final double scaleX = viewerSize.width / contentSize.width;
+    final double scaleY = viewerSize.height / contentSize.height;
+    final double fitScale = math.min(scaleX, scaleY);
+
+    // Optional: Add a small padding or maximum scale constraint if desired
+    // final double finalScale = math.min(fitScale * 0.95, 2.0);
+    final double finalScale = fitScale * 0.95; // 5% padding around the edges
+
+    // 2. Calculate the translation needed to center the content
+    final double translateX =
+        (viewerSize.width - contentSize.width * finalScale) / 2;
+    final double translateY =
+        (viewerSize.height - contentSize.height * finalScale) / 2;
+
+    // 3. Construct the final transformation matrix
+    final Matrix4 matrix = Matrix4.identity();
+    // Apply scale (S) and then translation (T)
+    matrix.setEntry(0, 0, finalScale); // Scale X
+    matrix.setEntry(1, 1, finalScale); // Scale Y
+    matrix.setEntry(0, 3, translateX); // Translate X
+    matrix.setEntry(1, 3, translateY); // Translate Y
+
+    // Apply the new matrix to the controller
+    _transformationController.value = matrix;
+    */
   }
 }
-*/
