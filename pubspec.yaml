@@ -20,8 +20,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+6
 
 environment:
-  sdk: ^3.10.7
-  flutter: 3.38.6
+  sdk: ^3.11.0
+  flutter: 3.41.2
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -35,7 +35,7 @@ dependencies:
   excel: ^4.0.6
   extension_google_sign_in_as_googleapis_auth: ^3.0.0 # ^2.0.13
   file: ^7.0.1
-  file_picker: ^10.3.8
+  file_picker: ^10.3.10
   file_saver: ^0.3.1
 
   flutter:
@@ -53,8 +53,8 @@ dependencies:
 
   # https://github.com/flutter/packages/blob/main/packages/google_sign_in/google_sign_in/MIGRATION.md
   google_sign_in: ^7.2.0 # ^6.3.0
-  googleapis: ^15.0.0
-  googleapis_auth: ^2.0.0
+  googleapis: ^16.0.0
+  googleapis_auth: ^2.1.0
 
   graphview: ^1.5.1
   http: ^1.6.0
@@ -77,14 +77,15 @@ dependencies:
   # isar_flutter_libs: ^3.1.0+1
   # permission_handler: ^11.3.1
 
-# dependency_overrides:
+dependency_overrides:
   # transitive dependencies
-  # material_color_utilities: ^0.13.0
-  # meta: ^1.17.0
+  # archive: ^4.0.9
+  # image: ^4.8.0
+  meta: ^1.18.1
+  # win32: ^6.0.0
 
   # transitive dev_dependencies
   # leak_tracker: ^11.0.1
-  # leak_tracker_flutter_testing: ^3.0.10
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4
