@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:yv_counter/data_model/user.dart';
-import 'package:googleapis/drive/v3.dart' as ga;
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:file/memory.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart' as ga;
+import 'package:yv_counter/data_model/user.dart';
+import 'package:yv_counter/generated/server_client_id.dart';
 
 class GoogleDrive {
   static const _scopes = [ga.DriveApi.driveAppdataScope];
@@ -15,105 +17,44 @@ class GoogleDrive {
   static const malasFileName = "malas";
   static String fileName = malasFileName;
 
-  final _googleSignIn = GoogleSignIn.instance; // standard(scopes: _scopes);
+  /*
+  Code: add at top-level (e.g., near app startup)
+  const String kServerClientId = String.fromEnvironment('SERVER_CLIENT_ID', defaultValue: '');
+  final drive = GoogleDrive(serverClientId: kServerClientId);
+  
+  Run locally:
+  flutter run --dart-define=SERVER_CLIENT_ID="YOUR_CLIENT_ID"
+  */
+  String? serverClientId;
+  late final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   GoogleSignInAccount? _account;
 
-  Future<void> initializeGoogleSignIn() async {
-    try {
-      await _googleSignIn.initialize();
-    } catch (error) {
-      debugPrint('initialize error: $error');
-      Future.error(error);
+  GoogleDrive({this.serverClientId}) {
+    if (serverClientId == null || serverClientId!.isEmpty) {
+      serverClientId = kServerClientId;
     }
   }
 
-  Future<void> signIn() async {
-    try {
-      debugPrint("signIn");
-      await _googleSignIn.initialize();
-      if (_googleSignIn.supportsAuthenticate()) {
-        _account =
-            await _googleSignIn.attemptLightweightAuthentication() ??
-            await _googleSignIn.authenticate(scopeHint: _scopes);
+  Future<void> deleteAppDataFolderFiles() async {
+    ga.DriveApi? driveApi = await _getDriveApi();
+    if (driveApi != null) {
+      final filesList = await driveApi.files.list(spaces: _appDataFolderId);
+      final files = filesList.files;
+      if (files != null) {
+        for (final file in files) {
+          final fileId = file.id;
+          if (fileId != null) {
+            driveApi.files.delete(fileId);
+          }
+        }
+        debugPrint("App data deleted successfully.");
       } else {
-        /*
-        // For web, you can use the renderButton method to display a sign-in button.
-        if (kIsWeb)
-          web.renderButton()
-         */
+        const error = "App data not available.";
+        return Future.error(error);
       }
-    } catch (error) {
-      debugPrint("signIn error: $error");
-      Future.error(error);
-    }
-  }
-
-  Future<void> signInSilently() async {
-    try {
-      debugPrint("signInSilently");
-      _account ??= await _googleSignIn.attemptLightweightAuthentication();
-    } catch (error) {
-      debugPrint("signInSilently error: $error");
-      Future.error(error);
-    }
-  }
-
-  Future<void> signOut() async {
-    debugPrint("signOut");
-    // await _googleSignIn.disconnect();
-    await _googleSignIn.signOut();
-    _account = null;
-  }
-
-  Future<User?> getUser() async {
-    debugPrint("getUser");
-    if (_account != null) {
-      final GoogleSignInAccount user = _account!;
-      await _printSignInMetaData(user);
-      return User(user.displayName, user.email, user.id);
     } else {
-      return null;
-    }
-  }
-
-  // Get Drive Api
-  Future<ga.DriveApi?> _getDriveApi() async {
-    debugPrint("_getDriveApi");
-    if (_account == null) {
-      debugPrint("User not signed in.");
-      await signIn();
-    }
-    final authorization = await _account?.authorizationClient.authorizeScopes(
-      _scopes,
-    );
-    final authClient = authorization?.authClient(scopes: _scopes);
-    if (authClient != null) {
-      return ga.DriveApi(authClient);
-    } else {
-      return null;
-    }
-  }
-
-  // check if the directory forlder is already available in drive , if available return its id
-  // if not available create a folder in drive and return id
-  //   if not able to create id then it means user authetication has failed
-  Future<String?> getFolderId(ga.DriveApi driveApi, String folderName) async {
-    try {
-      final folderId = await _getFolderIdIfExists(driveApi, folderName);
-      if (folderId != null) {
-        return folderId;
-      }
-      // Create a folder
-      ga.File folder = ga.File();
-      folder.name = folderName;
-      folder.mimeType = _folderMimeType;
-      final folderCreation = await driveApi.files.create(folder);
-      debugPrint("Folder ID: ${folderCreation.id}");
-
-      return folderCreation.id;
-    } catch (e) {
-      debugPrint(e.toString());
-      return null;
+      const error = "User not logged in.";
+      return Future.error(error);
     }
   }
 
@@ -148,27 +89,110 @@ class GoogleDrive {
     }
   }
 
-  Future<void> deleteAppDataFolderFiles() async {
-    ga.DriveApi? driveApi = await _getDriveApi();
-    if (driveApi != null) {
-      final filesList = await driveApi.files.list(spaces: _appDataFolderId);
-      final files = filesList.files;
-      if (files != null) {
-        for (final file in files) {
-          final fileId = file.id;
-          if (fileId != null) {
-            driveApi.files.delete(fileId);
-          }
-        }
-        debugPrint("App data deleted successfully.");
-      } else {
-        const error = "App data not available.";
-        return Future.error(error);
-      }
-    } else {
-      const error = "User not logged in.";
+  Future<File> downloadGoogleDriveFile() async {
+    var driveApi = await _getDriveApi();
+    if (driveApi == null) {
+      const error = "Sign In Error";
+      debugPrint(error);
       return Future.error(error);
+    } else {
+      final fileId = await _getFileId(driveApi);
+      return _downloadFileFromGoogleDrive(fileId, fileName, driveApi);
     }
+  }
+
+  // check if the directory forlder is already available in drive , if available return its id
+  // if not available create a folder in drive and return id
+  //   if not able to create id then it means user authetication has failed
+  Future<String?> getFolderId(ga.DriveApi driveApi, String folderName) async {
+    try {
+      final folderId = await _getFolderIdIfExists(driveApi, folderName);
+      if (folderId != null) {
+        return folderId;
+      }
+      // Create a folder
+      ga.File folder = ga.File();
+      folder.name = folderName;
+      folder.mimeType = _folderMimeType;
+      final folderCreation = await driveApi.files.create(folder);
+      debugPrint("Folder ID: ${folderCreation.id}");
+
+      return folderCreation.id;
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
+
+  Future<User?> getUser() async {
+    debugPrint("getUser");
+    if (_account != null) {
+      final GoogleSignInAccount user = _account!;
+      await _printSignInMetaData(user);
+      return User(user.displayName, user.email, user.id);
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> initializeGoogleSignIn() async {
+    try {
+      // If serverClientId is not set yet, try to fetch it from the platform
+      if ((serverClientId == null || serverClientId!.isEmpty) &&
+          (Platform.isAndroid || Platform.isIOS)) {
+        try {
+          final channel = MethodChannel('yv_counter/config');
+          final id = await channel.invokeMethod<String>('getServerClientId');
+          debugPrint('platform fetch serverClientId: $id');
+          if (id != null && id.isNotEmpty) serverClientId = id;
+        } catch (e) {
+          debugPrint('platform fetch serverClientId failed: $e');
+        }
+      }
+
+      await _googleSignIn.initialize(serverClientId: serverClientId);
+    } catch (error) {
+      debugPrint('initialize error: $error');
+      Future.error(error);
+    }
+  }
+
+  Future<void> signIn() async {
+    try {
+      debugPrint("signIn");
+      await _googleSignIn.initialize(serverClientId: serverClientId);
+      if (_googleSignIn.supportsAuthenticate()) {
+        _account =
+            await _googleSignIn.attemptLightweightAuthentication() ??
+            await _googleSignIn.authenticate(scopeHint: _scopes);
+      } else {
+        /*
+        // For web, you can use the renderButton method to display a sign-in button.
+        if (kIsWeb)
+          web.renderButton()
+         */
+      }
+    } catch (error) {
+      debugPrint("signIn error: $error");
+      Future.error(error);
+    }
+  }
+
+  Future<void> signInSilently() async {
+    try {
+      debugPrint("signInSilently");
+      _account ??= await _googleSignIn.attemptLightweightAuthentication();
+    } catch (error) {
+      debugPrint("signInSilently error: $error");
+      Future.error(error);
+    }
+  }
+
+  Future<void> signOut() async {
+    debugPrint("signOut");
+    // await _googleSignIn.disconnect();
+    await _googleSignIn.signOut();
+    _account = null;
   }
 
   Future<void> uploadFileToGoogleDrive(File file) async {
@@ -209,18 +233,6 @@ class GoogleDrive {
     }
   }
 
-  Future<File> downloadGoogleDriveFile() async {
-    var driveApi = await _getDriveApi();
-    if (driveApi == null) {
-      const error = "Sign In Error";
-      debugPrint(error);
-      return Future.error(error);
-    } else {
-      final fileId = await _getFileId(driveApi);
-      return _downloadFileFromGoogleDrive(fileId, fileName, driveApi);
-    }
-  }
-
   Future<File> _downloadFileFromGoogleDrive(
     String fileId,
     String fileName,
@@ -256,19 +268,21 @@ class GoogleDrive {
     }
   }
 
-  Future<String?> _getFolderIdIfExists(
-    ga.DriveApi driveApi,
-    String folderName,
-  ) async {
-    final found = await driveApi.files.list(
-      q: "mimeType = '$_folderMimeType' and name = '$folderName'",
-      $fields: "files(id)",
+  // Get Drive Api
+  Future<ga.DriveApi?> _getDriveApi() async {
+    debugPrint("_getDriveApi");
+    if (_account == null) {
+      debugPrint("User not signed in.");
+      await signIn();
+    }
+    final authorization = await _account?.authorizationClient.authorizeScopes(
+      _scopes,
     );
-    final files = found.files;
-    if (files == null || files.isEmpty) {
-      return null;
+    final authClient = authorization?.authClient(scopes: _scopes);
+    if (authClient != null) {
+      return ga.DriveApi(authClient);
     } else {
-      return files.first.id;
+      return null;
     }
   }
 
@@ -293,11 +307,50 @@ class GoogleDrive {
     }
   }
 
+  Future<String?> _getFolderIdIfExists(
+    ga.DriveApi driveApi,
+    String folderName,
+  ) async {
+    final found = await driveApi.files.list(
+      q: "mimeType = '$_folderMimeType' and name = '$folderName'",
+      $fields: "files(id)",
+    );
+    final files = found.files;
+    if (files == null || files.isEmpty) {
+      return null;
+    } else {
+      return files.first.id;
+    }
+  }
+
   Future<void> _printSignInMetaData(GoogleSignInAccount account) async {
     debugPrint("supportsAuthenticate: ${_googleSignIn.supportsAuthenticate()}");
     debugPrint("User: $account");
     final auth = account.authentication;
     debugPrint("idToken: ${auth.idToken}");
+  }
+
+  /// Create a GoogleDrive instance reading `SERVER_CLIENT_ID` from the
+  /// Android BuildConfig via a platform channel. Returns an instance with
+  /// `serverClientId` set when available.
+  static Future<GoogleDrive> createFromPlatform() async {
+    // Prefer the generated constant (synchronous) to avoid platform channel race.
+    if (kServerClientId.isNotEmpty) {
+      debugPrint('createFromPlatform using generated kServerClientId');
+      return GoogleDrive(serverClientId: kServerClientId);
+    }
+    try {
+      final channel = MethodChannel('yv_counter/config');
+      final id = await channel.invokeMethod<String>('getServerClientId');
+      debugPrint('createFromPlatform got serverClientId');
+      if (id == null || id.isEmpty) {
+        return GoogleDrive();
+      }
+      return GoogleDrive(serverClientId: id);
+    } catch (error) {
+      debugPrint('createFromPlatform error: $error');
+      return GoogleDrive();
+    }
   }
 
   /*

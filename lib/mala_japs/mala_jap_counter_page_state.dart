@@ -5,18 +5,21 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Mala> _malaList = [];
   User? _user;
 
-  final GoogleDrive _googleDrive = GoogleDrive();
+  late GoogleDrive _googleDrive;
   final SharedPref _sharedPref = SharedPref();
   final List<bool> _selections = [true, false];
 
   @override
   void initState() {
     super.initState();
-    _googleDrive.initializeGoogleSignIn().then((value) {
-      _googleDrive.signInSilently().then((value) {
-        _googleDrive.getUser().then((user) {
-          setState(() {
-            _user = user;
+    GoogleDrive.createFromPlatform().then((gd) {
+      _googleDrive = gd;
+      _googleDrive.initializeGoogleSignIn().then((value) {
+        _googleDrive.signInSilently().then((value) {
+          _googleDrive.getUser().then((user) {
+            setState(() {
+              _user = user;
+            });
           });
         });
       });

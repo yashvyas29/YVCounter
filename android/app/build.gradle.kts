@@ -38,6 +38,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_24
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         // Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.yash.YVCounter"
@@ -47,6 +51,33 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Expose serverClientId from key.properties or fallback to google-services.json
+        val serverClientIdFromKey: String? = keyProperties.getProperty("serverClientId")
+        var serverClientIdFromJson: String? = null
+        val googleServicesFile = rootProject.file("app/google-services.json")
+        if (googleServicesFile.exists()) {
+            try {
+                val jsonText = googleServicesFile.readText(Charsets.UTF_8)
+                val slurper = groovy.json.JsonSlurper()
+                val parsed = slurper.parseText(jsonText) as Map<*, *>
+                val clients = (parsed["client"] as? List<*>) ?: emptyList<Any>()
+                clients.forEach { client ->
+                    val oauthClients = (client as? Map<*, *>)?.get("oauth_client") as? List<*>
+                    oauthClients?.forEach { oauth ->
+                        val map = oauth as? Map<*, *>
+                        val clientType = map?.get("client_type")?.toString()?.toIntOrNull()
+                        if (clientType == 3) {
+                            serverClientIdFromJson = map["client_id"] as? String
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // ignore parsing errors and fallback to key.properties
+                println("${e.toString()}")
+            }
+        }
+        val serverClientIdProp: String? = serverClientIdFromKey ?: serverClientIdFromJson
+        buildConfigField("String", "SERVER_CLIENT_ID", serverClientIdProp?.let { "\"$it\"" } ?: "\"\"")
     }
 
     signingConfigs {
@@ -100,4 +131,49 @@ kotlin {
             )
         )
     }
+}
+
+// Task: generate a small Dart file with the server client id so Dart can read it synchronously.
+tasks.register("generateServerClientId") {
+    doLast {
+        val props = Properties()
+        val keyFile = rootProject.file("key.properties")
+        var serverId: String? = null
+        if (keyFile.exists()) {
+            keyFile.reader(Charsets.UTF_8).use { props.load(it) }
+            serverId = props.getProperty("serverClientId")
+        }
+        if (serverId.isNullOrEmpty()) {
+            val googleServicesFile = rootProject.file("app/google-services.json")
+            if (googleServicesFile.exists()) {
+                try {
+                    val jsonText = googleServicesFile.readText(Charsets.UTF_8)
+                    val slurper = groovy.json.JsonSlurper()
+                    val parsed = slurper.parseText(jsonText) as Map<*, *>
+                    val clients = (parsed["client"] as? List<*>) ?: emptyList<Any>()
+                    clients.forEach { client ->
+                        val oauthClients = (client as? Map<*, *>)?.get("oauth_client") as? List<*>
+                        oauthClients?.forEach { oauth ->
+                            val map = oauth as? Map<*, *>
+                            val clientType = map?.get("client_type")?.toString()?.toIntOrNull()
+                            if (clientType == 3) {
+                                serverId = map["client_id"] as? String
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    println("${e.toString()}")
+                }
+            }
+        }
+        // projectDir in app/build.gradle.kts is android/app/, so ../../ gets to Flutter root
+        val flutterRoot = File(projectDir.parentFile.parentFile, "lib/generated")
+        flutterRoot.mkdirs()
+        val out = File(flutterRoot, "server_client_id.dart")
+        out.writeText("const String kServerClientId = ${if (serverId != null) "\"$serverId\"" else "\"\""};\n")
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn("generateServerClientId")
 }
