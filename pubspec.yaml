@@ -36,7 +36,6 @@ dependencies:
   extension_google_sign_in_as_googleapis_auth: ^3.0.0 # ^2.0.13
   file: ^7.0.1
   file_picker: ^10.3.10
-  file_saver: ^0.3.1
 
   flutter:
     sdk: flutter
@@ -71,6 +70,7 @@ dependencies:
   zoom_pinch_overlay: ^1.4.3
 
   # drift: ^2.11.1
+  # file_saver: ^0.3.1
   # flutter_file_saver: ^0.9.0
   # flutter_secure_storage: ^9.0.0
   # isar: ^3.1.0+1

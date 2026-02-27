@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -96,6 +95,7 @@ class MalaJapExcelFileHandler {
           fileName: fileName,
           type: FileType.custom,
           allowedExtensions: ['xlsx'],
+          bytes: Uint8List.fromList(fileBytes),
         );
         /*
         final filePath = await FlutterFileSaver().writeFileAsBytes(
@@ -104,36 +104,17 @@ class MalaJapExcelFileHandler {
         );
         */
         if (filePath == null) {
+          // debugPrint("Cancelled");
           onFailure.call("Cancelled");
         } else {
-          await File(filePath).writeAsBytes(fileBytes);
+          /*
+          debugPrint("File saved to: $filePath");
+          if (Platform.isMacOS || Platform.isLinux || Platform.isWindows || Platform.isFuchsia) {
+            await File(filePath).writeAsBytes(fileBytes);
+          }
+          */
           await onSuccess.call();
         }
-      } catch (error) {
-        debugPrint(error.toString());
-        onFailure.call(error.toString());
-      }
-    } else {
-      onFailure.call("");
-    }
-  }
-
-  Future<void> createAndSaveExcelOnMobile(
-    final Future<void> Function() onSuccess,
-    final void Function(String) onFailure,
-  ) async {
-    final Excel excel = await _createExcel();
-    // List<int>? fileBytes = excel.encode();
-    List<int>? fileBytes = excel.save();
-    if (fileBytes != null && fileBytes.isNotEmpty) {
-      try {
-        await FileSaver.instance.saveFile(
-          name: "malas",
-          bytes: Uint8List.fromList(fileBytes),
-          fileExtension: "xlsx",
-          mimeType: MimeType.microsoftExcel,
-        );
-        await onSuccess.call();
       } catch (error) {
         debugPrint(error.toString());
         onFailure.call(error.toString());

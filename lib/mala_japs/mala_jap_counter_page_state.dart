@@ -449,11 +449,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           _handleExcelBackupSuccess,
                           _handleExcelBackupFailure,
                         );
-                      } else if (Platform.isAndroid || Platform.isIOS) {
-                        await fileHandler.createAndSaveExcelOnMobile(
-                          _handleExcelBackupSuccess,
-                          _handleExcelBackupFailure,
-                        );
                       } else {
                         await fileHandler.createAndSaveExcelOnDesktop(
                           _handleExcelBackupSuccess,

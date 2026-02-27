@@ -347,6 +347,8 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       border: inputBorder,
       hintText: hintText,
     );
+    final locale = Localizations.localeOf(context);
+    final currLangCode = locale.languageCode;
     TextEditingController textController = TextEditingController();
     textController.text = value;
     final image = _images[id];
@@ -463,6 +465,9 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
             Column(
               children: [
                 Row(
+                  crossAxisAlignment: readOnly
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
                   children: [
                     image != null
                         ? _imageWidget(image)
@@ -487,12 +492,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     SizedBox(width: 8),
                     readOnly
                         ? SizedBox(
-                            width: boxSide - imageSide - 88,
+                            width: boxSide - imageSide - 96,
                             child: Text(value, style: textStyle),
                           )
                         : SizedBox(
-                            width: boxSide - imageSide - 88,
-                            height: imageSide + 4,
+                            width: boxSide - imageSide - 96,
+                            height: imageSide + (isRoot ? 0 : spacing + (currLangCode == "hi" ? 26 : 0)),
                             child: TextField(
                               keyboardType: TextInputType.multiline,
                               maxLines: null,
