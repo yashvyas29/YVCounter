@@ -28,6 +28,17 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Generate Stub File
+        run: |
+          mkdir -p lib/generated
+          cat > lib/generated/server_client_id.dart << 'EOF'
+          const String kServerClientId =
+              String.fromEnvironment('SERVER_CLIENT_ID', defaultValue: '');
+          EOF
+
+      - name: Format Generated Stub
+        run: dart format lib/generated/server_client_id.dart || true
+
       - name: Verify Formatting
         run: dart format --output=none --set-exit-if-changed .
 
