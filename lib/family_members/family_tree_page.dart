@@ -24,8 +24,30 @@ class FamilyTreePage extends StatefulWidget {
     return _jsonFileHandler.getFamilyFileName(title);
   }
 
-  Future<Map<String, dynamic>> readJsonData() async {
-    final fileName = getFileName();
+  /// Loads the JSON for the current page, preferring a language-specific
+  /// variant when the locale indicates Hindi.
+  Future<Map<String, dynamic>> readJsonData(BuildContext context) async {
+    final baseName = getFileName();
+
+    // If the user has switched to Hindi, look for a *_hi version first.
+    final languageCode = Localizations.localeOf(context).languageCode;
+    String fileName = baseName;
+
+    if (languageCode == 'hi') {
+      final hiName = '${baseName}_hi';
+      // try local copy first
+      var data = await _jsonFileHandler.readJson(hiName);
+      if (data.isNotEmpty) {
+        return data;
+      }
+      // fall back to packaged version
+      data = await _jsonFileHandler.readJsonFromBundle(hiName);
+      if (data.isNotEmpty) {
+        return data;
+      }
+      // if hi variant is not present, continue with base
+    }
+
     final data = await _jsonFileHandler.readJson(fileName);
     if (data.isEmpty) {
       return await _jsonFileHandler.readJsonFromBundle(fileName);
@@ -158,7 +180,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   Widget _futureBuilder() {
     return _data.isEmpty
         ? FutureBuilder(
-            future: widget.readJsonData(),
+            future: widget.readJsonData(context),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               debugPrint(snapshot.connectionState.toString());
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -497,7 +519,12 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           )
                         : SizedBox(
                             width: boxSide - imageSide - 96,
-                            height: imageSide + (isRoot ? 0 : spacing + (currLangCode == "hi" ? 26 : 0)),
+                            height:
+                                imageSide +
+                                (isRoot
+                                    ? 0
+                                    : spacing +
+                                          (currLangCode == "hi" ? 26 : 0)),
                             child: TextField(
                               keyboardType: TextInputType.multiline,
                               maxLines: null,

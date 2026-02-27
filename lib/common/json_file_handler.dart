@@ -102,6 +102,12 @@ class JsonFileHandler {
         return 'kadvawat_family_hi';
       case 'धर्मावत परिवार':
         return 'dharmawat_family_hi';
+      case 'लोक':
+        return 'lok_hi';
+      case 'भूलोक':
+        return 'bhulok_hi';
+      case 'त्रिलोक':
+        return 'trilok_hi';
       default:
         return trimedName.toLowerCase().replaceAll(' ', '_');
     }

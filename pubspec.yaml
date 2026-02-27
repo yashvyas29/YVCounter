@@ -85,7 +85,8 @@ dependency_overrides:
   # win32: ^6.0.0
 
   # transitive dev_dependencies
-  # leak_tracker: ^11.0.1
+  # matcher: ^0.12.19
+  # test_api: ^0.7.10
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4

@@ -1,25 +1,25 @@
 {
   "nodes": [
-    {"id": 1, "label": "ब्रह्मांड (Cosmos)", "isRoot": true},
-    {"id": 2, "label": "स्वर्गलोक (ऊपरी लोक)", "isRootChild": true},
-    {"id": 3, "label": "भूलोक (मध्य लोक/पृथ्वी)", "isRootChild": true},
-    {"id": 4, "label": "पाताल/अधोलोक (निचले लोक)", "isRootChild": true},
-    {"id": 5, "label": "इंद्रपुरी (अमरावती/देव निवास)"},
-    {"id": 6, "label": "मेरु पर्वत"},
-    {"id": 7, "label": "मनुष्य/कर्मक्षेत्र"},
-    {"id": 8, "label": "नागलोक (वासुकी/शेष)"},
-    {"id": 9, "label": "असुर निवास (दैत्य)"},
-    {"id": 10, "label": "नरक (न्याय का स्थान)"}
+    {"id": 1, "label": "Cosmos", "isRoot": true},
+    {"id": 2, "label": "Swarglok (Upper world)", "isRootChild": true},
+    {"id": 3, "label": "Bhoolok (Middle world/Earth)", "isRootChild": true},
+    {"id": 4, "label": "Patal/Adholok (Lower world)", "isRootChild": true},
+    {"id": 5, "label": "Indrapuri (Amravati/Deva residence)"},
+    {"id": 6, "label": "Meru Mountain"},
+    {"id": 7, "label": "Human/Karmakshetra"},
+    {"id": 8, "label": "Nagalok (Vasuki/Shesha)"},
+    {"id": 9, "label": "Asura residence (Daitya)"},
+    {"id": 10, "label": "Naraka (Place of Justice)"}
   ],
   "edges": [
-    {"from": 1, "to": 2, "label": "विभाजन"},
-    {"from": 1, "to": 3, "label": "विभाजन"},
-    {"from": 1, "to": 4, "label": "विभाजन"},
-    {"from": 2, "to": 5, "label": "निवास"},
-    {"from": 2, "to": 6, "label": "केंद्रीय पर्वत"},
-    {"from": 3, "to": 7, "label": "क्षेत्र"},
-    {"from": 4, "to": 8, "label": "प्रमुख खंड"},
-    {"from": 4, "to": 9, "label": "प्रमुख खंड"},
+    {"from": 1, "to": 2, "label": "division"},
+    {"from": 1, "to": 3, "label": "division"},
+    {"from": 1, "to": 4, "label": "division"},
+    {"from": 2, "to": 5, "label": "residence"},
+    {"from": 2, "to": 6, "label": "central mountain"},
+    {"from": 3, "to": 7, "label": "field"},
+    {"from": 4, "to": 8, "label": "major part"},
+    {"from": 4, "to": 9, "label": "major part"},
     {"from": 7, "to": 10}
   ]
 }
