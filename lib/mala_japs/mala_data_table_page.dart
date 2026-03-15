@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yv_counter/common/date_time_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/data_model/mala.dart';
+import 'package:yv_counter/data_model/settings_model.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
 
 import 'mala_jap_excel_file_handler.dart';
 
-part '../mala_japs/mala_data_table_page_state.dart';
+part 'mala_data_table_page_state.dart';
 
 class MalaDataTablePage extends StatefulWidget {
   const MalaDataTablePage({super.key, required this.malas});

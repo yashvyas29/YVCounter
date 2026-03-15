@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Add'**
   String get add;
 
+  /// No description provided for @resetConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reset the counter for {date}?'**
+  String resetConfirmation({required String date});
+
   /// No description provided for @malaHistory.
   ///
   /// In en, this message translates to:
@@ -469,6 +475,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'image'**
   String get image;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @counterLabelPrimary.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter name (primary)'**
+  String get counterLabelPrimary;
+
+  /// No description provided for @counterLabelSecondary.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter name (secondary)'**
+  String get counterLabelSecondary;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @familyCardColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Family card color'**
+  String get familyCardColor;
+
+  /// No description provided for @familyTextColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Family text color'**
+  String get familyTextColor;
+
+  /// No description provided for @reverseCardTextColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap card and text colors'**
+  String get reverseCardTextColors;
+
+  /// No description provided for @reverseCardTextColorsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, the card background and text colors will be swapped.'**
+  String get reverseCardTextColorsDescription;
+
+  /// No description provided for @signInToGoogleDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Google Drive'**
+  String get signInToGoogleDrive;
+
+  /// No description provided for @signedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String signedInAs({required String email});
 
   /// No description provided for @commonError.
   ///

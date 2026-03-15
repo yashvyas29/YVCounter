@@ -1,4 +1,4 @@
-part of '../mala_japs/mala_data_table_page.dart';
+part of 'mala_data_table_page.dart';
 
 class _MalaDataTablePageState extends State<MalaDataTablePage>
     with RestorationMixin {
@@ -99,6 +99,9 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsModel>(context);
+    final malaLabel = settings.primaryLabel;
+    final japLabel = settings.secondaryLabel;
     final tableItemsCount = widget.malas.length;
     final totalMalas = widget._getTotalMalas();
     final totalJaps = totalMalas * Mala.japsPerMala;
@@ -133,7 +136,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                 children: [
                   PaginatedDataTable(
                     header: Text(
-                      '${localizations.mala}: $totalMalas, ${localizations.jap}: $totalJaps',
+                      '$malaLabel: $totalMalas, $japLabel: $totalJaps',
                     ),
                     availableRowsPerPage: [
                       rowsPerPage,
@@ -169,13 +172,13 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                         ),
                       ),
                       DataColumn(
-                        label: Text(localizations.mala),
+                        label: Text(malaLabel),
                         numeric: true,
                         onSort: (columnIndex, ascending) =>
                             _sort<num>((d) => d.count, columnIndex, ascending),
                       ),
                       DataColumn(
-                        label: Text(localizations.jap),
+                        label: Text(japLabel),
                         numeric: true,
                         onSort: (columnIndex, ascending) =>
                             _sort<num>((d) => d.japs, columnIndex, ascending),

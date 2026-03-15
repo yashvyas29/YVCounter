@@ -31,6 +31,11 @@ class AppLocalizationsHi extends AppLocalizations {
   String get add => 'जोड़े';
 
   @override
+  String resetConfirmation({required String date}) {
+    return 'क्या आप निश्चित रूप से $date के लिए काउंटर रीसेट करना चाहते हैं?';
+  }
+
+  @override
   String get malaHistory => 'माला इतिहास';
 
   @override
@@ -204,6 +209,48 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get image => 'चित्र';
+
+  @override
+  String get settings => 'सेटिंग';
+
+  @override
+  String get counterLabelPrimary => 'काउंटर नाम (प्राथमिक)';
+
+  @override
+  String get counterLabelSecondary => 'काउंटर नाम (द्वितीयक)';
+
+  @override
+  String get theme => 'थीम';
+
+  @override
+  String get themeSystem => 'सिस्टम डिफ़ॉल्ट';
+
+  @override
+  String get themeLight => 'लाइट';
+
+  @override
+  String get themeDark => 'डार्क';
+
+  @override
+  String get familyCardColor => 'परिवार कार्ड रंग';
+
+  @override
+  String get familyTextColor => 'परिवार पाठ रंग';
+
+  @override
+  String get reverseCardTextColors => 'कार्ड और पाठ रंग बदलें';
+
+  @override
+  String get reverseCardTextColorsDescription =>
+      'सक्षम होने पर कार्ड की पृष्ठभूमि और पाठ रंग स्वैप हो जाएंगे।';
+
+  @override
+  String get signInToGoogleDrive => 'गूगल ड्राइव में साइन इन करें';
+
+  @override
+  String signedInAs({required String email}) {
+    return 'लॉग इन $email के रूप में';
+  }
 
   @override
   String get commonError =>

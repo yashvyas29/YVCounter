@@ -1,4 +1,4 @@
-part of '../mala_japs/mala_jap_counter_page.dart';
+part of 'mala_jap_counter_page.dart';
 
 class _MyHomePageState extends State<MyHomePage> {
   late Mala _mala;
@@ -97,16 +97,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _resetCounter() async {
-    if (_mala.japs > 0) {
-      widget._playAlertSysSound();
-      setState(() {
-        _mala.count = 0;
-        _mala.japs = 0;
-      });
-      _malaList.remove(_mala);
-      _sharedPref.saveList(Mala.key, _malaList);
-      // widget.deleteMalaByDate(_mala.date);
-    }
+    if (_mala.japs == 0) return;
+
+    final ctx = context;
+    final localizations = AppLocalizations.of(ctx);
+    // ignore: use_build_context_synchronously
+    await showDeleteConfirmationDialog(
+      ctx,
+      localizations.resetConfirmation(
+        date: DateTimeHandler.getString(_mala.date, DateTimeHandler.dateFormat),
+      ),
+      () async {
+        if (!mounted) return;
+        widget._playAlertSysSound();
+        setState(() {
+          _mala.count = 0;
+          _mala.japs = 0;
+        });
+        _malaList.remove(_mala);
+        await _sharedPref.saveList(Mala.key, _malaList);
+        // ignore: use_build_context_synchronously
+        Navigator.of(ctx).pop();
+      },
+    );
   }
 
   Future<void> _restoreBackup() async {
@@ -348,6 +361,15 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
+          IconButton(
+            tooltip: localizations.settings,
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
           /*
           IconButton(
             tooltip: 'Open My Family',
@@ -413,6 +435,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 tooltip: localizations.menu,
                 onSelected: (menu) async {
                   switch (menu) {
+                    case Menu.settings:
+                      if (!mounted) return;
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsPage(),
+                        ),
+                      );
+                      break;
                     case Menu.language:
                       if (!mounted) return;
                       showProgressIndicator(
@@ -420,21 +450,52 @@ class _MyHomePageState extends State<MyHomePage> {
                         localizations.changingLanguage,
                       );
                       localeModel.set(Locale(changeToLanguage));
+                      if (!context.mounted) return;
+                      hideProgressIndicator(context);
+                      break;
+                    case Menu.signIn:
+                      if (!mounted) return;
+                      showProgressIndicator(
+                        context,
+                        localizations.signInToGoogleDrive,
+                      );
+                      await _googleDrive.signIn();
+                      if (!context.mounted) return;
+                      hideProgressIndicator(context);
+                      break;
                     case Menu.backup:
                       if (!mounted) return;
+                      if (_user == null) {
+                        showSnackBar(
+                          context,
+                          '${localizations.signInToGoogleDrive} first',
+                        );
+                        break;
+                      }
                       showProgressIndicator(
                         context,
                         localizations.backupInProgress,
                       );
                       await _saveBackup();
+                      if (!context.mounted) return;
+                      hideProgressIndicator(context);
                       break;
                     case Menu.restore:
                       if (!mounted) return;
+                      if (_user == null) {
+                        showSnackBar(
+                          context,
+                          '${localizations.signInToGoogleDrive} first',
+                        );
+                        break;
+                      }
                       showProgressIndicator(
                         context,
                         localizations.restoringFromBackup,
                       );
                       await _restoreBackup();
+                      if (!context.mounted) return;
+                      hideProgressIndicator(context);
                       break;
                     case Menu.backupExcel:
                       if (!mounted) return;
@@ -455,6 +516,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           _handleExcelBackupFailure,
                         );
                       }
+                      if (!context.mounted) return;
+                      hideProgressIndicator(context);
                       break;
                     case Menu.restoreExcel:
                       if (!mounted) return;
@@ -466,6 +529,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       break;
                     case Menu.delete:
                       if (!mounted) return;
+                      if (_user == null) {
+                        showSnackBar(
+                          context,
+                          '${localizations.signInToGoogleDrive} first',
+                        );
+                        break;
+                      }
                       showProgressIndicator(
                         context,
                         localizations.deletingBackupFromGD,
@@ -492,16 +562,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         localizations.signingOutFromGD,
                       );
                       await _googleDrive.signOut();
+                      break;
                   }
                   final user = await _googleDrive.getUser();
                   setState(() {
                     _user = user;
                   });
-                  if (!context.mounted) return;
-                  hideProgressIndicator(context);
                 },
                 itemBuilder: (context) {
                   return [
+                    PopupMenuItem(
+                      value: Menu.settings,
+                      child: Text(localizations.settings),
+                    ),
                     PopupMenuItem(
                       value: Menu.language,
                       child: Text(
@@ -532,6 +605,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       value: Menu.delete,
                       child: Text(localizations.deleteBackupFromGD),
                     ),
+                    if (_user == null)
+                      PopupMenuItem(
+                        value: Menu.signIn,
+                        child: Text(localizations.signInToGoogleDrive),
+                      ),
                     if (_user != null)
                       PopupMenuItem(
                         value: Menu.signOut,
@@ -549,8 +627,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // in the middle of the parent.
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints viewportConstraints) {
-            final malaString = AppLocalizations.of(context).mala;
-            final japString = AppLocalizations.of(context).jap;
+            final settings = Provider.of<SettingsModel>(context);
+            final malaString = settings.primaryLabel;
+            final japString = settings.secondaryLabel;
             return SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -690,26 +769,28 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            FloatingActionButton(
-              heroTag: 1,
-              onPressed: _decrementCounter,
-              tooltip: 'Remove Mala or Jap',
-              child: const Icon(Icons.remove),
-            ),
-            FloatingActionButton(
-              heroTag: 4,
-              onPressed: _resetCounter,
-              tooltip: 'Reset Mala or Jap',
-              child: const Icon(Icons.clear),
-            ),
-          ],
-        ),
-      ),
+      floatingActionButton: _mala.japs > 0
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  FloatingActionButton(
+                    heroTag: 1,
+                    onPressed: _decrementCounter,
+                    tooltip: 'Remove Mala or Jap',
+                    child: const Icon(Icons.remove),
+                  ),
+                  FloatingActionButton(
+                    heroTag: 4,
+                    onPressed: _resetCounter,
+                    tooltip: 'Reset Mala or Jap',
+                    child: const Icon(Icons.clear),
+                  ),
+                ],
+              ),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       // This trailing comma makes auto-formatting nicer for build methods.
     );

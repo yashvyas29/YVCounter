@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
+import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:yv_counter/common/image_file_handler.dart';
+import 'package:yv_counter/data_model/settings_model.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/family_members/family_member_page.dart';
@@ -111,6 +113,23 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
+            onPressed: () async {
+              final nodes = _data[FamilyJsonKey.nodes] as List<dynamic>?;
+              if (nodes == null || nodes.isEmpty) return;
+              final result = await showSearch<int?>(
+                context: context,
+                delegate: FamilyMemberSearchDelegate(
+                  nodes,
+                  AppLocalizations.of(context),
+                ),
+              );
+              if (result != null) {
+                _jumpToNode(ValueKey(result));
+              }
+            },
+            icon: const Icon(Icons.search),
+          ),
+          IconButton(
             onPressed: () {
               debugPrint("Jump to root node pressed.");
               _jumpToRootNode();
@@ -158,12 +177,13 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
   }
 
-  Widget _borderedWidget(Widget widget, double radius) {
+  Widget _borderedWidget(Widget widget, double radius, {Color? borderColor}) {
     final theme = Theme.of(context);
-    final borderColor = theme.textTheme.bodyLarge?.color ?? theme.primaryColor;
+    final effectiveBorderColor =
+        borderColor ?? theme.textTheme.bodyLarge?.color ?? theme.primaryColor;
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: borderColor, width: borderWidth),
+        border: Border.all(color: effectiveBorderColor, width: borderWidth),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: widget,
@@ -266,7 +286,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     );
   }
 
-  Widget _imageWidget(File image) {
+  Widget _imageWidget(File image, {Color? borderColor}) {
     return _borderedWidget(
       _clipRectWidget(
         ZoomOverlay(
@@ -280,6 +300,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         boxCornerRadius,
       ),
       boxCornerRadius,
+      borderColor: borderColor,
     );
   }
 
@@ -358,7 +379,41 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     final hintText = isRoot
         ? localizations.enterParentsName
         : localizations.enterChildAndSpouseName;
-    final borderColor = textStyle?.color ?? theme.primaryColor;
+    final settings = Provider.of<SettingsModel>(context);
+    final baseCardColor = settings.familyCardColor ?? theme.cardColor;
+    final baseTextColor =
+        ThemeData.estimateBrightnessForColor(baseCardColor) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
+    Color ensureReadableTextColor(Color card, Color desiredText) {
+      // If the colors are identical, force a readable contrast color.
+      if (card.toARGB32() == desiredText.toARGB32()) {
+        return ThemeData.estimateBrightnessForColor(card) == Brightness.dark
+            ? Colors.white
+            : Colors.black;
+      }
+      final cardBrightness = ThemeData.estimateBrightnessForColor(card);
+      final textBrightness = ThemeData.estimateBrightnessForColor(desiredText);
+      if (cardBrightness == textBrightness) {
+        return cardBrightness == Brightness.dark ? Colors.white : Colors.black;
+      }
+      return desiredText;
+    }
+
+    final cardColor = settings.familyCardTextSwap
+        ? baseTextColor
+        : baseCardColor;
+    final rawCardTextColor = settings.familyCardTextSwap
+        ? baseCardColor
+        : baseTextColor;
+    final cardTextColor = ensureReadableTextColor(cardColor, rawCardTextColor);
+    final borderColor = cardTextColor;
+
+    final hintStyle = textStyle?.copyWith(
+      color: cardTextColor.withValues(alpha: 0.7),
+    );
+
     final inputBorder = readOnly
         ? InputBorder.none
         : OutlineInputBorder(
@@ -368,6 +423,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       enabledBorder: inputBorder,
       border: inputBorder,
       hintText: hintText,
+      hintStyle: hintStyle,
     );
     final locale = Localizations.localeOf(context);
     final currLangCode = locale.languageCode;
@@ -467,7 +523,8 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
             .then((val) {
               // debugPrint("Returned from FamilyMemberPage.\n$val");
               setState(() {
-                // Update other data in future when user can edit it.
+                // Refresh data to reflect edits made in member details.
+                _data = {};
                 _images.remove(id);
               });
             });
@@ -476,6 +533,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         width: boxSide,
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
+          color: cardColor,
           borderRadius: BorderRadius.circular(boxCornerRadius),
           boxShadow: [BoxShadow(color: Colors.red[300]!, spreadRadius: 1)],
         ),
@@ -492,7 +550,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       : CrossAxisAlignment.start,
                   children: [
                     image != null
-                        ? _imageWidget(image)
+                        ? _imageWidget(image, borderColor: cardTextColor)
                         : FutureBuilder(
                             future: imageFileHandler.loadThumbnail(id),
                             builder:
@@ -502,11 +560,19 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                                       snapshot.hasData) {
                                     final image = snapshot.data!;
                                     _images[id] = image;
-                                    return _imageWidget(image);
+                                    return _imageWidget(
+                                      image,
+                                      borderColor: cardTextColor,
+                                    );
                                   } else {
                                     return _borderedWidget(
-                                      Icon(Icons.person, size: imageSide),
+                                      Icon(
+                                        Icons.person,
+                                        size: imageSide,
+                                        color: cardTextColor,
+                                      ),
                                       boxCornerRadius,
+                                      borderColor: cardTextColor,
                                     );
                                   }
                                 },
@@ -515,7 +581,10 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     readOnly
                         ? SizedBox(
                             width: boxSide - imageSide - 96,
-                            child: Text(value, style: textStyle),
+                            child: Text(
+                              value,
+                              style: textStyle?.copyWith(color: cardTextColor),
+                            ),
                           )
                         : SizedBox(
                             width: boxSide - imageSide - 96,
@@ -530,7 +599,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                               maxLines: null,
                               controller: textController,
                               decoration: inputDecoration,
-                              style: textStyle,
+                              style: textStyle?.copyWith(color: cardTextColor),
                               readOnly: readOnly,
                               autofocus: !readOnly,
                             ),
@@ -548,7 +617,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           );
                           _jumpToNode(prevNodeKey!);
                         },
-                        icon: const Icon(Icons.arrow_back),
+                        icon: Icon(Icons.arrow_back, color: cardTextColor),
                       ),
                     if (parentNode != null)
                       IconButton(
@@ -558,7 +627,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           );
                           _jumpToNode(parentNode.key!);
                         },
-                        icon: const Icon(Icons.arrow_upward),
+                        icon: Icon(Icons.arrow_upward, color: cardTextColor),
                       ),
                     if (successors.isNotEmpty)
                       IconButton(
@@ -568,7 +637,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           );
                           _jumpToNode(firstChildNode.key!);
                         },
-                        icon: const Icon(Icons.arrow_downward),
+                        icon: Icon(Icons.arrow_downward, color: cardTextColor),
                       ),
                     if (nextNodeKey != null)
                       IconButton(
@@ -578,7 +647,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           );
                           _jumpToNode(nextNodeKey!);
                         },
-                        icon: const Icon(Icons.arrow_forward),
+                        icon: Icon(Icons.arrow_forward, color: cardTextColor),
                       ),
                   ],
                 ),
@@ -612,7 +681,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                         },
                       );
                     },
-                    icon: const Icon(Icons.delete),
+                    icon: Icon(Icons.delete, color: cardTextColor),
                   )
                 else if (isRoot && readOnly)
                   IconButton(
@@ -644,7 +713,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       });
                       await widget.writeJsonData(_data);
                     },
-                    icon: const Icon(Icons.add_box),
+                    icon: Icon(Icons.add_box, color: cardTextColor),
                   ),
                 readOnly
                     ? IconButton(
@@ -665,7 +734,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                           });
                           // await widget.writeJsonData(_data);
                         },
-                        icon: const Icon(Icons.edit),
+                        icon: Icon(Icons.edit, color: cardTextColor),
                       )
                     : IconButton(
                         onPressed: () async {
@@ -687,7 +756,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                             debugPrint(hintText);
                           }
                         },
-                        icon: const Icon(Icons.done_outline),
+                        icon: Icon(Icons.done_outline, color: cardTextColor),
                       ),
                 if (readOnly)
                   IconButton(
@@ -705,7 +774,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       });
                       await widget.writeJsonData(_data);
                     },
-                    icon: const Icon(Icons.add_circle),
+                    icon: Icon(Icons.add_circle, color: cardTextColor),
                   )
                 else if (value.isNotEmpty)
                   IconButton(
@@ -716,7 +785,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       });
                       // await widget.writeJsonData(_data);
                     },
-                    icon: const Icon(Icons.cancel),
+                    icon: Icon(Icons.cancel, color: cardTextColor),
                   ),
                 /*
                   if (successors.isNotEmpty)
@@ -930,5 +999,58 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
     // Apply the new matrix to the controller
     _transformationController.value = matrix;
     */
+  }
+}
+
+class FamilyMemberSearchDelegate extends SearchDelegate<int?> {
+  FamilyMemberSearchDelegate(this.nodes, this.localizations)
+    : super(searchFieldLabel: localizations.memberName);
+
+  final List<dynamic> nodes;
+  final AppLocalizations localizations;
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, null),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    final filtered = nodes.where((node) {
+      final label = (node[FamilyJsonKey.label] ?? '').toString();
+      return label.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    return ListView.builder(
+      itemCount: filtered.length,
+      itemBuilder: (context, index) {
+        final node = filtered[index];
+        final label = node[FamilyJsonKey.label]?.toString() ?? '';
+        final id = node[FamilyJsonKey.id] as int;
+        return ListTile(
+          title: Text(label.isEmpty ? localizations.memberName : label),
+          onTap: () => close(context, id),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (query.isEmpty) {
+      return const Center(child: Text('Type to search')); // not localized
+    }
+    return buildResults(context);
   }
 }

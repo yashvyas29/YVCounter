@@ -21,6 +21,15 @@
       }
   },
   "add": "Add",
+  "resetConfirmation": "Are you sure you want to reset the counter for {date}?",
+  "@resetConfirmation" : {
+      "placeholders": {
+        "date": {
+          "type": "String",
+          "example": "2026-03-15"
+        }
+      }
+  },
 
   "malaHistory": "Mala History",
   "date": "Date",
@@ -105,6 +114,28 @@
   "memberName": "Member Name",
   "spouseName": "Spouse Name",
   "image": "image",
+
+  "settings": "Settings",
+  "counterLabelPrimary": "Counter name (primary)",
+  "counterLabelSecondary": "Counter name (secondary)",
+  "theme": "Theme",
+  "themeSystem": "System default",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "familyCardColor": "Family card color",
+  "familyTextColor": "Family text color",
+  "reverseCardTextColors": "Swap card and text colors",
+  "reverseCardTextColorsDescription": "When enabled, the card background and text colors will be swapped.",
+  "signInToGoogleDrive": "Sign in to Google Drive",
+  "signedInAs": "Signed in as {email}",
+  "@signedInAs" : {
+      "placeholders": {
+        "email": {
+          "type": "String",
+          "example": "yash@email.com"
+        }
+      }
+  },
 
   "commonError": "Something went wrong, please try again later."
 }

@@ -15,6 +15,7 @@ import 'package:yv_counter/common/date_time_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/sqlite_db_provider.dart';
 import 'package:yv_counter/data_model/locale_model.dart';
+import 'package:yv_counter/data_model/settings_model.dart';
 import 'package:yv_counter/family_members/family_list_page.dart';
 import 'package:yv_counter/common/google_drive.dart';
 import 'package:yv_counter/data_model/mala.dart';
@@ -24,12 +25,13 @@ import 'package:yv_counter/common/shared_pref.dart';
 import 'package:yv_counter/data_model/user.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
+import 'package:yv_counter/settings/settings_page.dart';
 
 import 'mala_jap_excel_file_handler.dart';
 
 // import '../common/family_handler.dart';
 
-part '../mala_japs/mala_jap_counter_page_state.dart';
+part 'mala_jap_counter_page_state.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -144,12 +146,14 @@ class MyHomePage extends StatefulWidget {
 
 // This is the type used by the popup menu below.
 enum Menu {
+  settings,
   language,
   backup,
   restore,
   backupExcel,
   restoreExcel,
   delete,
+  signIn,
   signOut,
 }
 

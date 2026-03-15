@@ -7,6 +7,7 @@ import 'package:image_cropper/image_cropper.dart' as ic;
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:widget_zoom/widget_zoom.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
+import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
 
@@ -32,11 +33,67 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
   late ImageFileHandler imageFileHandler;
   Uint8List? _imageData;
 
+  late String _currentLabel;
+  late TextEditingController _nameController;
+  late TextEditingController _spouseController;
+  bool _isEditing = false;
+
   @override
   void initState() {
     super.initState();
     imageFileHandler = ImageFileHandler(prefix: widget.familyFileName);
+    _currentLabel = widget.name;
+    _setupControllers();
     _loadImage();
+  }
+
+  void _setupControllers() {
+    final names = _names();
+    _nameController = TextEditingController(text: names.first);
+    _spouseController = TextEditingController(
+      text: names.length > 1 ? names.last : '',
+    );
+  }
+
+  void _resetEditing() {
+    final names = _names();
+    _nameController.text = names.first;
+    _spouseController.text = names.length > 1 ? names.last : '';
+    setState(() {
+      _isEditing = false;
+    });
+  }
+
+  Future<void> _saveMemberDetails() async {
+    final name = _nameController.text.trim();
+    final spouse = _spouseController.text.trim();
+    final label = spouse.isNotEmpty ? '$name\n$spouse' : name;
+    await _updateMemberLabel(label);
+    setState(() {
+      _currentLabel = label;
+      _isEditing = false;
+    });
+    if (!mounted) return;
+    showSnackBar(context, AppLocalizations.of(context).updated);
+  }
+
+  Future<void> _updateMemberLabel(String label) async {
+    try {
+      final handler = JsonFileHandler();
+      final data = await handler.readJson(widget.familyFileName);
+      if (data.isEmpty) return;
+      final nodes = data[FamilyJsonKey.nodes] as List<dynamic>?;
+      if (nodes == null) return;
+      for (final element in nodes) {
+        if (element[FamilyJsonKey.id] == widget.id) {
+          element[FamilyJsonKey.label] = label;
+          break;
+        }
+      }
+      await handler.writeJsonData(widget.familyFileName, data);
+    } catch (error) {
+      debugPrint('Failed to update member label: $error');
+    }
   }
 
   Future<void> _loadImage() async {
@@ -140,8 +197,15 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
     });
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _spouseController.dispose();
+    super.dispose();
+  }
+
   List<String> _names() {
-    return widget.name.split('\n');
+    return _currentLabel.split('\n');
   }
 
   bool _isMarried() {
@@ -253,6 +317,25 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
                 _cropController.crop();
               },
             ),
+          if (_imageData == null)
+            if (_isEditing) ...[
+              IconButton(
+                icon: const Icon(Icons.check),
+                onPressed: _saveMemberDetails,
+              ),
+              IconButton(
+                icon: const Icon(Icons.cancel),
+                onPressed: _resetEditing,
+              ),
+            ] else
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  setState(() {
+                    _isEditing = true;
+                  });
+                },
+              ),
         ],
       ),
       body: _imageData != null
@@ -309,16 +392,38 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${localizations.memberName}: ${names.first}'),
-                        if (_isMarried())
-                          Column(
-                            children: [
-                              SizedBox(height: 10),
-                              Text(
-                                '${localizations.spouseName}: ${names.last}',
-                              ),
-                            ],
+                        if (_isEditing) ...[
+                          Text(localizations.memberName),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              hintText: localizations.memberName,
+                            ),
                           ),
+                          const SizedBox(height: 16),
+                          Text(localizations.spouseName),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: _spouseController,
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              hintText: localizations.spouseName,
+                            ),
+                          ),
+                        ] else ...[
+                          Text('${localizations.memberName}: ${names.first}'),
+                          if (_isMarried())
+                            Column(
+                              children: [
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${localizations.spouseName}: ${names.last}',
+                                ),
+                              ],
+                            ),
+                        ],
                         /*
                   SizedBox(height: 10),
                   Text(

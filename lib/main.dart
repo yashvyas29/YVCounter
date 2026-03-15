@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yv_counter/data_model/locale_model.dart';
+import 'package:yv_counter/data_model/settings_model.dart';
 /*
 import 'package:isar/isar.dart';
 import 'package:yv_counter/data_model/family_member_relation.dart';
@@ -16,27 +17,37 @@ Future<void> main() async {
       inspector: true);
       */
   final localeModel = await LocaleModel.getInstance();
-  runApp(MyApp(localeModel: localeModel));
+  final settingsModel = await SettingsModel.getInstance();
+  runApp(MyApp(localeModel: localeModel, settingsModel: settingsModel));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.localeModel});
+  const MyApp({
+    super.key,
+    required this.localeModel,
+    required this.settingsModel,
+  });
 
   final LocaleModel localeModel;
+  final SettingsModel settingsModel;
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => localeModel,
-      child: Consumer<LocaleModel>(
-        builder: (context, localeModel, child) => MaterialApp(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<LocaleModel>.value(value: localeModel),
+        ChangeNotifierProvider<SettingsModel>.value(value: settingsModel),
+      ],
+      child: Consumer2<LocaleModel, SettingsModel>(
+        builder: (context, localeModel, settingsModel, child) => MaterialApp(
           onGenerateTitle: (context) => AppLocalizations.of(context).title,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: localeModel.locale,
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
+          themeMode: settingsModel.themeMode,
           home: const MyHomePage(),
         ),
       ),

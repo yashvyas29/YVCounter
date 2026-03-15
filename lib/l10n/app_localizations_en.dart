@@ -31,6 +31,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add => 'Add';
 
   @override
+  String resetConfirmation({required String date}) {
+    return 'Are you sure you want to reset the counter for $date?';
+  }
+
+  @override
   String get malaHistory => 'Mala History';
 
   @override
@@ -204,6 +209,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get image => 'image';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get counterLabelPrimary => 'Counter name (primary)';
+
+  @override
+  String get counterLabelSecondary => 'Counter name (secondary)';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get themeSystem => 'System default';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get familyCardColor => 'Family card color';
+
+  @override
+  String get familyTextColor => 'Family text color';
+
+  @override
+  String get reverseCardTextColors => 'Swap card and text colors';
+
+  @override
+  String get reverseCardTextColorsDescription =>
+      'When enabled, the card background and text colors will be swapped.';
+
+  @override
+  String get signInToGoogleDrive => 'Sign in to Google Drive';
+
+  @override
+  String signedInAs({required String email}) {
+    return 'Signed in as $email';
+  }
 
   @override
   String get commonError => 'Something went wrong, please try again later.';
