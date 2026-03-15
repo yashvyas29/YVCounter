@@ -20,8 +20,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+6
 
 environment:
-  sdk: ^3.11.0
-  flutter: 3.41.2
+  sdk: ^3.11.1
+  flutter: 3.41.4
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -53,7 +53,7 @@ dependencies:
   # https://github.com/flutter/packages/blob/main/packages/google_sign_in/google_sign_in/MIGRATION.md
   google_sign_in: ^7.2.0 # ^6.3.0
   googleapis: ^16.0.0
-  googleapis_auth: ^2.1.0
+  googleapis_auth: ^2.2.0
 
   graphview: ^1.5.1
   http: ^1.6.0
