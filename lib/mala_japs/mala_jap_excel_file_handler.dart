@@ -91,7 +91,7 @@ class MalaJapExcelFileHandler {
     if (fileBytes != null && fileBytes.isNotEmpty) {
       try {
         const fileName = 'malas.xlsx';
-        final filePath = await FilePicker.platform.saveFile(
+        final filePath = await FilePicker.saveFile(
           fileName: fileName,
           type: FileType.custom,
           allowedExtensions: ['xlsx'],

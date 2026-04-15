@@ -56,7 +56,7 @@ class MyHomePage extends StatefulWidget {
   }
 
   Future<List<Mala>> _getMalasFromExcel() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
     );

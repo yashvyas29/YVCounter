@@ -153,7 +153,7 @@ class GoogleDrive {
       await _googleSignIn.initialize(serverClientId: serverClientId);
     } catch (error) {
       debugPrint('initialize error: $error');
-      Future.error(error);
+      return Future.error(error);
     }
   }
 
@@ -174,7 +174,7 @@ class GoogleDrive {
       }
     } catch (error) {
       debugPrint("signIn error: $error");
-      Future.error(error);
+      return Future.error(error);
     }
   }
 
@@ -184,7 +184,7 @@ class GoogleDrive {
       _account ??= await _googleSignIn.attemptLightweightAuthentication();
     } catch (error) {
       debugPrint("signInSilently error: $error");
-      Future.error(error);
+      return Future.error(error);
     }
   }
 
@@ -271,19 +271,24 @@ class GoogleDrive {
   // Get Drive Api
   Future<ga.DriveApi?> _getDriveApi() async {
     debugPrint("_getDriveApi");
+
+    // Attempt sign-in if not already signed in
     if (_account == null) {
       debugPrint("User not signed in.");
       await signIn();
     }
-    final authorization = await _account?.authorizationClient.authorizeScopes(
-      _scopes,
-    );
-    final authClient = authorization?.authClient(scopes: _scopes);
-    if (authClient != null) {
-      return ga.DriveApi(authClient);
-    } else {
+
+    // Verify we have an account after sign-in attempt
+    if (_account == null) {
+      debugPrint("Sign in failed - account still null.");
       return null;
     }
+
+    // Get authorization (authorizeScopes either succeeds or throws)
+    final authorization = await _account!.authorizationClient.authorizeScopes(_scopes);
+
+    final authClient = authorization.authClient(scopes: _scopes);
+    return ga.DriveApi(authClient);
   }
 
   Future<String> _getFileId(ga.DriveApi driveApi) async {

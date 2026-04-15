@@ -233,11 +233,23 @@ class _SettingsPageState extends State<SettingsPage> {
     final colors = <Color?>[
       null,
       Colors.white,
-      Colors.grey.shade200,
+      Colors.grey.shade50,
       Colors.blue.shade50,
       Colors.green.shade50,
       Colors.amber.shade50,
       Colors.red.shade50,
+      Colors.purple.shade50,
+      Colors.yellow.shade50,
+      Colors.cyan.shade50,
+      Colors.orange.shade50,
+      Colors.pink.shade50,
+      Colors.brown.shade50,
+      Colors.teal.shade50,
+      Colors.lime.shade50,
+      Colors.indigo.shade50,
+      Colors.deepPurple.shade50,
+      Colors.deepOrange.shade50,
+      Colors.blueGrey.shade50,
     ];
 
     return Wrap(
