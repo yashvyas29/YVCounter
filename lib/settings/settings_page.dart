@@ -16,6 +16,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   late TextEditingController _primaryController;
   late TextEditingController _secondaryController;
+  late TextEditingController _japsPerMalaController;
   User? _user;
   late GoogleDrive _googleDrive;
   bool _isSigningIn = false;
@@ -26,6 +27,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final settings = Provider.of<SettingsModel>(context, listen: false);
     _primaryController = TextEditingController(text: settings.primaryLabel);
     _secondaryController = TextEditingController(text: settings.secondaryLabel);
+    _japsPerMalaController = TextEditingController(
+      text: settings.japsPerMala.toString(),
+    );
     GoogleDrive.createFromPlatform().then((gd) {
       _googleDrive = gd;
       _googleDrive.signInSilently().then((_) async {
@@ -41,6 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     _primaryController.dispose();
     _secondaryController.dispose();
+    _japsPerMalaController.dispose();
     super.dispose();
   }
 
@@ -85,7 +90,6 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /*
                 Text(localizations.counterLabelPrimary),
                 const SizedBox(height: 8),
                 TextField(
@@ -107,8 +111,22 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   onChanged: (value) => settings.secondaryLabel = value,
                 ),
+                const SizedBox(height: 16),
+                Text(localizations.counterJapsPerMala),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _japsPerMalaController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    hintText: settings.japsPerMala.toString(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    final parsed = int.tryParse(value);
+                    if (parsed != null) settings.japsPerMala = parsed;
+                  },
+                ),
                 const SizedBox(height: 24),
-                */
                 Text(
                   localizations.theme,
                   style: Theme.of(context).textTheme.titleMedium,

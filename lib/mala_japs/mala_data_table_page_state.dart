@@ -104,7 +104,7 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     final japLabel = settings.secondaryLabel;
     final tableItemsCount = widget.malas.length;
     final totalMalas = widget._getTotalMalas();
-    final totalJaps = totalMalas * Mala.japsPerMala;
+    final totalJaps = totalMalas * settings.japsPerMala;
     var isRowCountLessDefaultRowsPerPage = tableItemsCount < _rowsPerPage.value;
     final rowsPerPage = isRowCountLessDefaultRowsPerPage
         ? tableItemsCount

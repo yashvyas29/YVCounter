@@ -118,6 +118,7 @@
   "settings": "Settings",
   "counterLabelPrimary": "Counter name (primary)",
   "counterLabelSecondary": "Counter name (secondary)",
+  "counterJapsPerMala": "Count per primary (before reset)",
   "theme": "Theme",
   "themeSystem": "System default",
   "themeLight": "Light",

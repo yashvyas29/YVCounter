@@ -220,6 +220,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get counterLabelSecondary => 'Counter name (secondary)';
 
   @override
+  String get counterJapsPerMala => 'Count per primary (before reset)';
+
+  @override
   String get theme => 'Theme';
 
   @override

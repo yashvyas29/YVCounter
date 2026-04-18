@@ -57,17 +57,25 @@ class _MyHomePageState extends State<MyHomePage> {
       if (DateTimeHandler.isToday(_mala.date)) {
         _mala.date = DateTimeHandler.today;
       }
+      final japsPerMala = Provider.of<SettingsModel>(
+        context,
+        listen: false,
+      ).japsPerMala;
       if (_selections.first) {
         _mala.count += 1;
-        _mala.japs = _mala.count * Mala.japsPerMala;
+        _mala.japs = _mala.count * japsPerMala;
       } else {
         _mala.japs += 1;
-        _mala.count = _mala.japs ~/ Mala.japsPerMala;
+        _mala.count = _mala.japs ~/ japsPerMala;
       }
     });
     _sharedPref.saveList(Mala.key, _malaList);
     // widget._saveMalas(_malaList);
-    if (!_selections.first && _mala.japs % Mala.japsPerMala == 0) {
+    final japsPerMala = Provider.of<SettingsModel>(
+      context,
+      listen: false,
+    ).japsPerMala;
+    if (!_selections.first && _mala.japs % japsPerMala == 0) {
       widget._playAlertSysSound();
     } else {
       widget._playBeep();
@@ -78,14 +86,18 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_mala.japs > 0) {
       widget._playBeep(false);
     }
+    final japsPerMala = Provider.of<SettingsModel>(
+      context,
+      listen: false,
+    ).japsPerMala;
     if (_selections.first && _mala.count > 0) {
       setState(() {
         _mala.count -= 1;
-        _mala.japs = _mala.count * Mala.japsPerMala;
+        _mala.japs = _mala.count * japsPerMala;
       });
     } else if (!_selections.first && _mala.japs > 0) {
       setState(() {
-        _mala.count = _mala.japs ~/ Mala.japsPerMala;
+        _mala.count = _mala.japs ~/ japsPerMala;
         _mala.japs -= 1;
       });
     }
@@ -306,8 +318,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  String getJapsPerMala() {
-    final currentMalaJaps = _mala.japs % Mala.japsPerMala;
+  String getJapsPerMala(int japsPerMala) {
+    final currentMalaJaps = _mala.japs % japsPerMala;
     if (currentMalaJaps > 0) {
       return "${_mala.japs - currentMalaJaps} + $currentMalaJaps";
     } else {
@@ -630,6 +642,7 @@ class _MyHomePageState extends State<MyHomePage> {
             final settings = Provider.of<SettingsModel>(context);
             final malaString = settings.primaryLabel;
             final japString = settings.secondaryLabel;
+            final japsPerMala = settings.japsPerMala;
             return SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -679,7 +692,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 10),
                       // if (!_selections.first) const SizedBox(height: 10),
                       Text(
-                        '${_selections.first ? _mala.count : getJapsPerMala()}',
+                        '${_selections.first ? _mala.count : getJapsPerMala(japsPerMala)}',
                         style: Theme.of(context).textTheme.displayMedium,
                         textAlign: TextAlign.center,
                       ),

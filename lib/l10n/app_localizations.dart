@@ -494,6 +494,12 @@ abstract class AppLocalizations {
   /// **'Counter name (secondary)'**
   String get counterLabelSecondary;
 
+  /// No description provided for @counterJapsPerMala.
+  ///
+  /// In en, this message translates to:
+  /// **'Count per primary (before reset)'**
+  String get counterJapsPerMala;
+
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:

@@ -118,6 +118,7 @@
   "settings": "सेटिंग",
   "counterLabelPrimary": "काउंटर नाम (प्राथमिक)",
   "counterLabelSecondary": "काउंटर नाम (द्वितीयक)",
+  "counterJapsPerMala": "प्राथमिक प्रति गिनती (रीसेट से पहले)",
   "theme": "थीम",
   "themeSystem": "सिस्टम डिफ़ॉल्ट",
   "themeLight": "लाइट",

@@ -285,7 +285,9 @@ class GoogleDrive {
     }
 
     // Get authorization (authorizeScopes either succeeds or throws)
-    final authorization = await _account!.authorizationClient.authorizeScopes(_scopes);
+    final authorization = await _account!.authorizationClient.authorizeScopes(
+      _scopes,
+    );
 
     final authClient = authorization.authClient(scopes: _scopes);
     return ga.DriveApi(authClient);

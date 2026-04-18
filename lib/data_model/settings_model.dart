@@ -10,9 +10,11 @@ class SettingsModel extends ChangeNotifier {
   static const _keyFamilyCardColor = 'family_card_color';
   static const _keyFamilyTextColor = 'family_text_color';
   static const _keyFamilyCardTextSwap = 'family_card_text_swap';
+  static const _keyJapsPerMala = 'japs_per_mala';
 
   static const _defaultPrimaryLabel = 'Mala';
   static const _defaultSecondaryLabel = 'Jap';
+  static const _defaultJapsPerMala = 108;
 
   String _primaryLabel = _defaultPrimaryLabel;
   String _secondaryLabel = _defaultSecondaryLabel;
@@ -20,6 +22,7 @@ class SettingsModel extends ChangeNotifier {
   Color? _familyCardColor;
   Color? _familyTextColor;
   bool _familyCardTextSwap = false;
+  int _japsPerMala = _defaultJapsPerMala;
 
   SettingsModel();
 
@@ -39,6 +42,7 @@ class SettingsModel extends ChangeNotifier {
       _prefs.getInt(_keyFamilyTextColor),
     );
     model._familyCardTextSwap = _prefs.getBool(_keyFamilyCardTextSwap) ?? false;
+    model._japsPerMala = _prefs.getInt(_keyJapsPerMala) ?? _defaultJapsPerMala;
     return model;
   }
 
@@ -48,6 +52,7 @@ class SettingsModel extends ChangeNotifier {
   Color? get familyCardColor => _familyCardColor;
   Color? get familyTextColor => _familyTextColor;
   bool get familyCardTextSwap => _familyCardTextSwap;
+  int get japsPerMala => _japsPerMala;
 
   set primaryLabel(String value) {
     _primaryLabel = value.trim().isEmpty ? _defaultPrimaryLabel : value.trim();
@@ -92,6 +97,12 @@ class SettingsModel extends ChangeNotifier {
   set familyCardTextSwap(bool value) {
     _familyCardTextSwap = value;
     _prefs.setBool(_keyFamilyCardTextSwap, value);
+    notifyListeners();
+  }
+
+  set japsPerMala(int value) {
+    _japsPerMala = value > 0 ? value : _defaultJapsPerMala;
+    _prefs.setInt(_keyJapsPerMala, _japsPerMala);
     notifyListeners();
   }
 

@@ -220,6 +220,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get counterLabelSecondary => 'काउंटर नाम (द्वितीयक)';
 
   @override
+  String get counterJapsPerMala => 'प्राथमिक प्रति गिनती (रीसेट से पहले)';
+
+  @override
   String get theme => 'थीम';
 
   @override
