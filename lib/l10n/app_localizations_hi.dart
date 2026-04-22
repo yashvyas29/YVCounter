@@ -154,7 +154,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get backupError => 'बैकअप विफल रहा।';
 
   @override
-  String get restoreError => 'Restore विफल रहा।';
+  String get restoreError => 'पुनर्स्थापन विफल रहा।';
 
   @override
   String get deleteError => 'पुनर्स्थापन विफल रहा।';
@@ -258,4 +258,62 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get commonError =>
       'कुछ गलत हो गया है। कृपया बाद में दोबारा प्रयास करें।';
+
+  @override
+  String get ok => 'ठीक है';
+
+  @override
+  String get typeToSearch => 'खोजने के लिए टाइप करें';
+
+  @override
+  String get googleDriveHint =>
+      'साइन इन करने के बाद आप ऐप मेन्यू से अपना डेटा बैकअप/पुनर्स्थापित कर सकते हैं।';
+
+  @override
+  String get overview => 'सारांश';
+
+  @override
+  String get history => 'इतिहास';
+
+  @override
+  String get total => 'कुल';
+
+  @override
+  String get currentStreak => 'वर्तमान श्रृंखला';
+
+  @override
+  String get longestStreak => 'सबसे लंबी श्रृंखला';
+
+  @override
+  String days({required int count}) {
+    return '$count दिन';
+  }
+
+  @override
+  String get last7Days => 'पिछले 7 दिन';
+
+  @override
+  String get last12Months => 'पिछले 12 महीने';
+
+  @override
+  String get dailyTarget => 'दैनिक लक्ष्य';
+
+  @override
+  String get dailyTargetHint => '0 = कोई लक्ष्य नहीं';
+
+  @override
+  String get reminderEnabled => 'दैनिक अनुस्मारक';
+
+  @override
+  String get reminderEnabledDescription =>
+      'निर्धारित समय पर सूचना प्राप्त करें।';
+
+  @override
+  String get reminderTime => 'अनुस्मारक समय';
+
+  @override
+  String get reminderNotificationTitle => 'माला अनुस्मारक';
+
+  @override
+  String get reminderNotificationBody => 'आपकी दैनिक माला अभ्यास का समय है!';
 }

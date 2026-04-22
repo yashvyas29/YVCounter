@@ -11,10 +11,17 @@ class SettingsModel extends ChangeNotifier {
   static const _keyFamilyTextColor = 'family_text_color';
   static const _keyFamilyCardTextSwap = 'family_card_text_swap';
   static const _keyJapsPerMala = 'japs_per_mala';
+  static const _keyDailyMalaTarget = 'daily_mala_target';
+  static const _keyReminderEnabled = 'reminder_enabled';
+  static const _keyReminderHour = 'reminder_hour';
+  static const _keyReminderMinute = 'reminder_minute';
 
   static const _defaultPrimaryLabel = 'Mala';
   static const _defaultSecondaryLabel = 'Jap';
   static const _defaultJapsPerMala = 108;
+  static const _defaultDailyMalaTarget = 0;
+  static const _defaultReminderHour = 8;
+  static const _defaultReminderMinute = 0;
 
   String _primaryLabel = _defaultPrimaryLabel;
   String _secondaryLabel = _defaultSecondaryLabel;
@@ -23,6 +30,10 @@ class SettingsModel extends ChangeNotifier {
   Color? _familyTextColor;
   bool _familyCardTextSwap = false;
   int _japsPerMala = _defaultJapsPerMala;
+  int _dailyMalaTarget = _defaultDailyMalaTarget;
+  bool _reminderEnabled = false;
+  int _reminderHour = _defaultReminderHour;
+  int _reminderMinute = _defaultReminderMinute;
 
   SettingsModel();
 
@@ -43,6 +54,13 @@ class SettingsModel extends ChangeNotifier {
     );
     model._familyCardTextSwap = _prefs.getBool(_keyFamilyCardTextSwap) ?? false;
     model._japsPerMala = _prefs.getInt(_keyJapsPerMala) ?? _defaultJapsPerMala;
+    model._dailyMalaTarget =
+        _prefs.getInt(_keyDailyMalaTarget) ?? _defaultDailyMalaTarget;
+    model._reminderEnabled = _prefs.getBool(_keyReminderEnabled) ?? false;
+    model._reminderHour =
+        _prefs.getInt(_keyReminderHour) ?? _defaultReminderHour;
+    model._reminderMinute =
+        _prefs.getInt(_keyReminderMinute) ?? _defaultReminderMinute;
     return model;
   }
 
@@ -53,6 +71,10 @@ class SettingsModel extends ChangeNotifier {
   Color? get familyTextColor => _familyTextColor;
   bool get familyCardTextSwap => _familyCardTextSwap;
   int get japsPerMala => _japsPerMala;
+  int get dailyMalaTarget => _dailyMalaTarget;
+  bool get reminderEnabled => _reminderEnabled;
+  TimeOfDay get reminderTime =>
+      TimeOfDay(hour: _reminderHour, minute: _reminderMinute);
 
   set primaryLabel(String value) {
     _primaryLabel = value.trim().isEmpty ? _defaultPrimaryLabel : value.trim();
@@ -103,6 +125,26 @@ class SettingsModel extends ChangeNotifier {
   set japsPerMala(int value) {
     _japsPerMala = value > 0 ? value : _defaultJapsPerMala;
     _prefs.setInt(_keyJapsPerMala, _japsPerMala);
+    notifyListeners();
+  }
+
+  set dailyMalaTarget(int value) {
+    _dailyMalaTarget = value >= 0 ? value : 0;
+    _prefs.setInt(_keyDailyMalaTarget, _dailyMalaTarget);
+    notifyListeners();
+  }
+
+  set reminderEnabled(bool value) {
+    _reminderEnabled = value;
+    _prefs.setBool(_keyReminderEnabled, value);
+    notifyListeners();
+  }
+
+  void setReminderTime(TimeOfDay time) {
+    _reminderHour = time.hour;
+    _reminderMinute = time.minute;
+    _prefs.setInt(_keyReminderHour, time.hour);
+    _prefs.setInt(_keyReminderMinute, time.minute);
     notifyListeners();
   }
 

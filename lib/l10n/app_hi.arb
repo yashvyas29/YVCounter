@@ -84,7 +84,7 @@
 
   "saveError": "सहेजना विफल रहा।",
   "backupError": "बैकअप विफल रहा।",
-  "restoreError": "Restore विफल रहा।",
+  "restoreError": "पुनर्स्थापन विफल रहा।",
   "deleteError": "पुनर्स्थापन विफल रहा।",
 
   "deleteConfirmation": "क्या आप वाकई {name} को हटाना चाहते हैं?",
@@ -138,5 +138,33 @@
       }
   },
 
-  "commonError": "कुछ गलत हो गया है। कृपया बाद में दोबारा प्रयास करें।"
+  "commonError": "कुछ गलत हो गया है। कृपया बाद में दोबारा प्रयास करें।",
+  "ok": "ठीक है",
+  "typeToSearch": "खोजने के लिए टाइप करें",
+  "googleDriveHint": "साइन इन करने के बाद आप ऐप मेन्यू से अपना डेटा बैकअप/पुनर्स्थापित कर सकते हैं।",
+
+  "overview": "सारांश",
+  "history": "इतिहास",
+  "total": "कुल",
+  "currentStreak": "वर्तमान श्रृंखला",
+  "longestStreak": "सबसे लंबी श्रृंखला",
+  "days": "{count} दिन",
+  "@days": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "last7Days": "पिछले 7 दिन",
+  "last12Months": "पिछले 12 महीने",
+
+  "dailyTarget": "दैनिक लक्ष्य",
+  "dailyTargetHint": "0 = कोई लक्ष्य नहीं",
+  "reminderEnabled": "दैनिक अनुस्मारक",
+  "reminderEnabledDescription": "निर्धारित समय पर सूचना प्राप्त करें।",
+  "reminderTime": "अनुस्मारक समय",
+  "reminderNotificationTitle": "माला अनुस्मारक",
+  "reminderNotificationBody": "आपकी दैनिक माला अभ्यास का समय है!"
 }

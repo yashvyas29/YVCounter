@@ -138,5 +138,33 @@
       }
   },
 
-  "commonError": "Something went wrong, please try again later."
+  "commonError": "Something went wrong, please try again later.",
+  "ok": "OK",
+  "typeToSearch": "Type to search",
+  "googleDriveHint": "After Sign In you can backup/restore your data from the app menu.",
+
+  "overview": "Overview",
+  "history": "History",
+  "total": "Total",
+  "currentStreak": "Current Streak",
+  "longestStreak": "Longest Streak",
+  "days": "{count} days",
+  "@days": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "last7Days": "Last 7 Days",
+  "last12Months": "Last 12 Months",
+
+  "dailyTarget": "Daily Target",
+  "dailyTargetHint": "0 = no target",
+  "reminderEnabled": "Daily Reminder",
+  "reminderEnabledDescription": "Get a notification at the set time.",
+  "reminderTime": "Reminder Time",
+  "reminderNotificationTitle": "Mala Reminder",
+  "reminderNotificationBody": "Time for your daily mala practice!"
 }

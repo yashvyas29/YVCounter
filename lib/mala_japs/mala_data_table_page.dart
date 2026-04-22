@@ -7,6 +7,7 @@ import 'package:yv_counter/data_model/settings_model.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
 
 import 'mala_jap_excel_file_handler.dart';
+import 'widgets/mala_charts.dart';
 
 part 'mala_data_table_page_state.dart';
 
@@ -20,6 +21,10 @@ class MalaDataTablePage extends StatefulWidget {
 
   int _getTotalMalas() {
     return malas.fold(0, (sum, mala) => sum + mala.count);
+  }
+
+  int _getTotalJaps() {
+    return malas.fold(0, (sum, mala) => sum + mala.japs);
   }
 }
 

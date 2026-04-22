@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yv_counter/common/notification_service.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/data_model/settings_model.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
@@ -17,6 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
   late TextEditingController _primaryController;
   late TextEditingController _secondaryController;
   late TextEditingController _japsPerMalaController;
+  late TextEditingController _dailyTargetController;
   User? _user;
   late GoogleDrive _googleDrive;
   bool _isSigningIn = false;
@@ -29,6 +31,11 @@ class _SettingsPageState extends State<SettingsPage> {
     _secondaryController = TextEditingController(text: settings.secondaryLabel);
     _japsPerMalaController = TextEditingController(
       text: settings.japsPerMala.toString(),
+    );
+    _dailyTargetController = TextEditingController(
+      text: settings.dailyMalaTarget == 0
+          ? ''
+          : settings.dailyMalaTarget.toString(),
     );
     GoogleDrive.createFromPlatform().then((gd) {
       _googleDrive = gd;
@@ -46,6 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _primaryController.dispose();
     _secondaryController.dispose();
     _japsPerMalaController.dispose();
+    _dailyTargetController.dispose();
     super.dispose();
   }
 
@@ -124,6 +132,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   onChanged: (value) {
                     final parsed = int.tryParse(value);
                     if (parsed != null) settings.japsPerMala = parsed;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(localizations.dailyTarget),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _dailyTargetController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    hintText: localizations.dailyTargetHint,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    final parsed = int.tryParse(value);
+                    settings.dailyMalaTarget = parsed ?? 0;
                   },
                 ),
                 const SizedBox(height: 24),
@@ -212,6 +235,61 @@ class _SettingsPageState extends State<SettingsPage> {
                   value: settings.familyCardTextSwap,
                   onChanged: (value) => settings.familyCardTextSwap = value,
                 ),
+                const SizedBox(height: 24),
+                Text(
+                  localizations.reminderEnabled,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(localizations.reminderEnabled),
+                  subtitle: Text(localizations.reminderEnabledDescription),
+                  value: settings.reminderEnabled,
+                  onChanged: (enabled) async {
+                    if (enabled) {
+                      final granted =
+                          await NotificationService.requestPermission();
+                      if (!granted) return;
+                      settings.reminderEnabled = true;
+                      if (!context.mounted) return;
+                      final localizations = AppLocalizations.of(context);
+                      await NotificationService.scheduleDaily(
+                        time: settings.reminderTime,
+                        title: localizations.reminderNotificationTitle,
+                        body: localizations.reminderNotificationBody,
+                      );
+                    } else {
+                      settings.reminderEnabled = false;
+                      await NotificationService.cancel();
+                    }
+                  },
+                ),
+                if (settings.reminderEnabled)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(localizations.reminderTime),
+                    trailing: TextButton(
+                      child: Text(
+                        settings.reminderTime.format(context),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      onPressed: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: settings.reminderTime,
+                        );
+                        if (picked == null) return;
+                        settings.setReminderTime(picked);
+                        if (!context.mounted) return;
+                        final localizations = AppLocalizations.of(context);
+                        await NotificationService.scheduleDaily(
+                          time: picked,
+                          title: localizations.reminderNotificationTitle,
+                          body: localizations.reminderNotificationBody,
+                        );
+                      },
+                    ),
+                  ),
                 const SizedBox(height: 24),
                 Text(
                   localizations.signInToGoogleDrive,

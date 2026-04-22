@@ -951,54 +951,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 
   void _zoomToFit() {
-    /*
-    // Ensure the widgets are rendered and their render objects are accessible
-    final RenderBox? viewerBox =
-        _viewerKey.currentContext?.findRenderObject() as RenderBox?;
-    final RenderBox? contentBox =
-        _contentKey.currentContext?.findRenderObject() as RenderBox?;
-
-    if (viewerBox == null || contentBox == null) {
-      debugPrint("Render box not found.");
-      return;
-    }
-
-    final Size viewerSize = viewerBox.size;
-    final Size contentSize = contentBox.size;
-
-    if (viewerSize.isEmpty || contentSize.isEmpty) {
-      debugPrint("Render box size not found.");
-      return;
-    }
-
-    // 1. Calculate the scale factor to fit the content within the viewer bounds
-    // We calculate scale based on both width and height and take the minimum
-    // to ensure the entire content is visible without cropping.
-    final double scaleX = viewerSize.width / contentSize.width;
-    final double scaleY = viewerSize.height / contentSize.height;
-    final double fitScale = math.min(scaleX, scaleY);
-
-    // Optional: Add a small padding or maximum scale constraint if desired
-    // final double finalScale = math.min(fitScale * 0.95, 2.0);
-    final double finalScale = fitScale * 0.95; // 5% padding around the edges
-
-    // 2. Calculate the translation needed to center the content
-    final double translateX =
-        (viewerSize.width - contentSize.width * finalScale) / 2;
-    final double translateY =
-        (viewerSize.height - contentSize.height * finalScale) / 2;
-
-    // 3. Construct the final transformation matrix
-    final Matrix4 matrix = Matrix4.identity();
-    // Apply scale (S) and then translation (T)
-    matrix.setEntry(0, 0, finalScale); // Scale X
-    matrix.setEntry(1, 1, finalScale); // Scale Y
-    matrix.setEntry(0, 3, translateX); // Translate X
-    matrix.setEntry(1, 3, translateY); // Translate Y
-
-    // Apply the new matrix to the controller
-    _transformationController.value = matrix;
-    */
+    _transformationController.value = Matrix4.identity();
   }
 }
 
@@ -1049,7 +1002,7 @@ class FamilyMemberSearchDelegate extends SearchDelegate<int?> {
   @override
   Widget buildSuggestions(BuildContext context) {
     if (query.isEmpty) {
-      return const Center(child: Text('Type to search')); // not localized
+      return Center(child: Text(localizations.typeToSearch));
     }
     return buildResults(context);
   }

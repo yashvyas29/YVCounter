@@ -565,6 +565,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong, please try again later.'**
   String get commonError;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @typeToSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Type to search'**
+  String get typeToSearch;
+
+  /// No description provided for @googleDriveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'After Sign In you can backup/restore your data from the app menu.'**
+  String get googleDriveHint;
+
+  /// No description provided for @overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overview;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @currentStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Streak'**
+  String get currentStreak;
+
+  /// No description provided for @longestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Streak'**
+  String get longestStreak;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String days({required int count});
+
+  /// No description provided for @last7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 Days'**
+  String get last7Days;
+
+  /// No description provided for @last12Months.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 12 Months'**
+  String get last12Months;
+
+  /// No description provided for @dailyTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Target'**
+  String get dailyTarget;
+
+  /// No description provided for @dailyTargetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'0 = no target'**
+  String get dailyTargetHint;
+
+  /// No description provided for @reminderEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminder'**
+  String get reminderEnabled;
+
+  /// No description provided for @reminderEnabledDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a notification at the set time.'**
+  String get reminderEnabledDescription;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Time'**
+  String get reminderTime;
+
+  /// No description provided for @reminderNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mala Reminder'**
+  String get reminderNotificationTitle;
+
+  /// No description provided for @reminderNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for your daily mala practice!'**
+  String get reminderNotificationBody;
 }
 
 class _AppLocalizationsDelegate

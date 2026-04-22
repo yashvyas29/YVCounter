@@ -257,4 +257,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonError => 'Something went wrong, please try again later.';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get typeToSearch => 'Type to search';
+
+  @override
+  String get googleDriveHint =>
+      'After Sign In you can backup/restore your data from the app menu.';
+
+  @override
+  String get overview => 'Overview';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get currentStreak => 'Current Streak';
+
+  @override
+  String get longestStreak => 'Longest Streak';
+
+  @override
+  String days({required int count}) {
+    return '$count days';
+  }
+
+  @override
+  String get last7Days => 'Last 7 Days';
+
+  @override
+  String get last12Months => 'Last 12 Months';
+
+  @override
+  String get dailyTarget => 'Daily Target';
+
+  @override
+  String get dailyTargetHint => '0 = no target';
+
+  @override
+  String get reminderEnabled => 'Daily Reminder';
+
+  @override
+  String get reminderEnabledDescription =>
+      'Get a notification at the set time.';
+
+  @override
+  String get reminderTime => 'Reminder Time';
+
+  @override
+  String get reminderNotificationTitle => 'Mala Reminder';
+
+  @override
+  String get reminderNotificationBody => 'Time for your daily mala practice!';
 }

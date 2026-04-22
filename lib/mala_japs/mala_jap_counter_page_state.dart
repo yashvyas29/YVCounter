@@ -702,6 +702,23 @@ class _MyHomePageState extends State<MyHomePage> {
                         '${!_selections.first ? malaString : japString}: ${!_selections.first ? _mala.count : _mala.japs}',
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
+                      if (settings.dailyMalaTarget > 0) ...[
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: LinearProgressIndicator(
+                            value: (_mala.count / settings.dailyMalaTarget)
+                                .clamp(0.0, 1.0),
+                            minHeight: 8,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${_mala.count} / ${settings.dailyMalaTarget} $malaString',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
                       const SizedBox(height: 20),
                       ToggleButtons(
                         onPressed: (int index) {

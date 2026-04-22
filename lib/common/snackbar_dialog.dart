@@ -11,18 +11,19 @@ void showSnackBar(BuildContext context, String message) {
 }
 
 Future<void> showAlertDialog(BuildContext context, String massage) async {
+  final localizations = AppLocalizations.of(context);
   return showDialog<void>(
     context: context,
     barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Alert'),
+        title: Text(localizations.alert),
         content: SingleChildScrollView(
           child: ListBody(children: <Widget>[Text(massage)]),
         ),
         actions: <Widget>[
           TextButton(
-            child: const Text('OK'),
+            child: Text(localizations.ok),
             onPressed: () {
               Navigator.of(context).pop();
             },

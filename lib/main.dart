@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yv_counter/common/notification_service.dart';
 import 'package:yv_counter/data_model/locale_model.dart';
 import 'package:yv_counter/data_model/settings_model.dart';
 /*
@@ -16,6 +17,7 @@ Future<void> main() async {
   await Isar.open([MalaSchema, FamilySchema, MemberSchema, RelationSchema],
       inspector: true);
       */
+  await NotificationService.initialize();
   final localeModel = await LocaleModel.getInstance();
   final settingsModel = await SettingsModel.getInstance();
   runApp(MyApp(localeModel: localeModel, settingsModel: settingsModel));
