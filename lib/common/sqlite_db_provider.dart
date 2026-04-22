@@ -7,6 +7,10 @@ import '../data_model/treemember.dart';
 class DBProvider {
   DBProvider._();
 
+  /// Escapes a table/value name for safe embedding in raw SQL by doubling
+  /// any single-quote characters (standard SQLite escaping).
+  static String _escape(String name) => name.replaceAll("'", "''");
+
   static final DBProvider db = DBProvider._();
   static const dbName = 'family.db';
   static Database? _database;
@@ -24,21 +28,19 @@ class DBProvider {
 
   Future<bool> checkIfTableExists(String table) async {
     final db = await database;
-
+    final escaped = _escape(table);
     var res = await db.rawQuery('''
-    SELECT * FROM sqlite_master WHERE name ='$table' and type='table';
+    SELECT * FROM sqlite_master WHERE name ='$escaped' and type='table';
     ''');
-
     return res.isNotEmpty;
   }
 
   Future<int> getRowCount(String table) async {
     final db = await database;
-
+    final escaped = _escape(table);
     var res = await db.rawQuery('''
-      SELECT COUNT(*) from '$table';
+      SELECT COUNT(*) from '$escaped';
       ''');
-
     return res.length;
   }
 
@@ -48,28 +50,27 @@ class DBProvider {
     String columnValue,
   ) async {
     final db = await database;
-
-    var res = await db.rawQuery('''
-    SELECT * FROM '$tableName' WHERE $columnName = '$columnValue';
-    ''');
-
-    // debugPrint(res.toString());
+    final escapedTable = _escape(tableName);
+    var res = await db.rawQuery(
+      '''SELECT * FROM '$escapedTable' WHERE $columnName = ?;''',
+      [columnValue],
+    );
     return res.isNotEmpty;
   }
 
   Future<void> createTable(String familyName) async {
     final db = await database;
-
+    final escaped = _escape(familyName);
     db
       ..execute('''
-   CREATE TABLE IF NOT EXISTS '$familyName' (
+   CREATE TABLE IF NOT EXISTS '$escaped' (
    id INTEGER PRIMARY KEY AUTOINCREMENT,
    name TEXT,
    c INTEGER);
     ''')
       ..rawInsert(
         '''
-     REPLACE INTO '$familyName' (id, name, c)
+     REPLACE INTO '$escaped' (id, name, c)
       VALUES (?, ?, ?);
      ''',
         [1, familyName, null],
@@ -78,24 +79,28 @@ class DBProvider {
 
   Future<List<Map>> cleanTable(String table) async {
     final db = await database;
+    final escaped = _escape(table);
     var res = await db.rawQuery('''
-    delete from '$table';
+    delete from '$escaped';
     ''');
     return res;
   }
 
   Future<List<Map>> deleteTable(String table) async {
     final db = await database;
+    final escaped = _escape(table);
     var res = await db.rawQuery('''
-    drop table if exists '$table';
+    drop table if exists '$escaped';
     ''');
     return res;
   }
 
   Future<void> renameTable(String oldName, String newName) async {
     final db = await database;
+    final escapedOld = _escape(oldName);
+    final escapedNew = _escape(newName);
     await db.rawQuery('''
-    ALTER TABLE '$oldName' RENAME TO '$newName';
+    ALTER TABLE '$escapedOld' RENAME TO '$escapedNew';
     ''');
   }
 
@@ -109,24 +114,23 @@ class DBProvider {
 
   Future<int> insertMember(TreeMember treeMember, String table) async {
     final db = await database;
-
+    final escaped = _escape(table);
     var res = await db.rawInsert(
       '''
-    INSERT INTO '$table' (id, name, c)
+    INSERT INTO '$escaped' (id, name, c)
     VALUES (?, ?, ?);
     ''',
       [treeMember.id, treeMember.name, treeMember.c],
     );
-
-    //print(res);
     return res;
   }
 
   Future<void> updateMember(String table, TreeMember treeMember) async {
     final db = await database;
+    final escaped = _escape(table);
     await db.rawInsert(
       '''
-     REPLACE INTO '$table' (id, name, c)
+     REPLACE INTO '$escaped' (id, name, c)
       VALUES (?, ?, ?);
      ''',
       [treeMember.id, treeMember.name, treeMember.c],
@@ -135,25 +139,23 @@ class DBProvider {
 
   Future<int> removeMember(TreeMember treeMember, String table) async {
     final db = await database;
-
+    final escaped = _escape(table);
     var res = await db.rawDelete(
       '''
-     DELETE FROM '$table' WHERE id = ?;
+     DELETE FROM '$escaped' WHERE id = ?;
      ''',
       [treeMember.id],
     );
-
-    //print(res);
     return res;
   }
 
   Future<List<Map>> getMembers(String table) async {
     final db = await database;
+    final escaped = _escape(table);
     var res = await db.rawQuery('''
-    SELECT * FROM '$table';
+    SELECT * FROM '$escaped';
     ''');
-    //print(res);
-    if (res.isEmpty || res.isEmpty) {
+    if (res.isEmpty) {
       return Future.error("No data found.");
     }
     return res;
