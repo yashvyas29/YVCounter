@@ -3,27 +3,13 @@ part of 'mala_jap_counter_page.dart';
 class _MyHomePageState extends State<MyHomePage> {
   late Mala _mala;
   List<Mala> _malaList = [];
-  User? _user;
 
-  late GoogleDrive _googleDrive;
   final SharedPref _sharedPref = SharedPref();
   final List<bool> _selections = [true, false];
 
   @override
   void initState() {
     super.initState();
-    GoogleDrive.createFromPlatform().then((gd) {
-      _googleDrive = gd;
-      _googleDrive.initializeGoogleSignIn().then((value) {
-        _googleDrive.signInSilently().then((value) {
-          _googleDrive.getUser().then((user) {
-            setState(() {
-              _user = user;
-            });
-          });
-        });
-      });
-    });
     _mala = Mala(DateTimeHandler.today, 0, 0);
     _loadMala();
     // FamilyHandler().loadFamily();
@@ -136,8 +122,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _restoreBackup() async {
     debugPrint("_restoreBackup");
+    final drive = context.read<GoogleDriveModel>().drive;
     try {
-      final files = await _googleDrive.downloadAppDataFolderFiles();
+      final files = await drive.downloadAppDataFolderFiles();
       const jsonFileHandler = JsonFileHandler();
       for (final file in files) {
         String path = '';
@@ -247,6 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _saveBackup() async {
+    final drive = context.read<GoogleDriveModel>().drive;
     try {
       final malasJson = json.encode(_malaList);
       debugPrint(malasJson);
@@ -254,7 +242,7 @@ class _MyHomePageState extends State<MyHomePage> {
       GoogleDrive.fileName = GoogleDrive.malasFileName;
       final file = File("${tempDir.path}/${GoogleDrive.fileName}");
       await file.writeAsString(malasJson);
-      await _googleDrive.uploadFileToGoogleDrive(file);
+      await drive.uploadFileToGoogleDrive(file);
       file.delete();
       debugPrint('Malas file uploaded successfully.');
     } catch (error) {
@@ -271,7 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
         debugPrint('File to upload with path: $filePath');
         final file = File(filePath);
         GoogleDrive.fileName = p.basename(filePath);
-        await _googleDrive.uploadFileToGoogleDrive(file);
+        await drive.uploadFileToGoogleDrive(file);
       }
       debugPrint('Family json files uploaded successfully.');
 
@@ -280,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final dbFile = File(dbFilePath);
       if (await dbFile.exists()) {
         GoogleDrive.fileName = p.basename(dbFilePath);
-        await _googleDrive.uploadFileToGoogleDrive(dbFile);
+        await drive.uploadFileToGoogleDrive(dbFile);
         debugPrint('Database file uploaded successfully.');
       }
     } catch (error) {
@@ -344,6 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
+    final driveModel = context.watch<GoogleDriveModel>();
     var language = Localizations.localeOf(context).toString();
 
     return Scaffold(
@@ -473,13 +462,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         context,
                         localizations.signInToGoogleDrive,
                       );
-                      await _googleDrive.signIn();
+                      await context.read<GoogleDriveModel>().signIn();
                       if (!context.mounted) return;
                       hideProgressIndicator(context);
                       break;
                     case Menu.backup:
                       if (!mounted) return;
-                      if (_user == null) {
+                      if (!context.read<GoogleDriveModel>().isSignedIn) {
                         showSnackBar(
                           context,
                           '${localizations.signInToGoogleDrive} first',
@@ -496,7 +485,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       break;
                     case Menu.restore:
                       if (!mounted) return;
-                      if (_user == null) {
+                      if (!context.read<GoogleDriveModel>().isSignedIn) {
                         showSnackBar(
                           context,
                           '${localizations.signInToGoogleDrive} first',
@@ -543,7 +532,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       break;
                     case Menu.delete:
                       if (!mounted) return;
-                      if (_user == null) {
+                      if (!context.read<GoogleDriveModel>().isSignedIn) {
                         showSnackBar(
                           context,
                           '${localizations.signInToGoogleDrive} first',
@@ -555,7 +544,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         localizations.deletingBackupFromGD,
                       );
                       try {
-                        await _googleDrive.deleteAppDataFolderFiles();
+                        await context
+                            .read<GoogleDriveModel>()
+                            .drive
+                            .deleteAppDataFolderFiles();
                         if (!context.mounted) return;
                         await showAlertDialog(
                           context,
@@ -575,13 +567,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         context,
                         localizations.signingOutFromGD,
                       );
-                      await _googleDrive.signOut();
+                      await context.read<GoogleDriveModel>().signOut();
+                      if (!context.mounted) return;
+                      hideProgressIndicator(context);
                       break;
                   }
-                  final user = await _googleDrive.getUser();
-                  setState(() {
-                    _user = user;
-                  });
                 },
                 itemBuilder: (context) {
                   return [
@@ -619,12 +609,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       value: Menu.delete,
                       child: Text(localizations.deleteBackupFromGD),
                     ),
-                    if (_user == null)
+                    if (!driveModel.isSignedIn)
                       PopupMenuItem(
                         value: Menu.signIn,
                         child: Text(localizations.signInToGoogleDrive),
                       ),
-                    if (_user != null)
+                    if (driveModel.isSignedIn)
                       PopupMenuItem(
                         value: Menu.signOut,
                         child: Text(localizations.signOutFromGD),
@@ -656,10 +646,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       const SizedBox(height: 20),
-                      if (_user?.name != null)
+                      if (driveModel.currentUser?.name != null)
                         Text(
                           localizations.welcomeUser(
-                            name: _user?.name ?? 'User',
+                            name: driveModel.currentUser?.name ?? 'User',
                           ),
                           style: Theme.of(context).textTheme.titleMedium,
                           textAlign: TextAlign.center,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yv_counter/common/notification_service.dart';
+import 'package:yv_counter/data_model/google_drive_model.dart';
 import 'package:yv_counter/data_model/locale_model.dart';
 import 'package:yv_counter/data_model/settings_model.dart';
 /*
@@ -20,7 +21,14 @@ Future<void> main() async {
   await NotificationService.initialize();
   final localeModel = await LocaleModel.getInstance();
   final settingsModel = await SettingsModel.getInstance();
-  runApp(MyApp(localeModel: localeModel, settingsModel: settingsModel));
+  final googleDriveModel = await GoogleDriveModel.getInstance();
+  runApp(
+    MyApp(
+      localeModel: localeModel,
+      settingsModel: settingsModel,
+      googleDriveModel: googleDriveModel,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,10 +36,12 @@ class MyApp extends StatelessWidget {
     super.key,
     required this.localeModel,
     required this.settingsModel,
+    required this.googleDriveModel,
   });
 
   final LocaleModel localeModel;
   final SettingsModel settingsModel;
+  final GoogleDriveModel googleDriveModel;
 
   // This widget is the root of your application.
   @override
@@ -40,6 +50,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<LocaleModel>.value(value: localeModel),
         ChangeNotifierProvider<SettingsModel>.value(value: settingsModel),
+        ChangeNotifierProvider<GoogleDriveModel>.value(value: googleDriveModel),
       ],
       child: Consumer2<LocaleModel, SettingsModel>(
         builder: (context, localeModel, settingsModel, child) => MaterialApp(

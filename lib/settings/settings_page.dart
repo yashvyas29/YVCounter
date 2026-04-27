@@ -4,8 +4,7 @@ import 'package:yv_counter/common/notification_service.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/data_model/settings_model.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
-import 'package:yv_counter/common/google_drive.dart';
-import 'package:yv_counter/data_model/user.dart';
+import 'package:yv_counter/data_model/google_drive_model.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -19,8 +18,6 @@ class _SettingsPageState extends State<SettingsPage> {
   late TextEditingController _secondaryController;
   late TextEditingController _japsPerMalaController;
   late TextEditingController _dailyTargetController;
-  User? _user;
-  late GoogleDrive _googleDrive;
   bool _isSigningIn = false;
 
   @override
@@ -37,17 +34,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ? ''
           : settings.dailyMalaTarget.toString(),
     );
-    GoogleDrive.createFromPlatform().then((gd) {
-      _googleDrive = gd;
-      _googleDrive.signInSilently().then((_) async {
-        final user = await _googleDrive.getUser();
-        if (mounted) {
-          setState(() {
-            _user = user;
-          });
-        }
-      });
-    });
   }
 
   @override
@@ -75,29 +61,26 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _toggleGoogleSignIn() async {
-    final ctx = context;
+    final driveModel = context.read<GoogleDriveModel>();
     setState(() {
       _isSigningIn = true;
     });
 
-    User? updatedUser;
     try {
-      if (_user == null) {
-        await _googleDrive.signIn();
+      if (driveModel.isSignedIn) {
+        await driveModel.signOut();
       } else {
-        await _googleDrive.signOut();
+        await driveModel.signIn();
       }
-      updatedUser = await _googleDrive.getUser();
     } catch (error) {
       if (mounted) {
         // ignore: use_build_context_synchronously
-        showSnackBar(ctx, error.toString());
+        showSnackBar(context, error.toString());
       }
     } finally {
       if (mounted) {
         setState(() {
           _isSigningIn = false;
-          _user = updatedUser;
         });
       }
     }
@@ -108,8 +91,8 @@ class _SettingsPageState extends State<SettingsPage> {
     final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(localizations.settings)),
-      body: Consumer<SettingsModel>(
-        builder: (context, settings, child) {
+      body: Consumer2<SettingsModel, GoogleDriveModel>(
+        builder: (context, settings, driveModel, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -315,22 +298,26 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
-                if (_user != null)
+                if (driveModel.currentUser != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(localizations.signedInAs(email: _user!.email)),
+                    child: Text(
+                      localizations.signedInAs(
+                        email: driveModel.currentUser!.email,
+                      ),
+                    ),
                   ),
                 ElevatedButton(
                   onPressed: _isSigningIn ? null : _toggleGoogleSignIn,
                   child: Text(
-                    _user == null
-                        ? localizations.signInToGoogleDrive
-                        : AppLocalizations.of(context).signOutFromGD,
+                    driveModel.isSignedIn
+                        ? AppLocalizations.of(context).signOutFromGD
+                        : localizations.signInToGoogleDrive,
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'After Sign In you can backup/restore your data from the app menu.',
+                  localizations.googleDriveHint,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
