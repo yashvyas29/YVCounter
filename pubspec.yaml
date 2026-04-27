@@ -46,6 +46,7 @@ dependencies:
       url: https://github.com/yashvyas29/flutter_beep
       ref: feature/flutter-gradle-dependencies-upgrade
 
+  flutter_colorpicker: ^1.1.0
   flutter_image_compress: ^2.4.0
   flutter_local_notifications: ^21.0.0
 

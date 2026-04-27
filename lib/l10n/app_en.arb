@@ -159,6 +159,7 @@
     }
   },
   "last7Days": "Last 7 Days",
+  "last30Days": "Last 30 Days",
   "last12Months": "Last 12 Months",
 
   "dailyTarget": "Daily Target",

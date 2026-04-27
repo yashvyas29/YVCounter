@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'Last 7 Days'**
   String get last7Days;
 
+  /// No description provided for @last30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get last30Days;
+
   /// No description provided for @last12Months.
   ///
   /// In en, this message translates to:

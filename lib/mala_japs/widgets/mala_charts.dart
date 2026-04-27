@@ -192,14 +192,23 @@ class MalaWeeklyChart extends StatelessWidget {
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 24,
+              reservedSize: 36,
               getTitlesWidget: (value, meta) {
                 final day = today.subtract(Duration(days: 6 - value.toInt()));
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    DateFormat('E').format(day),
-                    style: const TextStyle(fontSize: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        DateFormat('E').format(day),
+                        style: const TextStyle(fontSize: 9),
+                      ),
+                      Text(
+                        DateFormat('d MMM').format(day),
+                        style: const TextStyle(fontSize: 7),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -233,6 +242,108 @@ class MalaWeeklyChart extends StatelessWidget {
                   '${rod.toY.toInt()} $malaLabel',
                   const TextStyle(fontSize: 12),
                 ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bar chart showing daily mala counts for the last 30 days.
+class MalaLast30DaysChart extends StatelessWidget {
+  const MalaLast30DaysChart({
+    super.key,
+    required this.malas,
+    required this.malaLabel,
+  });
+
+  final List<Mala> malas;
+  final String malaLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.primary;
+    final today = DateUtils.dateOnly(DateTime.now());
+
+    double maxVal = 0;
+    final groups = List.generate(30, (i) {
+      final day = today.subtract(Duration(days: 29 - i));
+      final count = malas
+          .where((m) => DateUtils.isSameDay(m.date, day))
+          .fold(0, (sum, m) => sum + m.count)
+          .toDouble();
+      if (count > maxVal) maxVal = count;
+      return BarChartGroupData(
+        x: i,
+        barRods: [
+          BarChartRodData(
+            toY: count,
+            color: color,
+            width: 6,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ],
+      );
+    });
+
+    final chartMaxY = maxVal > 0 ? (maxVal * 1.3).ceilToDouble() : 5.0;
+
+    return BarChart(
+      BarChartData(
+        maxY: chartMaxY,
+        barGroups: groups,
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 36,
+              interval: 1,
+              getTitlesWidget: (value, meta) {
+                final idx = value.toInt();
+                if (idx != 0 && idx != 29 && idx % 5 != 0) {
+                  return const SizedBox.shrink();
+                }
+                final day = today.subtract(Duration(days: 29 - idx));
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    DateFormat('d MMM').format(day),
+                    style: const TextStyle(fontSize: 8),
+                  ),
+                );
+              },
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 28,
+              getTitlesWidget: (value, meta) {
+                if (value == 0 || value == meta.max) {
+                  return const SizedBox.shrink();
+                }
+                if (value % 1 != 0) return const SizedBox.shrink();
+                return Text(
+                  value.toInt().toString(),
+                  style: const TextStyle(fontSize: 10),
+                );
+              },
+            ),
+          ),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        ),
+        borderData: FlBorderData(show: false),
+        gridData: const FlGridData(show: true),
+        barTouchData: BarTouchData(
+          touchTooltipData: BarTouchTooltipData(
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              final day = today.subtract(Duration(days: 29 - group.x));
+              return BarTooltipItem(
+                '${DateFormat('d MMM').format(day)}\n${rod.toY.toInt()} $malaLabel',
+                const TextStyle(fontSize: 12),
+              );
+            },
           ),
         ),
       ),
@@ -306,8 +417,8 @@ class MalaMonthlyChart extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    DateFormat('MMM').format(monthDate),
-                    style: const TextStyle(fontSize: 9),
+                    DateFormat("MMM ''yy").format(monthDate),
+                    style: const TextStyle(fontSize: 8),
                   ),
                 );
               },

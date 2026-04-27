@@ -133,6 +133,29 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
+                    localizations.last30Days,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 200,
+                    child: MalaLast30DaysChart(
+                      malas: widget.malas,
+                      malaLabel: malaLabel,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     localizations.last12Months,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),

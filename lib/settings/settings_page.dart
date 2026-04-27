@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:yv_counter/common/notification_service.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
@@ -315,7 +316,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         : localizations.signInToGoogleDrive,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Text(
                   localizations.googleDriveHint,
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -332,7 +333,7 @@ class _SettingsPageState extends State<SettingsPage> {
     required Color? selected,
     required void Function(Color?) onChanged,
   }) {
-    final colors = <Color?>[
+    final presetColors = <Color?>[
       null,
       Colors.white,
       Colors.grey.shade50,
@@ -352,32 +353,104 @@ class _SettingsPageState extends State<SettingsPage> {
       Colors.deepPurple.shade50,
       Colors.deepOrange.shade50,
       Colors.blueGrey.shade50,
+      Colors.lightBlue.shade50,
+      Colors.lightGreen.shade50,
+      Colors.red.shade100,
+      Colors.blue.shade100,
     ];
+
+    final isCustom = selected != null && !presetColors.contains(selected);
 
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: colors.map((color) {
-        final isSelected = selected == color;
-        return GestureDetector(
-          onTap: () => onChanged(color),
+      children: [
+        ...presetColors.map((color) {
+          final isSelected = selected == color;
+          return GestureDetector(
+            onTap: () => onChanged(color),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color ?? Colors.transparent,
+                border: Border.all(
+                  color: isSelected ? Colors.blue : Colors.grey,
+                  width: isSelected ? 2 : 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: color == null
+                  ? const Center(child: Icon(Icons.close, size: 18))
+                  : null,
+            ),
+          );
+        }),
+        GestureDetector(
+          onTap: () => _showCustomColorPicker(
+            current: isCustom ? selected : Colors.white,
+            onChanged: onChanged,
+          ),
           child: Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color ?? Colors.transparent,
+              color: isCustom ? selected : Colors.transparent,
               border: Border.all(
-                color: isSelected ? Colors.blue : Colors.grey,
-                width: isSelected ? 2 : 1,
+                color: isCustom ? Colors.blue : Colors.grey,
+                width: isCustom ? 2 : 1,
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: color == null
-                ? const Center(child: Icon(Icons.close, size: 18))
-                : null,
+            child: Center(
+              child: Icon(
+                Icons.colorize,
+                size: 18,
+                color: isCustom
+                    ? (ThemeData.estimateBrightnessForColor(selected) ==
+                              Brightness.dark
+                          ? Colors.white
+                          : Colors.black)
+                    : null,
+              ),
+            ),
           ),
-        );
-      }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showCustomColorPicker({
+    required Color current,
+    required void Function(Color?) onChanged,
+  }) async {
+    Color pickerColor = current;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppLocalizations.of(context).familyCardColor),
+        content: SingleChildScrollView(
+          child: ColorPicker(
+            pickerColor: pickerColor,
+            onColorChanged: (color) => pickerColor = color,
+            enableAlpha: false,
+            labelTypes: const [],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () {
+              onChanged(pickerColor);
+              Navigator.of(ctx).pop();
+            },
+            child: Text(MaterialLocalizations.of(context).okButtonLabel),
+          ),
+        ],
+      ),
     );
   }
 }

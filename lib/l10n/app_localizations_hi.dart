@@ -302,6 +302,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get last7Days => 'पिछले 7 दिन';
 
   @override
+  String get last30Days => 'पिछले 30 दिन';
+
+  @override
   String get last12Months => 'पिछले 12 महीने';
 
   @override
