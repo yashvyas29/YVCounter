@@ -32,6 +32,7 @@
   },
 
   "malaHistory": "माला इतिहास",
+  "malaProgress": "माला प्रगति",
   "date": "दिनांक",
   "familyList": "परिवार सूची",
   "about": "जानकारी",
@@ -148,7 +149,7 @@
   "total": "कुल",
   "currentStreak": "वर्तमान श्रृंखला",
   "longestStreak": "सबसे लंबी श्रृंखला",
-  "days": "{count} दिन",
+  "days": "{count, plural, =1{{count} दिन} other{{count} दिन}}",
   "@days": {
     "placeholders": {
       "count": {

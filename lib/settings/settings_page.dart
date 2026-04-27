@@ -41,11 +41,28 @@ class _SettingsPageState extends State<SettingsPage> {
       _googleDrive = gd;
       _googleDrive.signInSilently().then((_) async {
         final user = await _googleDrive.getUser();
-        setState(() {
-          _user = user;
-        });
+        if (mounted) {
+          setState(() {
+            _user = user;
+          });
+        }
       });
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update controllers with localized defaults after context is available
+    final settings = Provider.of<SettingsModel>(context, listen: false);
+    final localizations = AppLocalizations.of(context);
+
+    if (settings.isPrimaryLabelDefault) {
+      _primaryController.text = localizations.mala;
+    }
+    if (settings.isSecondaryLabelDefault) {
+      _secondaryController.text = localizations.jap;
+    }
   }
 
   @override
@@ -98,58 +115,6 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(localizations.counterLabelPrimary),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _primaryController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    hintText: settings.primaryLabel,
-                  ),
-                  onChanged: (value) => settings.primaryLabel = value,
-                ),
-                const SizedBox(height: 16),
-                Text(localizations.counterLabelSecondary),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _secondaryController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    hintText: settings.secondaryLabel,
-                  ),
-                  onChanged: (value) => settings.secondaryLabel = value,
-                ),
-                const SizedBox(height: 16),
-                Text(localizations.counterJapsPerMala),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _japsPerMalaController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    hintText: settings.japsPerMala.toString(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    final parsed = int.tryParse(value);
-                    if (parsed != null) settings.japsPerMala = parsed;
-                  },
-                ),
-                const SizedBox(height: 16),
-                Text(localizations.dailyTarget),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _dailyTargetController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    hintText: localizations.dailyTargetHint,
-                  ),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    final parsed = int.tryParse(value);
-                    settings.dailyMalaTarget = parsed ?? 0;
-                  },
-                ),
-                const SizedBox(height: 24),
                 Text(
                   localizations.theme,
                   style: Theme.of(context).textTheme.titleMedium,
@@ -236,10 +201,27 @@ class _SettingsPageState extends State<SettingsPage> {
                   onChanged: (value) => settings.familyCardTextSwap = value,
                 ),
                 const SizedBox(height: 24),
+                Text(localizations.dailyTarget),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _dailyTargetController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    hintText: localizations.dailyTargetHint,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    final parsed = int.tryParse(value);
+                    settings.dailyMalaTarget = parsed ?? 0;
+                  },
+                ),
+                const SizedBox(height: 24),
+                /*
                 Text(
                   localizations.reminderEnabled,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
+                */
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(localizations.reminderEnabled),
@@ -290,6 +272,43 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                     ),
                   ),
+                const SizedBox(height: 24),
+                Text(localizations.counterLabelPrimary),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _primaryController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    hintText: localizations.mala,
+                  ),
+                  onChanged: (value) => settings.primaryLabel = value,
+                ),
+                const SizedBox(height: 16),
+                Text(localizations.counterLabelSecondary),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _secondaryController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    hintText: localizations.jap,
+                  ),
+                  onChanged: (value) => settings.secondaryLabel = value,
+                ),
+                const SizedBox(height: 16),
+                Text(localizations.counterJapsPerMala),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _japsPerMalaController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    hintText: settings.japsPerMala.toString(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    final parsed = int.tryParse(value);
+                    if (parsed != null) settings.japsPerMala = parsed;
+                  },
+                ),
                 const SizedBox(height: 24),
                 Text(
                   localizations.signInToGoogleDrive,

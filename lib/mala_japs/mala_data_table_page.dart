@@ -18,14 +18,6 @@ class MalaDataTablePage extends StatefulWidget {
 
   @override
   State<MalaDataTablePage> createState() => _MalaDataTablePageState();
-
-  int _getTotalMalas() {
-    return malas.fold(0, (sum, mala) => sum + mala.count);
-  }
-
-  int _getTotalJaps() {
-    return malas.fold(0, (sum, mala) => sum + mala.japs);
-  }
 }
 
 /*

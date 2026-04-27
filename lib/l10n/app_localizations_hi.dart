@@ -39,6 +39,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get malaHistory => 'माला इतिहास';
 
   @override
+  String get malaProgress => 'माला प्रगति';
+
+  @override
   String get date => 'दिनांक';
 
   @override
@@ -286,7 +289,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String days({required int count}) {
-    return '$count दिन';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन',
+      one: '$count दिन',
+    );
+    return '$_temp0';
   }
 
   @override

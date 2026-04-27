@@ -32,6 +32,7 @@
   },
 
   "malaHistory": "Mala History",
+  "malaProgress": "Mala Progress",
   "date": "Date",
   "familyList": "Family List",
   "about": "About",
@@ -148,7 +149,7 @@
   "total": "Total",
   "currentStreak": "Current Streak",
   "longestStreak": "Longest Streak",
-  "days": "{count} days",
+  "days": "{count, plural, =1{{count} day} other{{count} days}}",
   "@days": {
     "placeholders": {
       "count": {

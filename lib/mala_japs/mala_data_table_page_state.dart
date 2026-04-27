@@ -103,13 +103,6 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MalaStatsCard(
-            malas: widget.malas,
-            malaLabel: malaLabel,
-            japLabel: japLabel,
-            localizations: localizations,
-          ),
-          const SizedBox(height: 16),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -164,11 +157,8 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
     AppLocalizations localizations,
     String malaLabel,
     String japLabel,
-    SettingsModel settings,
   ) {
     final tableItemsCount = widget.malas.length;
-    final totalMalas = widget._getTotalMalas();
-    final totalJaps = widget._getTotalJaps();
     var isRowCountLessDefaultRowsPerPage = tableItemsCount < _rowsPerPage.value;
     final rowsPerPage = isRowCountLessDefaultRowsPerPage
         ? tableItemsCount
@@ -184,9 +174,6 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
               padding: const EdgeInsets.all(16),
               children: [
                 PaginatedDataTable(
-                  header: Text(
-                    '$malaLabel: $totalMalas, $japLabel: $totalJaps',
-                  ),
                   availableRowsPerPage: [
                     rowsPerPage,
                     rowsPerPage * 2,
@@ -242,15 +229,15 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
   @override
   Widget build(BuildContext context) {
     final settings = Provider.of<SettingsModel>(context);
-    final malaLabel = settings.primaryLabel;
-    final japLabel = settings.secondaryLabel;
+    final malaLabel = settings.getLocalizedPrimaryLabel(context);
+    final japLabel = settings.getLocalizedSecondaryLabel(context);
     final localizations = AppLocalizations.of(context);
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(localizations.malaHistory),
+          title: Text(localizations.malaProgress),
           actions: [
             if (widget.malas.isNotEmpty)
               IconButton(
@@ -271,10 +258,26 @@ class _MalaDataTablePageState extends State<MalaDataTablePage>
             ],
           ),
         ),
-        body: TabBarView(
+        body: Column(
           children: [
-            _buildOverviewTab(localizations, malaLabel, japLabel),
-            _buildHistoryTab(localizations, malaLabel, japLabel, settings),
+            if (widget.malas.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: MalaStatsCard(
+                  malas: widget.malas,
+                  malaLabel: malaLabel,
+                  japLabel: japLabel,
+                  localizations: localizations,
+                ),
+              ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildOverviewTab(localizations, malaLabel, japLabel),
+                  _buildHistoryTab(localizations, malaLabel, japLabel),
+                ],
+              ),
+            ),
           ],
         ),
       ),

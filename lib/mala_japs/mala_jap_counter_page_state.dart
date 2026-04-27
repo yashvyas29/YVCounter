@@ -351,7 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(AppLocalizations.of(context).title),
         actions: [
           IconButton(
-            tooltip: localizations.malaHistory,
+            tooltip: localizations.malaProgress,
             icon: const Icon(Icons.menu),
             onPressed: () {
               Navigator.of(context).push(
@@ -373,6 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
+          /*
           IconButton(
             tooltip: localizations.settings,
             icon: const Icon(Icons.settings),
@@ -382,6 +383,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
+          */
           /*
           IconButton(
             tooltip: 'Open My Family',
@@ -640,8 +642,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints viewportConstraints) {
             final settings = Provider.of<SettingsModel>(context);
-            final malaString = settings.primaryLabel;
-            final japString = settings.secondaryLabel;
+            final malaString = settings.getLocalizedPrimaryLabel(context);
+            final japString = settings.getLocalizedSecondaryLabel(context);
             final japsPerMala = settings.japsPerMala;
             return SingleChildScrollView(
               child: ConstrainedBox(

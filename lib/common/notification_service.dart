@@ -20,7 +20,7 @@ class NotificationService {
     tz_data.initializeTimeZones();
     try {
       final localTimezone = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(localTimezone));
+      tz.setLocalLocation(tz.getLocation(localTimezone.identifier));
     } catch (_) {
       // Fall back to UTC if timezone lookup fails.
       tz.setLocalLocation(tz.UTC);
@@ -36,7 +36,7 @@ class NotificationService {
     );
 
     await _plugin.initialize(
-      const InitializationSettings(
+      settings: const InitializationSettings(
         android: androidSettings,
         iOS: darwinSettings,
         macOS: darwinSettings,
@@ -87,11 +87,9 @@ class NotificationService {
     if (kIsWeb) return;
 
     await _plugin.zonedSchedule(
-      _reminderId,
-      title,
-      body,
-      _nextInstanceOfTime(time.hour, time.minute),
-      NotificationDetails(
+      id: _reminderId,
+      scheduledDate: _nextInstanceOfTime(time.hour, time.minute),
+      notificationDetails: NotificationDetails(
         android: const AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -103,8 +101,8 @@ class NotificationService {
         macOS: const DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
+      title: title,
+      body: body,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }
@@ -112,7 +110,7 @@ class NotificationService {
   /// Cancel the daily reminder.
   static Future<void> cancel() async {
     if (kIsWeb) return;
-    await _plugin.cancel(_reminderId);
+    await _plugin.cancel(id: _reminderId);
   }
 
   static tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {

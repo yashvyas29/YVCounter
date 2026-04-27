@@ -39,6 +39,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get malaHistory => 'Mala History';
 
   @override
+  String get malaProgress => 'Mala Progress';
+
+  @override
   String get date => 'Date';
 
   @override
@@ -285,7 +288,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String days({required int count}) {
-    return '$count days';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '$count day',
+    );
+    return '$_temp0';
   }
 
   @override

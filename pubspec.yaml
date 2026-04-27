@@ -20,8 +20,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+6
 
 environment:
-  sdk: ^3.11.1
-  flutter: 3.41.4
+  sdk: ^3.11.5
+  flutter: 3.41.7
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,7 +36,7 @@ dependencies:
   extension_google_sign_in_as_googleapis_auth: ^3.0.0 # ^2.0.13
   file: ^7.0.1
   file_picker: ^11.0.2
-  fl_chart: ^0.68.0
+  fl_chart: ^1.2.0
 
   flutter:
     sdk: flutter
@@ -47,12 +47,12 @@ dependencies:
       ref: feature/flutter-gradle-dependencies-upgrade
 
   flutter_image_compress: ^2.4.0
-  flutter_local_notifications: ^17.0.0
+  flutter_local_notifications: ^21.0.0
 
   flutter_localizations:
     sdk: flutter
 
-  flutter_timezone: ^1.0.0
+  flutter_timezone: ^5.0.2
   # https://github.com/flutter/packages/blob/main/packages/google_sign_in/google_sign_in/MIGRATION.md
   google_sign_in: ^7.2.0 # ^6.3.0
   googleapis: ^16.0.0
@@ -66,8 +66,8 @@ dependencies:
   path_provider: ^2.1.5
   provider: ^6.1.5+1
   shared_preferences: ^2.5.5
-  sqflite: ^2.4.2
-  timezone: ^0.9.0
+  sqflite: ^2.4.2+1
+  timezone: ^0.11.0
   vector_math: ^2.2.0 #^2.3.0
   widget_zoom: ^0.0.4
   zoom_pinch_overlay: ^1.4.3
@@ -84,7 +84,7 @@ dependency_overrides:
   # transitive dependencies
   # archive: ^4.0.9
   # image: ^4.8.0
-  meta: ^1.18.2
+  # meta: ^1.18.2
   # win32: ^6.0.1
 
   # transitive dev_dependencies

@@ -31,11 +31,13 @@ require(detStorePassword != null) { "storePassword not found in key.properties f
 android {
     namespace = "com.yash.YVCounter"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973" // flutter.ndkVersion
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_24
         targetCompatibility = JavaVersion.VERSION_24
+
+        isCoreLibraryDesugaringEnabled = true
     }
 
     buildFeatures {
@@ -115,6 +117,10 @@ android {
             )
         }
     }
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
 
 flutter {

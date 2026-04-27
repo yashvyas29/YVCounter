@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yv_counter/l10n/app_localizations.dart';
 
 class SettingsModel extends ChangeNotifier {
   static late SharedPreferences _prefs;
@@ -16,15 +17,34 @@ class SettingsModel extends ChangeNotifier {
   static const _keyReminderHour = 'reminder_hour';
   static const _keyReminderMinute = 'reminder_minute';
 
-  static const _defaultPrimaryLabel = 'Mala';
-  static const _defaultSecondaryLabel = 'Jap';
+  // Fallback defaults (English)
+  static const _fallbackPrimaryLabel = 'Mala';
+  static const _fallbackSecondaryLabel = 'Jap';
   static const _defaultJapsPerMala = 108;
   static const _defaultDailyMalaTarget = 0;
   static const _defaultReminderHour = 8;
   static const _defaultReminderMinute = 0;
 
-  String _primaryLabel = _defaultPrimaryLabel;
-  String _secondaryLabel = _defaultSecondaryLabel;
+  /// Returns the localized default primary label based on the current locale.
+  static String getDefaultPrimaryLabel(BuildContext? context) {
+    if (context != null) {
+      return AppLocalizations.of(context).mala;
+    }
+    // Fallback to English if no context
+    return _fallbackPrimaryLabel;
+  }
+
+  /// Returns the localized default secondary label based on the current locale.
+  static String getDefaultSecondaryLabel(BuildContext? context) {
+    if (context != null) {
+      return AppLocalizations.of(context).jap;
+    }
+    // Fallback to English if no context
+    return _fallbackSecondaryLabel;
+  }
+
+  String _primaryLabel = _fallbackPrimaryLabel;
+  String _secondaryLabel = _fallbackSecondaryLabel;
   ThemeMode _themeMode = ThemeMode.system;
   Color? _familyCardColor;
   Color? _familyTextColor;
@@ -41,9 +61,9 @@ class SettingsModel extends ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
     final model = SettingsModel();
     model._primaryLabel =
-        _prefs.getString(_keyPrimaryLabel) ?? _defaultPrimaryLabel;
+        _prefs.getString(_keyPrimaryLabel) ?? _fallbackPrimaryLabel;
     model._secondaryLabel =
-        _prefs.getString(_keySecondaryLabel) ?? _defaultSecondaryLabel;
+        _prefs.getString(_keySecondaryLabel) ?? _fallbackSecondaryLabel;
     final themeModeString = _prefs.getString(_keyThemeMode);
     model._themeMode = _themeModeFromString(themeModeString);
     model._familyCardColor = _colorFromPrefs(
@@ -66,6 +86,32 @@ class SettingsModel extends ChangeNotifier {
 
   String get primaryLabel => _primaryLabel;
   String get secondaryLabel => _secondaryLabel;
+
+  /// Returns true if primary label is at its default fallback value.
+  bool get isPrimaryLabelDefault => _primaryLabel == _fallbackPrimaryLabel;
+
+  /// Returns true if secondary label is at its default fallback value.
+  bool get isSecondaryLabelDefault =>
+      _secondaryLabel == _fallbackSecondaryLabel;
+
+  /// Returns the primary label, using localized default when at fallback.
+  /// Requires a BuildContext to access AppLocalizations.
+  String getLocalizedPrimaryLabel(BuildContext context) {
+    if (isPrimaryLabelDefault) {
+      return AppLocalizations.of(context).mala;
+    }
+    return _primaryLabel;
+  }
+
+  /// Returns the secondary label, using localized default when at fallback.
+  /// Requires a BuildContext to access AppLocalizations.
+  String getLocalizedSecondaryLabel(BuildContext context) {
+    if (isSecondaryLabelDefault) {
+      return AppLocalizations.of(context).jap;
+    }
+    return _secondaryLabel;
+  }
+
   ThemeMode get themeMode => _themeMode;
   Color? get familyCardColor => _familyCardColor;
   Color? get familyTextColor => _familyTextColor;
@@ -77,14 +123,14 @@ class SettingsModel extends ChangeNotifier {
       TimeOfDay(hour: _reminderHour, minute: _reminderMinute);
 
   set primaryLabel(String value) {
-    _primaryLabel = value.trim().isEmpty ? _defaultPrimaryLabel : value.trim();
+    _primaryLabel = value.trim().isEmpty ? _fallbackPrimaryLabel : value.trim();
     _prefs.setString(_keyPrimaryLabel, _primaryLabel);
     notifyListeners();
   }
 
   set secondaryLabel(String value) {
     _secondaryLabel = value.trim().isEmpty
-        ? _defaultSecondaryLabel
+        ? _fallbackSecondaryLabel
         : value.trim();
     _prefs.setString(_keySecondaryLabel, _secondaryLabel);
     notifyListeners();

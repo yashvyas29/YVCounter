@@ -146,6 +146,12 @@ abstract class AppLocalizations {
   /// **'Mala History'**
   String get malaHistory;
 
+  /// No description provided for @malaProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Mala Progress'**
+  String get malaProgress;
+
   /// No description provided for @date.
   ///
   /// In en, this message translates to:
@@ -617,7 +623,7 @@ abstract class AppLocalizations {
   /// No description provided for @days.
   ///
   /// In en, this message translates to:
-  /// **'{count} days'**
+  /// **'{count, plural, =1{{count} day} other{{count} days}}'**
   String days({required int count});
 
   /// No description provided for @last7Days.
