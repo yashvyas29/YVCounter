@@ -30,23 +30,33 @@ class MalaStatsCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _StatTile(
-              label: '${localizations.total} $malaLabel',
-              value: totalMalas.toString(),
+            Row(
+              children: [
+                _StatTile(
+                  label: '${localizations.total} $malaLabel',
+                  value: totalMalas.toString(),
+                ),
+                _StatTile(
+                  label: '${localizations.total} $japLabel',
+                  value: totalJaps.toString(),
+                ),
+              ],
             ),
-            _StatTile(
-              label: '${localizations.total} $japLabel',
-              value: totalJaps.toString(),
-            ),
-            _StatTile(
-              label: localizations.currentStreak,
-              value: localizations.days(count: currentStreak),
-            ),
-            _StatTile(
-              label: localizations.longestStreak,
-              value: localizations.days(count: longestStreak),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _StatTile(
+                  label: localizations.currentStreak,
+                  value: localizations.days(count: currentStreak),
+                ),
+                _StatTile(
+                  label: localizations.longestStreak,
+                  value: localizations.days(count: longestStreak),
+                ),
+              ],
             ),
           ],
         ),
