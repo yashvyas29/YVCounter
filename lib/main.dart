@@ -22,6 +22,16 @@ Future<void> main() async {
   final localeModel = await LocaleModel.getInstance();
   final settingsModel = await SettingsModel.getInstance();
   final googleDriveModel = await GoogleDriveModel.getInstance();
+
+  if (settingsModel.reminderEnabled) {
+    final l10n = await AppLocalizations.delegate.load(localeModel.locale);
+    await NotificationService.scheduleDaily(
+      time: settingsModel.reminderTime,
+      title: l10n.reminderNotificationTitle,
+      body: l10n.reminderNotificationBody,
+    );
+  }
+
   runApp(
     MyApp(
       localeModel: localeModel,

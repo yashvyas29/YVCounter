@@ -89,18 +89,18 @@ class NotificationService {
     await _plugin.zonedSchedule(
       id: _reminderId,
       scheduledDate: _nextInstanceOfTime(time.hour, time.minute),
-      notificationDetails: NotificationDetails(
-        android: const AndroidNotificationDetails(
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
           _channelId,
           _channelName,
           channelDescription: _channelDescription,
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
+          importance: Importance.high,
+          priority: Priority.high,
         ),
-        iOS: const DarwinNotificationDetails(),
-        macOS: const DarwinNotificationDetails(),
+        iOS: DarwinNotificationDetails(),
+        macOS: DarwinNotificationDetails(),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       title: title,
       body: body,
       matchDateTimeComponents: DateTimeComponents.time,
