@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:yv_counter/common/app_database.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
-import 'package:yv_counter/common/sqlite_db_provider.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
 
 import '../common/json_file_handler.dart';
@@ -44,12 +44,15 @@ class _FamilyListPageState extends State<FamilyListPage> {
   }
 
   Future<List<String>> _getFamilies() async {
-    final families = kIsWeb
-        ? _getStaticFamilies()
-        : await DBProvider.db.getFamilies();
-    // debugPrint(families.toString());
+    final List<String> names;
+    if (kIsWeb) {
+      names = _getStaticFamilies().map((e) => e['name']!).toList();
+    } else {
+      final rows = await AppDatabase.instance.getAllFamilies();
+      names = rows.map((f) => f.name).toList();
+    }
     setState(() {
-      _families.addAll(families.map((e) => e['name'].toString()));
+      _families.addAll(names);
       _setReadOnlyList();
       _controllers.addAll(
         _families.map((family) => TextEditingController(text: family)),
@@ -67,9 +70,9 @@ class _FamilyListPageState extends State<FamilyListPage> {
   }
 
   Future<void> _addFamily(String name) async {
-    var isExist = await DBProvider.db.checkIfTableExists(name);
-    if (!isExist) {
-      await DBProvider.db.createTable(name);
+    final existing = await AppDatabase.instance.getFamilyByName(name);
+    if (existing == null) {
+      await AppDatabase.instance.insertFamilyByName(name);
       setState(() {
         name == newFamilyName
             ? _readOnlyList.add(false)
@@ -91,7 +94,11 @@ class _FamilyListPageState extends State<FamilyListPage> {
       context,
       AppLocalizations.of(context).deleteConfirmation(name: name),
       () async {
-        await DBProvider.db.deleteTable(name);
+        final family = await AppDatabase.instance.getFamilyByName(name);
+        if (family != null) {
+          // deleteFamilyById also cascades deletion of family_tree_data rows.
+          await AppDatabase.instance.deleteFamilyById(family.id);
+        }
         final prefix = widget.getFamilyFileName(name);
         await widget._jsonFileHandler.deleteLocalFile(prefix);
         await ImageFileHandler.deleteFiles(prefix);
@@ -111,9 +118,16 @@ class _FamilyListPageState extends State<FamilyListPage> {
     if (newName.isEmpty) {
       _deleteFamily(oldName, index);
     } else {
-      var isExist = await DBProvider.db.checkIfTableExists(newName);
-      if (!isExist) {
-        await DBProvider.db.renameTable(oldName, newName.trim());
+      final existing = await AppDatabase.instance.getFamilyByName(newName);
+      if (existing == null) {
+        final oldFamily = await AppDatabase.instance.getFamilyByName(oldName);
+        if (oldFamily != null) {
+          await AppDatabase.instance.updateFamilyName(
+            oldFamily.id,
+            newName.trim(),
+          );
+        }
+        // Keep JSON file rename for backward-compat with any in-flight file backups.
         final oldFileName = widget.getFamilyFileName(oldName);
         final newFileName = widget.getFamilyFileName(newName);
         final oldFile = await widget._jsonFileHandler.localFile(oldFileName);

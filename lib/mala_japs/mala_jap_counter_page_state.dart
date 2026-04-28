@@ -4,7 +4,6 @@ class _MyHomePageState extends State<MyHomePage> {
   late Mala _mala;
   List<Mala> _malaList = [];
 
-  final SharedPref _sharedPref = SharedPref();
   final List<bool> _selections = [true, false];
 
   @override
@@ -17,8 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadMala() async {
     try {
-      // _malaList = await widget._getMalas();
-      _malaList = await _sharedPref.readList(Mala.key);
+      _malaList = await AppDatabase.instance.getAllMalas();
       final todayMala = _malaList.firstWhere(
         (mala) => DateTimeHandler.isToday(mala.date),
       );
@@ -55,8 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _mala.count = _mala.japs ~/ japsPerMala;
       }
     });
-    _sharedPref.saveList(Mala.key, _malaList);
-    // widget._saveMalas(_malaList);
+    AppDatabase.instance.upsertMala(_mala);
     final japsPerMala = Provider.of<SettingsModel>(
       context,
       listen: false,
@@ -89,9 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     if (_mala.japs == 0) {
       _malaList.remove(_mala);
+      AppDatabase.instance.deleteMalaByDate(_mala.date);
+    } else {
+      AppDatabase.instance.upsertMala(_mala);
     }
-    _sharedPref.saveList(Mala.key, _malaList);
-    // widget._saveMalas(_malaList);
   }
 
   Future<void> _resetCounter() async {
@@ -113,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _mala.japs = 0;
         });
         _malaList.remove(_mala);
-        await _sharedPref.saveList(Mala.key, _malaList);
+        await AppDatabase.instance.deleteMalaByDate(_mala.date);
         // ignore: use_build_context_synchronously
         Navigator.of(ctx).pop();
       },
@@ -167,8 +165,9 @@ class _MyHomePageState extends State<MyHomePage> {
       final malas = malasJson.map((value) => Mala.fromJson(value)).toList();
       if (malas.isNotEmpty) {
         _malaList = malas;
-        _sharedPref.saveList(Mala.key, malas);
-        // widget._saveMalas(_malaList);
+        for (final mala in malas) {
+          await AppDatabase.instance.upsertMala(mala);
+        }
 
         try {
           final mala = malas.firstWhere(
@@ -207,8 +206,9 @@ class _MyHomePageState extends State<MyHomePage> {
         _malaList.removeWhere((mala) => malas.contains(mala));
         malas.addAll(_malaList);
         _malaList = malas;
-        _sharedPref.saveList(Mala.key, malas);
-        // widget._saveMalas(_malaList);
+        for (final mala in malas) {
+          await AppDatabase.instance.upsertMala(mala);
+        }
         try {
           final mala = malas.firstWhere(
             (mala) => DateTimeHandler.isToday(mala.date),
@@ -219,8 +219,11 @@ class _MyHomePageState extends State<MyHomePage> {
         } catch (error) {
           dLog('No malas found for today.\n$error');
         }
+        if (!mounted) return;
         await showAlertDialog(
+          // ignore: use_build_context_synchronously
           context,
+          // ignore: use_build_context_synchronously
           AppLocalizations.of(context).excelRestoreSuccessful,
         );
       }
@@ -236,7 +239,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _saveBackup() async {
     final drive = context.read<GoogleDriveModel>().drive;
     try {
-      final malasJson = json.encode(_malaList);
+      final freshMalas = await AppDatabase.instance.getAllMalas();
+      final malasJson = json.encode(freshMalas);
       dLog(malasJson);
       final tempDir = await getTemporaryDirectory();
       GoogleDrive.fileName = GoogleDrive.malasFileName;

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
+import 'package:yv_counter/common/app_database.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/data_model/settings_model.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
@@ -27,40 +29,73 @@ class FamilyTreePage extends StatefulWidget {
     return _jsonFileHandler.getFamilyFileName(title);
   }
 
-  /// Loads the JSON for the current page, preferring a language-specific
-  /// variant when the locale indicates Hindi.
+  /// Loads the JSON for the current page from Drift DB (primary) with fallback
+  /// to local JSON file and bundled asset.  Saves to DB on first load.
   Future<Map<String, dynamic>> readJsonData(BuildContext context) async {
+    final db = AppDatabase.instance;
+    final languageCode = Localizations.localeOf(context).languageCode;
     final baseName = getFileName();
 
-    // If the user has switched to Hindi, look for a *_hi version first.
-    final languageCode = Localizations.localeOf(context).languageCode;
-    String fileName = baseName;
+    // Ensure the family row exists in DB (creates it if missing).
+    int familyId = await _getOrCreateFamilyId(db);
 
+    // Try DB first (language-specific, then English fallback).
+    if (languageCode == 'hi') {
+      final json = await db.getFamilyTreeJson(familyId, languageCode: 'hi');
+      if (json != null && json.isNotEmpty) return jsonDecode(json);
+    }
+    final json = await db.getFamilyTreeJson(familyId, languageCode: 'en');
+    if (json != null && json.isNotEmpty) return jsonDecode(json);
+
+    // Not in DB yet — load from file / bundle then persist to DB.
     if (languageCode == 'hi') {
       final hiName = '${baseName}_hi';
-      // try local copy first
       var data = await _jsonFileHandler.readJson(hiName);
+      if (data.isEmpty) {
+        try {
+          data = await _jsonFileHandler.readJsonFromBundle(hiName);
+        } catch (_) {}
+      }
       if (data.isNotEmpty) {
+        await db.saveFamilyTreeJson(
+          familyId,
+          jsonEncode(data),
+          languageCode: 'hi',
+        );
         return data;
       }
-      // fall back to packaged version
-      data = await _jsonFileHandler.readJsonFromBundle(hiName);
-      if (data.isNotEmpty) {
-        return data;
-      }
-      // if hi variant is not present, continue with base
     }
 
-    final data = await _jsonFileHandler.readJson(fileName);
+    var data = await _jsonFileHandler.readJson(baseName);
     if (data.isEmpty) {
-      return await _jsonFileHandler.readJsonFromBundle(fileName);
-    } else {
-      return data;
+      try {
+        data = await _jsonFileHandler.readJsonFromBundle(baseName);
+      } catch (_) {}
     }
+    if (data.isNotEmpty) {
+      await db.saveFamilyTreeJson(
+        familyId,
+        jsonEncode(data),
+        languageCode: 'en',
+      );
+    }
+    return data;
   }
 
   Future<void> writeJsonData(Map<String, dynamic> map) async {
-    await _jsonFileHandler.writeJsonData(getFileName(), map);
+    final db = AppDatabase.instance;
+    final familyId = await _getOrCreateFamilyId(db);
+    await db.saveFamilyTreeJson(familyId, jsonEncode(map));
+  }
+
+  Future<int> _getOrCreateFamilyId(AppDatabase db) async {
+    var family = await db.getFamilyByName(title);
+    if (family != null) return family.id;
+    // Family missing from DB (edge case) — insert it.
+    final id = await db.insertFamilyByName(title);
+    if (id != 0) return id;
+    family = await db.getFamilyByName(title);
+    return family!.id;
   }
 }
 
@@ -518,6 +553,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                   id: id,
                   name: value,
                   familyFileName: widget.getFileName(),
+                  familyName: widget.title,
                 ),
               ),
             )

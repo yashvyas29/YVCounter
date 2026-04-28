@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yv_counter/common/migration_service.dart';
 import 'package:yv_counter/common/notification_service.dart';
 import 'package:yv_counter/data_model/google_drive_model.dart';
 import 'package:yv_counter/data_model/locale_model.dart';
@@ -19,6 +20,7 @@ Future<void> main() async {
       inspector: true);
       */
   await NotificationService.initialize();
+  await MigrationService.migrateIfNeeded();
   final localeModel = await LocaleModel.getInstance();
   final settingsModel = await SettingsModel.getInstance();
   final googleDriveModel = await GoogleDriveModel.getInstance();

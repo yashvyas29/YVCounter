@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart' as ic;
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:widget_zoom/widget_zoom.dart';
+import 'dart:convert';
+import 'package:yv_counter/common/app_database.dart';
 import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
@@ -16,12 +18,14 @@ class FamilyMemberPage extends StatefulWidget {
   final int id;
   final String name;
   final String familyFileName;
+  final String familyName;
 
   const FamilyMemberPage({
     super.key,
     required this.id,
     required this.name,
     required this.familyFileName,
+    required this.familyName,
   });
 
   @override
@@ -80,9 +84,14 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
 
   Future<void> _updateMemberLabel(String label) async {
     try {
-      final handler = JsonFileHandler();
-      final data = await handler.readJson(widget.familyFileName);
-      if (data.isEmpty) return;
+      final db = AppDatabase.instance;
+      final family = await db.getFamilyByName(widget.familyName);
+      if (family == null) return;
+
+      final jsonStr = await db.getFamilyTreeJson(family.id, languageCode: 'en');
+      if (jsonStr == null || jsonStr.isEmpty) return;
+
+      final data = jsonDecode(jsonStr) as Map<String, dynamic>;
       final nodes = data[FamilyJsonKey.nodes] as List<dynamic>?;
       if (nodes == null) return;
       for (final element in nodes) {
@@ -91,7 +100,11 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
           break;
         }
       }
-      await handler.writeJsonData(widget.familyFileName, data);
+      await db.saveFamilyTreeJson(
+        family.id,
+        jsonEncode(data),
+        languageCode: 'en',
+      );
     } catch (error) {
       dLog('Failed to update member label: $error');
     }
