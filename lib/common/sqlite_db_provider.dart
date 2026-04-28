@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 import '../data_model/treemember.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class DBProvider {
   DBProvider._();
@@ -17,7 +17,7 @@ class DBProvider {
 
   Future<String> getDatabasePath() async {
     final path = await getDatabasesPath();
-    debugPrint(path);
+    dLog(path);
     return join(path, dbName);
   }
 

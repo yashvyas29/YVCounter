@@ -4,6 +4,7 @@ import 'package:yv_counter/famity_tree/tools/string_extension.dart';
 
 import '../../common/sqlite_db_provider.dart';
 import '../../data_model/treemember.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key});
@@ -184,7 +185,7 @@ class _AddPageState extends State<AddPage> {
                                           ),
                                         );
                                       } else {
-                                        debugPrint(ss.data.toString());
+                                        dLog(ss.data.toString());
                                         return Flexible(
                                           child: DropdownButton(
                                             hint: Text(
@@ -213,7 +214,7 @@ class _AddPageState extends State<AddPage> {
                                                 safe = true;
                                                 safeNodeStatus(value!);
                                               });
-                                              debugPrint(_selected1);
+                                              dLog(_selected1);
                                             },
                                           ),
                                         );
@@ -284,9 +285,7 @@ class _AddPageState extends State<AddPage> {
                                                     setState(() {
                                                       _selected = value!;
                                                     });
-                                                    debugPrint(
-                                                      _selected.toString(),
-                                                    );
+                                                    dLog(_selected.toString());
                                                   },
                                                 ),
                                               );

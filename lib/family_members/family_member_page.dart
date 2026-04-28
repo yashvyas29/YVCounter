@@ -10,6 +10,7 @@ import 'package:yv_counter/common/image_file_handler.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class FamilyMemberPage extends StatefulWidget {
   final int id;
@@ -92,7 +93,7 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
       }
       await handler.writeJsonData(widget.familyFileName, data);
     } catch (error) {
-      debugPrint('Failed to update member label: $error');
+      dLog('Failed to update member label: $error');
     }
   }
 
@@ -237,7 +238,7 @@ class FamilyMemberPageState extends State<FamilyMemberPage> {
           case CropSuccess(:final croppedImage):
             await _saveImage(data: croppedImage);
           case CropFailure():
-            debugPrint('Image crop error: $result');
+            dLog('Image crop error: $result');
         }
       },
       aspectRatio: 1,

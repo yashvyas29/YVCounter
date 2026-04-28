@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
+import 'package:yv_counter/common/logger.dart';
 import 'package:yv_counter/data_model/user.dart';
 import 'package:yv_counter/generated/server_client_id.dart';
 
@@ -21,7 +22,7 @@ class GoogleDrive {
   Code: add at top-level (e.g., near app startup)
   const String kServerClientId = String.fromEnvironment('SERVER_CLIENT_ID', defaultValue: '');
   final drive = GoogleDrive(serverClientId: kServerClientId);
-  
+
   Run locally:
   flutter run --dart-define=SERVER_CLIENT_ID="YOUR_CLIENT_ID"
   */
@@ -47,7 +48,7 @@ class GoogleDrive {
             driveApi.files.delete(fileId);
           }
         }
-        debugPrint("App data deleted successfully.");
+        dLog("App data deleted successfully.");
       } else {
         const error = "App data not available.";
         return Future.error(error);
@@ -93,7 +94,7 @@ class GoogleDrive {
     var driveApi = await _getDriveApi();
     if (driveApi == null) {
       const error = "Sign In Error";
-      debugPrint(error);
+      dLog(error);
       return Future.error(error);
     } else {
       final fileId = await _getFileId(driveApi);
@@ -115,17 +116,17 @@ class GoogleDrive {
       folder.name = folderName;
       folder.mimeType = _folderMimeType;
       final folderCreation = await driveApi.files.create(folder);
-      debugPrint("Folder ID: ${folderCreation.id}");
+      dLog("Folder ID: ${folderCreation.id}");
 
       return folderCreation.id;
     } catch (e) {
-      debugPrint(e.toString());
+      dLog(e.toString());
       return null;
     }
   }
 
   Future<User?> getUser() async {
-    debugPrint("getUser");
+    dLog("getUser");
     if (_account != null) {
       final GoogleSignInAccount user = _account!;
       await _printSignInMetaData(user);
@@ -143,24 +144,23 @@ class GoogleDrive {
         try {
           final channel = MethodChannel('yv_counter/config');
           final id = await channel.invokeMethod<String>('getServerClientId');
-          debugPrint('platform fetch serverClientId: $id');
+          dLog('platform fetch serverClientId: $id');
           if (id != null && id.isNotEmpty) serverClientId = id;
         } catch (e) {
-          debugPrint('platform fetch serverClientId failed: $e');
+          dLog('platform fetch serverClientId failed: $e');
         }
       }
 
       await _googleSignIn.initialize(serverClientId: serverClientId);
     } catch (error) {
-      debugPrint('initialize error: $error');
+      dLog('initialize error: $error');
       return Future.error(error);
     }
   }
 
   Future<void> signIn() async {
     try {
-      debugPrint("signIn");
-      await _googleSignIn.initialize(serverClientId: serverClientId);
+      dLog("signIn");
       if (_googleSignIn.supportsAuthenticate()) {
         _account =
             await _googleSignIn.attemptLightweightAuthentication() ??
@@ -173,23 +173,23 @@ class GoogleDrive {
          */
       }
     } catch (error) {
-      debugPrint("signIn error: $error");
+      dLog("signIn error: $error");
       return Future.error(error);
     }
   }
 
   Future<void> signInSilently() async {
     try {
-      debugPrint("signInSilently");
+      dLog("signInSilently");
       _account ??= await _googleSignIn.attemptLightweightAuthentication();
     } catch (error) {
-      debugPrint("signInSilently error: $error");
+      dLog("signInSilently error: $error");
       return Future.error(error);
     }
   }
 
   Future<void> signOut() async {
-    debugPrint("signOut");
+    dLog("signOut");
     // await _googleSignIn.disconnect();
     await _googleSignIn.signOut();
     _account = null;
@@ -199,13 +199,13 @@ class GoogleDrive {
     final driveApi = await _getDriveApi();
     if (driveApi == null) {
       const error = "Sign In Error";
-      debugPrint(error);
+      dLog(error);
       return Future.error(error);
     } else {
       ga.File fileToUpload = ga.File();
       try {
         final fileId = await _getFileId(driveApi);
-        debugPrint("Update file");
+        dLog("Update file");
         // final uploadedFile =
         await driveApi.files.update(
           fileToUpload,
@@ -214,10 +214,10 @@ class GoogleDrive {
         );
         // _printFileMetaData(uploadedFile);
       } catch (error) {
-        debugPrint(error.toString());
+        dLog(error.toString());
         fileToUpload.parents = [_appDataFolderId];
         fileToUpload.name = fileName;
-        debugPrint("Create file");
+        dLog("Create file");
         try {
           // final uploadedFile =
           await driveApi.files.create(
@@ -226,7 +226,7 @@ class GoogleDrive {
           );
           // _printFileMetaData(uploadedFile);
         } catch (error) {
-          debugPrint(error.toString());
+          dLog(error.toString());
           return Future.error(error);
         }
       }
@@ -252,13 +252,13 @@ class GoogleDrive {
           dataStore.insertAll(dataStore.length, data);
         },
         onDone: () async {
-          debugPrint("$fileName downloaded.");
+          dLog("$fileName downloaded.");
           final file = MemoryFileSystem().file(fileName);
           await file.writeAsBytes(dataStore);
           completer.complete(file);
         },
         onError: (error) {
-          debugPrint("downloadGoogleDriveFile Error: $error");
+          dLog("downloadGoogleDriveFile Error: $error");
           completer.completeError(error);
         },
       );
@@ -270,17 +270,17 @@ class GoogleDrive {
 
   // Get Drive Api
   Future<ga.DriveApi?> _getDriveApi() async {
-    debugPrint("_getDriveApi");
+    dLog("_getDriveApi");
 
     // Attempt sign-in if not already signed in
     if (_account == null) {
-      debugPrint("User not signed in.");
+      dLog("User not signed in.");
       await signIn();
     }
 
     // Verify we have an account after sign-in attempt
     if (_account == null) {
-      debugPrint("Sign in failed - account still null.");
+      dLog("Sign in failed - account still null.");
       return null;
     }
 
@@ -303,13 +303,13 @@ class GoogleDrive {
       final fileId = found.files?.first.id;
       if (fileId == null || fileId.isEmpty) {
         const error = "File not found";
-        debugPrint(error);
+        dLog(error);
         return Future.error(error);
       } else {
         return fileId;
       }
     } catch (error) {
-      debugPrint("_getFileId error: $error");
+      dLog("_getFileId error: $error");
       return Future.error(error);
     }
   }
@@ -331,10 +331,11 @@ class GoogleDrive {
   }
 
   Future<void> _printSignInMetaData(GoogleSignInAccount account) async {
-    debugPrint("supportsAuthenticate: ${_googleSignIn.supportsAuthenticate()}");
-    debugPrint("User: $account");
+    if (!kDebugMode) return;
+    dLog("supportsAuthenticate: ${_googleSignIn.supportsAuthenticate()}");
+    dLog("User: $account");
     final auth = account.authentication;
-    debugPrint("idToken: ${auth.idToken}");
+    dLog("idToken: ${auth.idToken}");
   }
 
   /// Create a GoogleDrive instance reading `SERVER_CLIENT_ID` from the
@@ -343,28 +344,28 @@ class GoogleDrive {
   static Future<GoogleDrive> createFromPlatform() async {
     // Prefer the generated constant (synchronous) to avoid platform channel race.
     if (kServerClientId.isNotEmpty) {
-      debugPrint('createFromPlatform using generated kServerClientId');
+      dLog('createFromPlatform using generated kServerClientId');
       return GoogleDrive(serverClientId: kServerClientId);
     }
     try {
       final channel = MethodChannel('yv_counter/config');
       final id = await channel.invokeMethod<String>('getServerClientId');
-      debugPrint('createFromPlatform got serverClientId');
+      dLog('createFromPlatform got serverClientId');
       if (id == null || id.isEmpty) {
         return GoogleDrive();
       }
       return GoogleDrive(serverClientId: id);
     } catch (error) {
-      debugPrint('createFromPlatform error: $error');
+      dLog('createFromPlatform error: $error');
       return GoogleDrive();
     }
   }
 
   /*
   void _printFileMetaData(ga.File file) {
-    debugPrint(file.id);
-    debugPrint(file.name);
-    debugPrint(file.mimeType);
+    dLog(file.id);
+    dLog(file.name);
+    dLog(file.mimeType);
   }
   */
 }

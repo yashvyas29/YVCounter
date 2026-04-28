@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yv_counter/common/google_drive.dart';
 import 'package:yv_counter/data_model/user.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class GoogleDriveModel extends ChangeNotifier {
   late final GoogleDrive _drive;
@@ -34,7 +35,7 @@ class GoogleDriveModel extends ChangeNotifier {
       _currentUser = await _drive.getUser();
       notifyListeners();
     } catch (error) {
-      debugPrint('GoogleDriveModel.initialize: $error');
+      dLog('GoogleDriveModel.initialize: $error');
     }
   }
 

@@ -28,6 +28,7 @@ import 'package:yv_counter/l10n/app_localizations.dart';
 import 'package:yv_counter/settings/settings_page.dart';
 
 import 'mala_jap_excel_file_handler.dart';
+import 'package:yv_counter/common/logger.dart';
 
 // import '../common/family_handler.dart';
 
@@ -62,7 +63,7 @@ class MyHomePage extends StatefulWidget {
     );
     final file = result?.files.single;
     if (file != null) {
-      debugPrint(file.name);
+      dLog(file.name);
       final fileBytes = file.bytes;
       if (fileBytes != null) {
         return await _restoreMalasFromExcel(fileBytes);
@@ -81,11 +82,11 @@ class MyHomePage extends StatefulWidget {
   Future<List<Mala>> _restoreMalasFromExcel(Uint8List fileBytes) async {
     final excel = Excel.decodeBytes(fileBytes);
     for (final table in excel.tables.keys) {
-      debugPrint(table); //sheet Name
+      dLog(table); //sheet Name
       final sheet = excel.tables[table];
       if (sheet != null) {
-        debugPrint(sheet.maxColumns.toString());
-        debugPrint(sheet.maxRows.toString());
+        dLog(sheet.maxColumns.toString());
+        dLog(sheet.maxRows.toString());
         final List<Mala> malas = [];
         sheet.rows.asMap().forEach((rowIndex, rowValue) {
           if (rowIndex > 0) {

@@ -12,6 +12,7 @@ import 'package:yv_counter/common/snackbar_dialog.dart';
 import 'package:yv_counter/family_members/family_member_page.dart';
 import 'package:yv_counter/l10n/app_localizations.dart';
 import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class FamilyTreePage extends StatefulWidget {
   final String title;
@@ -131,7 +132,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           ),
           IconButton(
             onPressed: () {
-              debugPrint("Jump to root node pressed.");
+              dLog("Jump to root node pressed.");
               _jumpToRootNode();
             },
             icon: const Icon(Icons.restore),
@@ -139,7 +140,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           /*
           IconButton(
             onPressed: () {
-              debugPrint("Reset to family pressed.");
+              dLog("Reset to family pressed.");
               _reset();
             },
             icon: const Icon(Icons.restore),
@@ -159,7 +160,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
 
   @override
   void initState() {
-    debugPrint("initState");
+    dLog("initState");
     super.initState();
 
     imageFileHandler = ImageFileHandler(prefix: widget.getFileName());
@@ -202,7 +203,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         ? FutureBuilder(
             future: widget.readJsonData(context),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              debugPrint(snapshot.connectionState.toString());
+              dLog(snapshot.connectionState.toString());
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator(
@@ -328,7 +329,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
   }
 
   void _jumpToNode(ValueKey nodeKey) {
-    debugPrint("Jump to node id: ${nodeKey.value}.");
+    dLog("Jump to node id: ${nodeKey.value}.");
     // _controller.animateToNode(nodeKey);
     try {
       final startNode = _graph.nodes.firstWhere(
@@ -345,7 +346,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
           ..translateByVector3(Vector3(position.dx, position.dy, 0));
       });
     } catch (error) {
-      debugPrint("Node not found.\n$error");
+      dLog("Node not found.\n$error");
       // zoomToFit();
     }
   }
@@ -612,7 +613,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     if (prevNodeKey != null)
                       IconButton(
                         onPressed: () {
-                          debugPrint(
+                          dLog(
                             "Previous node key $prevNodeKey for $value pressed.",
                           );
                           _jumpToNode(prevNodeKey!);
@@ -622,7 +623,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     if (parentNode != null)
                       IconButton(
                         onPressed: () {
-                          debugPrint(
+                          dLog(
                             "Parent node key ${parentNode!.key} for $value pressed.",
                           );
                           _jumpToNode(parentNode.key!);
@@ -632,7 +633,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     if (successors.isNotEmpty)
                       IconButton(
                         onPressed: () {
-                          debugPrint(
+                          dLog(
                             "Parent node key ${firstChildNode!.key} for $value pressed.",
                           );
                           _jumpToNode(firstChildNode.key!);
@@ -642,7 +643,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                     if (nextNodeKey != null)
                       IconButton(
                         onPressed: () {
-                          debugPrint(
+                          dLog(
                             "Next node key $nextNodeKey for $value pressed.",
                           );
                           _jumpToNode(nextNodeKey!);
@@ -658,7 +659,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 if (!isRoot && ((!isRootChild && nodes.length > 2) || readOnly))
                   IconButton(
                     onPressed: () {
-                      debugPrint("Delete for $value pressed.");
+                      dLog("Delete for $value pressed.");
                       showDeleteConfirmationDialog(
                         context,
                         AppLocalizations.of(
@@ -686,7 +687,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 else if (isRoot && readOnly)
                   IconButton(
                     onPressed: () async {
-                      debugPrint("Add on top for $value pressed.");
+                      dLog("Add on top for $value pressed.");
                       final nodes = _data[FamilyJsonKey.nodes];
                       final newId = _getNewNodeId();
                       final currentRoot = nodes.firstWhere(
@@ -699,7 +700,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                         );
                         currentRootChild.remove(FamilyJsonKey.isRootChild);
                       } catch (error) {
-                        debugPrint("No root child found.\n$error");
+                        dLog("No root child found.\n$error");
                       }
                       currentRoot[FamilyJsonKey.isRootChild] = true;
                       final newNode = _getNewNodeMap(newId, isRoot: true);
@@ -718,7 +719,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 readOnly
                     ? IconButton(
                         onPressed: () {
-                          debugPrint("Edit for $value pressed.");
+                          dLog("Edit for $value pressed.");
                           try {
                             final currentEditableNode = nodes.firstWhere(
                               (node) =>
@@ -727,7 +728,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                             );
                             currentEditableNode[FamilyJsonKey.readOnly] = true;
                           } catch (error) {
-                            debugPrint("No editable node found.\n$error");
+                            dLog("No editable node found.\n$error");
                           }
                           setState(() {
                             nodeValue[FamilyJsonKey.readOnly] = false;
@@ -738,7 +739,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                       )
                     : IconButton(
                         onPressed: () async {
-                          debugPrint("Done for $value pressed.");
+                          dLog("Done for $value pressed.");
                           final text = textController.text;
                           if (text.isNotEmpty) {
                             setState(() {
@@ -753,7 +754,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                                 : "$value ${localizations.updated}";
                             showSnackBar(context, message);
                           } else {
-                            debugPrint(hintText);
+                            dLog(hintText);
                           }
                         },
                         icon: Icon(Icons.done_outline, color: cardTextColor),
@@ -761,7 +762,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 if (readOnly)
                   IconButton(
                     onPressed: () async {
-                      debugPrint("Add for $value pressed.");
+                      dLog("Add for $value pressed.");
                       final newId = _getNewNodeId();
                       final newNode = _getNewNodeMap(newId);
                       final newEdge = {
@@ -779,7 +780,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                 else if (value.isNotEmpty)
                   IconButton(
                     onPressed: () {
-                      debugPrint("Cancel for $value pressed.");
+                      dLog("Cancel for $value pressed.");
                       setState(() {
                         nodeValue[FamilyJsonKey.readOnly] = true;
                       });
@@ -791,7 +792,7 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
                   if (successors.isNotEmpty)
                   IconButton(
                     onPressed: () {
-                      debugPrint("Expand Collapse for $value pressed.");
+                      dLog("Expand Collapse for $value pressed.");
                       _controller.toggleNodeExpanded(_graph, node, animate: true);
                     },
                     icon: Icon(_controller.isNodeCollapsed(node) ? Icons.arrow_drop_down : Icons.arrow_drop_up),
@@ -845,21 +846,21 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
       );
       return rootNode[FamilyJsonKey.id];
     } catch (error) {
-      debugPrint('No manual root found.\n$error');
+      dLog('No manual root found.\n$error');
       return 1;
     }
   }
 
   void _updateNode(List edges) {
-    debugPrint("updateNode");
-    debugPrint("Edges count: ${edges.length.toString()}");
+    dLog("updateNode");
+    dLog("Edges count: ${edges.length.toString()}");
     // debugPrint("Edges value: ${edges.toString()}");
 
     if (edges.isEmpty) {
       final nodes = _data[FamilyJsonKey.nodes];
       /*
-      debugPrint("Nodes count: ${nodes.length.toString()}");
-      debugPrint("Nodes value: ${nodes.toString()}");
+      dLog("Nodes count: ${nodes.length.toString()}");
+      dLog("Nodes value: ${nodes.toString()}");
       */
       final int firstId;
       final int secondId;

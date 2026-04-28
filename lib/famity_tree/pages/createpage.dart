@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../common/sqlite_db_provider.dart';
+import 'package:yv_counter/common/logger.dart';
 // import '../models/treemember.dart';
 
 class CreatePage extends StatefulWidget {
@@ -30,7 +31,7 @@ class _CreatePageState extends State<CreatePage> {
         color = Colors.black;
       });
     } else {
-      debugPrint('Exists');
+      dLog('Exists');
       setState(() {
         _msg = "Family Already Exists!";
         color = Colors.red;

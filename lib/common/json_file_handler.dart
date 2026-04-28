@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class JsonFileHandler {
   const JsonFileHandler();
@@ -25,7 +25,7 @@ class JsonFileHandler {
     final directory = Directory(await localPath());
     final list = directory.listSync();
     for (final file in list) {
-      debugPrint(file.path);
+      dLog(file.path);
       // await file.delete();
     }
     return list.map((e) => e.path).toList();
@@ -42,7 +42,7 @@ class JsonFileHandler {
   }
 
   Future<Map<String, dynamic>> readJson(String fileName) async {
-    debugPrint("readJson");
+    dLog("readJson");
     try {
       final file = await localFile(fileName);
       // Read the file
@@ -50,29 +50,29 @@ class JsonFileHandler {
       // debugPrint(content);
       return jsonDecode(content);
     } catch (error) {
-      debugPrint(error.toString());
+      dLog(error.toString());
       return {};
     }
   }
 
   Future<Map<String, dynamic>> readJsonFromBundle(String fileName) async {
-    debugPrint("readJsonFromBundle");
+    dLog("readJsonFromBundle");
     try {
       final content = await readJsonStringFromBundle(fileName);
       return await jsonDecode(content);
     } catch (error) {
-      debugPrint(error.toString());
+      dLog(error.toString());
       return {};
     }
   }
 
   Future<String> readJsonStringFromBundle(String fileName) async {
-    debugPrint("readJsonStringFromBundle");
+    dLog("readJsonStringFromBundle");
     try {
       String filePath = 'lib/resources/$fileName.json';
       return await rootBundle.loadString(filePath);
     } catch (error) {
-      debugPrint(error.toString());
+      dLog(error.toString());
       return Future.error(error);
     }
   }
@@ -83,7 +83,7 @@ class JsonFileHandler {
       // Delete the file
       await file.delete();
     } catch (error) {
-      debugPrint(error.toString());
+      dLog(error.toString());
     }
   }
 

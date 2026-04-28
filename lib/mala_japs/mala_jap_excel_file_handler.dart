@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:yv_counter/common/date_time_handler.dart';
 
 import '../data_model/mala.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class MalaJapExcelFileHandler {
   const MalaJapExcelFileHandler(this.malas);
@@ -73,7 +74,7 @@ class MalaJapExcelFileHandler {
           await file.writeAsBytes(fileBytes);
           await onSuccess.call();
         } catch (error) {
-          debugPrint(error.toString());
+          dLog(error.toString());
           onFailure.call(error.toString());
         }
       } else {
@@ -108,7 +109,7 @@ class MalaJapExcelFileHandler {
           onFailure.call("Cancelled");
         } else {
           /*
-          debugPrint("File saved to: $filePath");
+          dLog("File saved to: $filePath");
           if (Platform.isMacOS || Platform.isLinux || Platform.isWindows || Platform.isFuchsia) {
             await File(filePath).writeAsBytes(fileBytes);
           }
@@ -116,7 +117,7 @@ class MalaJapExcelFileHandler {
           await onSuccess.call();
         }
       } catch (error) {
-        debugPrint(error.toString());
+        dLog(error.toString());
         onFailure.call(error.toString());
       }
     } else {

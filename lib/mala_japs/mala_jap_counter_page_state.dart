@@ -26,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _mala = todayMala;
       });
     } catch (error) {
-      debugPrint('No malas found for today.\n$error');
+      dLog('No malas found for today.\n$error');
       /*
       if (!mounted) return;
       showSnackBar(context, AppLocalizations.of(context).noMalaAvailable);
@@ -121,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _restoreBackup() async {
-    debugPrint("_restoreBackup");
+    dLog("_restoreBackup");
     final drive = context.read<GoogleDriveModel>().drive;
     try {
       final files = await drive.downloadAppDataFolderFiles();
@@ -130,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
         String path = '';
         final fileExtension = p.extension(file.path);
         final fileName = p.basename(file.path);
-        debugPrint('Restoring $fileName.');
+        dLog('Restoring $fileName.');
         if (fileName == GoogleDrive.malasFileName) {
           _restoreMalasBackup(file);
         } else if (fileExtension == '.json') {
@@ -150,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
         AppLocalizations.of(context).gdRestoreSuccessful,
       );
     } catch (error) {
-      debugPrint(error.toString());
+      dLog(error.toString());
       if (!mounted) return;
       showSnackBar(
         context,
@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _restoreMalasBackup(File file) async {
     try {
-      debugPrint('_restoreMalasBackup');
+      dLog('_restoreMalasBackup');
       final malasString = await file.readAsString();
       final malasJson = json.decode(malasString) as List;
       final malas = malasJson.map((value) => Mala.fromJson(value)).toList();
@@ -178,16 +178,16 @@ class _MyHomePageState extends State<MyHomePage> {
             _mala = mala;
           });
         } catch (error) {
-          debugPrint('No malas found for today.\n$error');
+          dLog('No malas found for today.\n$error');
         }
 
-        debugPrint('Malas restored successfully.');
+        dLog('Malas restored successfully.');
       } else {
         if (!mounted) return;
         showSnackBar(context, AppLocalizations.of(context).backupNotAvailable);
       }
     } catch (error) {
-      debugPrint(error.toString());
+      dLog(error.toString());
       if (!mounted) return;
       showSnackBar(
         context,
@@ -197,7 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _restoreExcelBackup() async {
-    debugPrint("_restoreExcelBackup");
+    dLog("_restoreExcelBackup");
     try {
       final malas = await widget._getMalasFromExcel();
       if (!mounted) return;
@@ -217,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _mala = mala;
           });
         } catch (error) {
-          debugPrint('No malas found for today.\n$error');
+          dLog('No malas found for today.\n$error');
         }
         await showAlertDialog(
           context,
@@ -237,14 +237,14 @@ class _MyHomePageState extends State<MyHomePage> {
     final drive = context.read<GoogleDriveModel>().drive;
     try {
       final malasJson = json.encode(_malaList);
-      debugPrint(malasJson);
+      dLog(malasJson);
       final tempDir = await getTemporaryDirectory();
       GoogleDrive.fileName = GoogleDrive.malasFileName;
       final file = File("${tempDir.path}/${GoogleDrive.fileName}");
       await file.writeAsString(malasJson);
       await drive.uploadFileToGoogleDrive(file);
       file.delete();
-      debugPrint('Malas file uploaded successfully.');
+      dLog('Malas file uploaded successfully.');
     } catch (error) {
       if (!mounted) return;
       showSnackBar(
@@ -256,23 +256,23 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final files = await const JsonFileHandler().files();
       for (final filePath in files) {
-        debugPrint('File to upload with path: $filePath');
+        dLog('File to upload with path: $filePath');
         final file = File(filePath);
         GoogleDrive.fileName = p.basename(filePath);
         await drive.uploadFileToGoogleDrive(file);
       }
-      debugPrint('Family json files uploaded successfully.');
+      dLog('Family json files uploaded successfully.');
 
       final dbFilePath = await DBProvider.db.getDatabasePath();
-      debugPrint('File to upload with path: $dbFilePath');
+      dLog('File to upload with path: $dbFilePath');
       final dbFile = File(dbFilePath);
       if (await dbFile.exists()) {
         GoogleDrive.fileName = p.basename(dbFilePath);
         await drive.uploadFileToGoogleDrive(dbFile);
-        debugPrint('Database file uploaded successfully.');
+        dLog('Database file uploaded successfully.');
       }
     } catch (error) {
-      debugPrint(error.toString());
+      dLog(error.toString());
     }
 
     if (!mounted) return;
@@ -300,7 +300,7 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         } catch (error) {
           _mala = Mala(pickedDate, 0, 0);
-          debugPrint('No malas found for today.\n$error');
+          dLog('No malas found for today.\n$error');
         }
       });
     }

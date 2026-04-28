@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:yv_counter/common/json_file_handler.dart';
 import 'package:yv_counter/data_model/family_member_relation.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class FamilyHandler {
   final jsonFileHendler = const JsonFileHandler();
 
   Future<void> loadFamily() async {
     final isar = await openIsarFamily();
-    debugPrint(isar.name);
-    debugPrint(isar.directory);
-    debugPrint(isar.path);
+    dLog(isar.name);
+    dLog(isar.directory);
+    dLog(isar.path);
 
     /*
     await isar.writeTxn(() async {
@@ -38,8 +39,8 @@ class FamilyHandler {
       final List edges = familyJson['edges'];
       final relations =
           edges.map((e) => Relation(e['from'], e['to'], id: e['id']));
-      debugPrint(members.toString());
-      debugPrint(relations.toString());
+      dLog(members.toString());
+      dLog(relations.toString());
 
       family.members.addAll(members);
       family.relations.addAll(relations);
@@ -53,16 +54,16 @@ class FamilyHandler {
         await family.relations.save();
       });
       /*
-      debugPrint(family.name);
-      debugPrint(family.members.toString());
-      debugPrint(family.relations.toString());
+      dLog(family.name);
+      dLog(family.members.toString());
+      dLog(family.relations.toString());
       */
     } else {
       /*
       final families = await getFamilies();
       await families.first.members.load();
       await families.first.relations.load();
-      debugPrint(families.first.toString());
+      dLog(families.first.toString());
       */
     }
   }

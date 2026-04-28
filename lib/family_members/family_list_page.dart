@@ -7,6 +7,7 @@ import 'package:yv_counter/l10n/app_localizations.dart';
 import '../common/json_file_handler.dart';
 import '../common/snackbar_dialog.dart';
 import 'family_tree_page.dart';
+import 'package:yv_counter/common/logger.dart';
 
 class FamilyListPage extends StatefulWidget {
   const FamilyListPage({super.key, required this.title});
@@ -167,7 +168,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
           if (_families.isEmpty)
             IconButton(
               onPressed: () async {
-                debugPrint("Restore family pressed.");
+                dLog("Restore family pressed.");
                 final staticFamilies = _getStaticFamilies().map(
                   (e) => e['name'].toString(),
                 );
@@ -181,7 +182,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
           if (!kIsWeb)
             IconButton(
               onPressed: () async {
-                debugPrint("Add family pressed.");
+                dLog("Add family pressed.");
                 await _addFamily(newFamilyName);
               },
               icon: const Icon(Icons.add_circle),
@@ -249,14 +250,14 @@ class _FamilyListPageState extends State<FamilyListPage> {
                               children: [
                                 IconButton(
                                   onPressed: () async {
-                                    debugPrint("Delete for $title pressed.");
+                                    dLog("Delete for $title pressed.");
                                     await _deleteFamily(title, index);
                                   },
                                   icon: const Icon(Icons.delete),
                                 ),
                                 IconButton(
                                   onPressed: () async {
-                                    debugPrint("Edit for $title pressed.");
+                                    dLog("Edit for $title pressed.");
                                     _setReadOnlyList();
                                     setState(() {
                                       _readOnlyList[index] = false;
@@ -272,18 +273,14 @@ class _FamilyListPageState extends State<FamilyListPage> {
                                 title == newFamilyName
                                     ? IconButton(
                                         onPressed: () async {
-                                          debugPrint(
-                                            "Delete for $title pressed.",
-                                          );
+                                          dLog("Delete for $title pressed.");
                                           await _deleteFamily(title, index);
                                         },
                                         icon: const Icon(Icons.delete),
                                       )
                                     : IconButton(
                                         onPressed: () async {
-                                          debugPrint(
-                                            "Cancel for $title pressed.",
-                                          );
+                                          dLog("Cancel for $title pressed.");
                                           setState(() {
                                             _readOnlyList[index] = true;
                                           });
@@ -292,7 +289,7 @@ class _FamilyListPageState extends State<FamilyListPage> {
                                       ),
                                 IconButton(
                                   onPressed: () async {
-                                    debugPrint("Done for $title pressed.");
+                                    dLog("Done for $title pressed.");
                                     final newTitle = _controllers[index].text
                                         .trim();
                                     if (newTitle == newFamilyName) {

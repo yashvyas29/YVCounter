@@ -69,5 +69,7 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Required for google_sign_in v7 Credential Manager to discover Google Play Services -->
+        <package android:name="com.google.android.gms"/>
     </queries>
 </manifest>
