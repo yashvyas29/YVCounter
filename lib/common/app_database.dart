@@ -112,13 +112,22 @@ class AppDatabase extends _$AppDatabase {
     int familyId,
     String jsonData, {
     String languageCode = 'en',
-  }) => into(familyTreeData).insertOnConflictUpdate(
-    FamilyTreeDataCompanion(
+  }) {
+    final companion = FamilyTreeDataCompanion(
       familyId: Value(familyId),
       languageCode: Value(languageCode),
       jsonData: Value(jsonData),
-    ),
-  );
+    );
+    return into(familyTreeData).insert(
+      companion,
+      onConflict: DoUpdate(
+        (_) => FamilyTreeDataCompanion.custom(
+          jsonData: Variable(jsonData),
+        ),
+        target: [familyTreeData.familyId, familyTreeData.languageCode],
+      ),
+    );
+  }
 
   Future<void> deleteFamilyTreeData(int familyId) =>
       (delete(familyTreeData)..where((t) => t.familyId.equals(familyId))).go();

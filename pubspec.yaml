@@ -32,8 +32,8 @@ environment:
 dependencies:
   crop_your_image: ^2.0.0
   cupertino_icons: ^1.0.9
-  drift: ^2.22.0
-  drift_flutter: ^0.2.0
+  drift: ^2.32.1
+  drift_flutter: ^0.3.0
   excel: ^4.0.6
   extension_google_sign_in_as_googleapis_auth: ^3.0.0 # ^2.0.13
   file: ^7.0.1
@@ -95,7 +95,7 @@ dependency_overrides:
 
 dev_dependencies:
   build_runner: ^2.4.11
-  drift_dev: ^2.22.0
+  drift_dev: ^2.32.1
   flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
   flutter_test:
