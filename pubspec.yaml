@@ -21,7 +21,7 @@ version: 1.0.0+6
 
 environment:
   sdk: ^3.11.5
-  flutter: 3.41.7
+  flutter: 3.41.9
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -57,11 +57,11 @@ dependencies:
   # https://github.com/flutter/packages/blob/main/packages/google_sign_in/google_sign_in/MIGRATION.md
   google_sign_in: ^7.2.0 # ^6.3.0
   googleapis: ^16.0.0
-  googleapis_auth: ^2.3.0
+  googleapis_auth: ^2.3.1
   graphview: ^1.5.1
   http: ^1.6.0
   image_cropper: ^12.2.1
-  image_picker: ^1.2.1
+  image_picker: ^1.2.2
   intl: ^0.20.2
   path: ^1.9.0 # 1.9.1
   path_provider: ^2.1.5

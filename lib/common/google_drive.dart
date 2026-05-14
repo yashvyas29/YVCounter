@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yv_counter/common/logger.dart';
 import 'package:yv_counter/data_model/user.dart';
 import 'package:yv_counter/generated/server_client_id.dart';
@@ -131,9 +132,23 @@ class GoogleDrive {
       final GoogleSignInAccount user = _account!;
       await _printSignInMetaData(user);
       return User(user.displayName, user.email, user.id);
-    } else {
-      return null;
     }
+
+    // Check if there's a stored email (local persistence)
+    final prefs = await SharedPreferences.getInstance();
+    final storedEmail = prefs.getString(_signedInEmailKey);
+    if (storedEmail != null) {
+      final storedName = prefs.getString(_signedInNameKey) ?? '';
+      dLog("Returning user from storage: $storedName, $storedEmail");
+      // Return user object from stored state with both name and email
+      return User(
+        storedName.isEmpty ? null : storedName,
+        storedEmail,
+        storedEmail,
+      );
+    }
+
+    return null;
   }
 
   Future<void> initializeGoogleSignIn() async {
@@ -158,19 +173,21 @@ class GoogleDrive {
     }
   }
 
+  static const _signedInEmailKey = 'gd_signed_in_email';
+  static const _signedInNameKey = 'gd_signed_in_name';
+
   Future<void> signIn() async {
     try {
       dLog("signIn");
       if (_googleSignIn.supportsAuthenticate()) {
-        _account =
-            await _googleSignIn.attemptLightweightAuthentication() ??
-            await _googleSignIn.authenticate(scopeHint: _scopes);
-      } else {
-        /*
-        // For web, you can use the renderButton method to display a sign-in button.
-        if (kIsWeb)
-          web.renderButton()
-         */
+        _account = await _googleSignIn.authenticate(scopeHint: _scopes);
+        // Store sign-in state locally for persistence
+        if (_account != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(_signedInEmailKey, _account!.email);
+          await prefs.setString(_signedInNameKey, _account!.displayName ?? '');
+          dLog("Stored signed-in: ${_account!.email}, ${_account!.displayName}");
+        }
       }
     } catch (error) {
       dLog("signIn error: $error");
@@ -181,16 +198,40 @@ class GoogleDrive {
   Future<void> signInSilently() async {
     try {
       dLog("signInSilently");
-      _account ??= await _googleSignIn.attemptLightweightAuthentication();
+
+      // First, try to restore from SharedPreferences (local persistence)
+      final prefs = await SharedPreferences.getInstance();
+      final storedEmail = prefs.getString(_signedInEmailKey);
+
+      if (storedEmail != null) {
+        dLog("Found stored sign-in email: $storedEmail");
+        // Try to get the account from plugin's cache
+        _account ??= await _googleSignIn.attemptLightweightAuthentication();
+
+        // If still null, at least mark as expected to be signed in
+        // (user will be prompted to authenticate when accessing Drive)
+        if (_account == null) {
+          dLog("No cached account for stored email: $storedEmail");
+          // We'll attempt authentication when actually needed (_getDriveApi)
+        }
+      } else {
+        // No stored email, do normal silent sign-in attempt
+        dLog("No stored sign-in state, attempting lightweight auth");
+        _account ??= await _googleSignIn.attemptLightweightAuthentication();
+      }
     } catch (error) {
       dLog("signInSilently error: $error");
-      return Future.error(error);
+      // Don't propagate - silent sign-in failing is expected on first launch
     }
   }
 
   Future<void> signOut() async {
     dLog("signOut");
-    // await _googleSignIn.disconnect();
+    // Clear local persistence
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_signedInEmailKey);
+    await prefs.remove(_signedInNameKey);
+
     await _googleSignIn.signOut();
     _account = null;
   }
@@ -268,13 +309,12 @@ class GoogleDrive {
     }
   }
 
-  // Get Drive Api
   Future<ga.DriveApi?> _getDriveApi() async {
     dLog("_getDriveApi");
 
     // Attempt sign-in if not already signed in
     if (_account == null) {
-      dLog("User not signed in.");
+      dLog("User not signed in, attempting sign-in");
       await signIn();
     }
 
